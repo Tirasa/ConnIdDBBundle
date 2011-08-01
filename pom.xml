@@ -86,6 +86,21 @@
         </dependencies>
     </dependencyManagement>
 
+    <build>
+        <pluginManagement>
+	    <plugins>	
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.0</version>
+                <configuration>
+                    <tagBase>https://connid.googlecode.com/svn/bundles/db/tags</tagBase>
+                </configuration>
+            </plugin>
+	    </plugins>	
+	</pluginManagement>
+    </build>
+
     <modules>
         <module>common</module>
         <module>table</module>
