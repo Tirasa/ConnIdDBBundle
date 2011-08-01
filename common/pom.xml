@@ -30,7 +30,7 @@
     <parent>
         <artifactId>db</artifactId>
         <groupId>org.connid.bundles.db</groupId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
     </parent>
 
     <groupId>org.connid.bundles.db</groupId>

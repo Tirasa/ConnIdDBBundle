@@ -35,7 +35,7 @@
 
     <groupId>org.connid.bundles.db</groupId>
     <artifactId>db</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
 
     <name>ConnId Bundles: DB</name>
 
@@ -106,4 +106,10 @@
         <module>table</module>
     </modules>
 
+
+  <scm>
+    <connection>scm:svn:http://connid.googlecode.com/svn/bundles/db/tags/db-1.2</connection>
+    <developerConnection>scm:svn:https://connid.googlecode.com/svn/bundles/db/tags/db-1.2</developerConnection>
+    <url>http://connid.googlecode.com/svn/bundles/db/tags/db-1.2</url>
+  </scm>
 </project>
