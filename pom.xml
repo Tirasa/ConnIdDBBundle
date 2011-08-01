@@ -35,11 +35,17 @@
 
     <groupId>org.connid.bundles.db</groupId>
     <artifactId>db</artifactId>
-    <version>1.2</version>
+    <version>1.2-SNAPSHOT</version>
 
     <name>ConnId Bundles: DB</name>
 
     <packaging>pom</packaging>
+
+    <scm>
+        <connection>scm:svn:http://connid.googlecode.com/svn/bundles/db/trunk/</connection>
+        <developerConnection>scm:svn:https://connid.googlecode.com/svn/bundles/db/trunk/</developerConnection>
+        <url>http://connid.googlecode.com/svn/bundles/db/trunk/</url>
+    </scm>
 
     <properties>
         <base.version>1.3.1</base.version>
@@ -106,10 +112,4 @@
         <module>table</module>
     </modules>
 
-
-  <scm>
-    <connection>scm:svn:http://connid.googlecode.com/svn/bundles/db/tags/db-1.2</connection>
-    <developerConnection>scm:svn:https://connid.googlecode.com/svn/bundles/db/tags/db-1.2</developerConnection>
-    <url>http://connid.googlecode.com/svn/bundles/db/tags/db-1.2</url>
-  </scm>
 </project>
