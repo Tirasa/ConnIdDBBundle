@@ -56,7 +56,9 @@ public class DatabaseTableFilterTranslator extends DatabaseFilterTranslator {
         final Object value = AttributeUtil.getSingleValue(attribute);
         final String columnName = connector.getColumnName(attribute.getName());
         final Integer columnType = connector.getColumnType(columnName);
-        return new SQLParam(columnName, value,columnType);
+        String quoting = ((DatabaseTableConfiguration)  this.connector.getConfiguration()).getQuoting();
+        String quotedName = DatabaseTableSQLUtil.quoteName(quoting, columnName);
+        return new SQLParam(columnName, value,columnType,quotedName);
     }
 
 }

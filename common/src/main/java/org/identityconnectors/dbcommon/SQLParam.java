@@ -24,7 +24,6 @@ package org.identityconnectors.dbcommon;
 
 import java.sql.Types;
 
-
 /**
  * The SQL parameter / util class
  * 
@@ -36,7 +35,7 @@ public final class SQLParam {
     private String _name;
     private Object _value;
     private int _sqlType;
-
+    private final String _quotedName;
 
     /**
      * The Sql param is a pair of value and its sqlType
@@ -46,6 +45,17 @@ public final class SQLParam {
      * @param sqlType sql type
      */
     public SQLParam(String name, Object value, int sqlType) {
+        this(name, value, sqlType, name);
+    }
+
+    /**
+     * The Sql param is a pair of value and its sqlType
+     * 
+     * @param name name of the attribute
+     * @param value value
+     * @param sqlType sql type
+     */
+    public SQLParam(String name, Object value, int sqlType, String quotedName) {
         if (name == null || name.length() == 0) {
             //TODO localize this
             throw new IllegalArgumentException("SQL param name should be not null");
@@ -53,8 +63,9 @@ public final class SQLParam {
         _name = name;
         _value = value;
         _sqlType = sqlType;
-    }    
-    
+        _quotedName = quotedName;
+    }
+
     /**
      * The Sql param is a pair of value and its sqlType
      * 
@@ -62,15 +73,16 @@ public final class SQLParam {
      * @param value value
      */
     public SQLParam(String name, Object value) {
-        if (name == null || name.length() == 0) {
-            //TODO localize this
-            throw new IllegalArgumentException("SQL param name should be not null");
-        }
-        _name = name;
-        _value = value;
-        _sqlType = Types.NULL;
-    }    
+        this(name, value, Types.NULL, name);
+    }
 
+    /**
+     * Accessor for the quoted name property
+     * @return the _name
+     */
+    public String getQuotedName() {
+        return _quotedName;
+    }
 
     /**
      * Accessor for the name property
@@ -79,7 +91,7 @@ public final class SQLParam {
     public String getName() {
         return _name;
     }
-    
+
     /**
      * The param value
      * 
@@ -100,16 +112,16 @@ public final class SQLParam {
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) {
+        if (this == obj) {
             return true;
         }
-        if((obj == null) || (obj.getClass() != this.getClass())) {
-            return false;        
+        if ((obj == null) || (obj.getClass() != this.getClass())) {
+            return false;
         }
         SQLParam other = (SQLParam) obj;
-        return (_name == other._name || (_name != null && _name.equals(other._name))) &&
-               (_value == other._value || (_value != null && _value.equals(other._value))) &&
-               _sqlType == other._sqlType;
+        return (_name == other._name || (_name != null && _name.equals(other._name)))
+                && (_value == other._value || (_value != null && _value.equals(other._value)))
+                && _sqlType == other._sqlType;
     }
 
     @Override
@@ -124,47 +136,105 @@ public final class SQLParam {
     @Override
     public String toString() {
         StringBuilder ret = new StringBuilder();
-        if(getName()!=null) {
+        if (getName() != null) {
             ret.append(getName());
             ret.append("=");
         }
-        ret .append("\""+getValue()+"\"");
+        ret.append("\"" + getValue() + "\"");
         switch (getSqlType()) {
-        case Types.ARRAY:  ret.append(":[ARRAY]]"); break;
-        case Types.BIGINT: ret.append(":[BIGINT]"); break;
-        case Types.BINARY: ret.append(":[BINARY]"); break;
-        case Types.BIT: ret.append(":[BIT]"); break;
-        case Types.BLOB: ret.append(":[BLOB]"); break;
-        case Types.BOOLEAN: ret.append(":[BOOLEAN]"); break;
-        case Types.CHAR: ret.append(":[CHAR]"); break;
-        case Types.CLOB: ret.append(":[CLOB]"); break;
-        case Types.DATALINK: ret.append(":[DATALINK]"); break;
-        case Types.DATE: ret.append(":[DATE]"); break;
-        case Types.DECIMAL: ret.append(":[DECIMAL]"); break;
-        case Types.DISTINCT: ret.append(":[DISTINCT]"); break;
-        case Types.DOUBLE: ret.append(":[DOUBLE]"); break;
-        case Types.FLOAT: ret.append(":[FLOAT]"); break;
-        case Types.INTEGER: ret.append(":[INTEGER]"); break;
-        case Types.JAVA_OBJECT: ret.append(":[JAVA_OBJECT]"); break;
-        case Types.LONGVARBINARY: ret.append(":[LONGVARBINARY]"); break;
-        case Types.LONGVARCHAR: ret.append(":[LONGVARCHAR]"); break;
-        case Types.NULL: break;
-        case Types.NUMERIC: ret.append(":[NUMERIC]"); break;
-        case Types.OTHER: ret.append(":[OTHER]"); break;
-        case Types.REAL: ret.append(":[REAL]"); break;
-        case Types.REF: ret.append(":[REF]"); break;
-        case Types.SMALLINT: ret.append(":[SMALLINT]"); break;
-        case Types.STRUCT: ret.append(":[STRUCT]"); break;
-        case Types.TIME: ret.append(":[TIME]"); break;
-        case Types.TIMESTAMP: ret.append(":[TIMESTAMP]"); break;
-        case Types.TINYINT: ret.append(":[TINYINT]"); break;
-        case Types.VARBINARY: ret.append(":[VARBINARY]"); break;
-        case Types.VARCHAR: ret.append(":[VARCHAR]"); break;
-        default:
-            ret.append(":[SQL Type:"+getSqlType()+"]");
+            case Types.ARRAY:
+                ret.append(":[ARRAY]]");
+                break;
+            case Types.BIGINT:
+                ret.append(":[BIGINT]");
+                break;
+            case Types.BINARY:
+                ret.append(":[BINARY]");
+                break;
+            case Types.BIT:
+                ret.append(":[BIT]");
+                break;
+            case Types.BLOB:
+                ret.append(":[BLOB]");
+                break;
+            case Types.BOOLEAN:
+                ret.append(":[BOOLEAN]");
+                break;
+            case Types.CHAR:
+                ret.append(":[CHAR]");
+                break;
+            case Types.CLOB:
+                ret.append(":[CLOB]");
+                break;
+            case Types.DATALINK:
+                ret.append(":[DATALINK]");
+                break;
+            case Types.DATE:
+                ret.append(":[DATE]");
+                break;
+            case Types.DECIMAL:
+                ret.append(":[DECIMAL]");
+                break;
+            case Types.DISTINCT:
+                ret.append(":[DISTINCT]");
+                break;
+            case Types.DOUBLE:
+                ret.append(":[DOUBLE]");
+                break;
+            case Types.FLOAT:
+                ret.append(":[FLOAT]");
+                break;
+            case Types.INTEGER:
+                ret.append(":[INTEGER]");
+                break;
+            case Types.JAVA_OBJECT:
+                ret.append(":[JAVA_OBJECT]");
+                break;
+            case Types.LONGVARBINARY:
+                ret.append(":[LONGVARBINARY]");
+                break;
+            case Types.LONGVARCHAR:
+                ret.append(":[LONGVARCHAR]");
+                break;
+            case Types.NULL:
+                break;
+            case Types.NUMERIC:
+                ret.append(":[NUMERIC]");
+                break;
+            case Types.OTHER:
+                ret.append(":[OTHER]");
+                break;
+            case Types.REAL:
+                ret.append(":[REAL]");
+                break;
+            case Types.REF:
+                ret.append(":[REF]");
+                break;
+            case Types.SMALLINT:
+                ret.append(":[SMALLINT]");
+                break;
+            case Types.STRUCT:
+                ret.append(":[STRUCT]");
+                break;
+            case Types.TIME:
+                ret.append(":[TIME]");
+                break;
+            case Types.TIMESTAMP:
+                ret.append(":[TIMESTAMP]");
+                break;
+            case Types.TINYINT:
+                ret.append(":[TINYINT]");
+                break;
+            case Types.VARBINARY:
+                ret.append(":[VARBINARY]");
+                break;
+            case Types.VARCHAR:
+                ret.append(":[VARCHAR]");
+                break;
+            default:
+                ret.append(":[SQL Type:" + getSqlType() + "]");
         }
         return ret.toString();
-        
-    }
 
+    }
 }

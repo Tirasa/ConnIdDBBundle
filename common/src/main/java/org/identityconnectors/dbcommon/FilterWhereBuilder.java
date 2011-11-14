@@ -100,7 +100,7 @@ public class FilterWhereBuilder {
      */
     public void addBind(final SQLParam param, final String operator) {
         if (param == null) throw new IllegalArgumentException("null.param.not.suported");
-        where.append(param.getName());
+        where.append(param.getQuotedName());
         where.append(" ").append(operator).append(" ?");
         params.add(param);
     }
