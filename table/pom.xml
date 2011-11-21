@@ -88,8 +88,115 @@
         </dependency>
 
     </dependencies>
+    <profiles>
+        
+        <profile>
+            <id>postgres</id>
+            
+            <properties>
+                <jdbcdriver.groupId>postgresql</jdbcdriver.groupId>
+                <jdbcdriver.artifactId>postgresql</jdbcdriver.artifactId>
+                <javaagent></javaagent>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <version>9.0-801.jdbc4</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <defaultGoal>clean verify</defaultGoal>
+
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                        <filtering>true</filtering>
+                        <excludes>
+                            <exclude>persistence.properties</exclude>
+                        </excludes>
+                    </testResource>
+                    <testResource>
+                        <directory>src/test/resources/postgres</directory>
+                        <filtering>true</filtering>
+                    </testResource>
+                </testResources>
+            </build>
+        </profile>
+        
+        <profile>
+            <id>mysql</id>
+            
+            <properties>
+                <jdbcdriver.groupId>mysql</jdbcdriver.groupId>
+                <jdbcdriver.artifactId>mysql-connector-java</jdbcdriver.artifactId>
+                <javaagent></javaagent>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>5.1.17</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <defaultGoal>clean verify</defaultGoal>
+
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                        <filtering>true</filtering>
+                        <excludes>
+                            <exclude>persistence.properties</exclude>
+                        </excludes>
+                    </testResource>
+                    <testResource>
+                        <directory>src/test/resources/mysql</directory>
+                        <filtering>true</filtering>
+                    </testResource>
+                </testResources>
+            </build>
+        </profile>
+        
+        <profile>
+            <id>oracle</id>
+            <properties>
+                <jdbcdriver.groupId>com.oracle</jdbcdriver.groupId>
+                <jdbcdriver.artifactId>ojdbc6</jdbcdriver.artifactId>
+                <javaagent></javaagent>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc6</artifactId>
+                    <version>11.1.0</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <defaultGoal>clean verify</defaultGoal>
+                
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                        <filtering>true</filtering>
+                        <excludes>
+                            <exclude>persistence.properties</exclude>
+                        </excludes>
+                    </testResource>
+                    <testResource>
+                        <directory>src/test/resources/oracle</directory>
+                        <filtering>true</filtering>
+                    </testResource>
+                </testResources>
+            </build>
+        </profile>
+    </profiles>
 
     <build>
+        
         <plugins>
             
             <plugin>
@@ -149,5 +256,17 @@
                 </executions>
             </plugin>
         </plugins>
+        
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>postgres/**</exclude>
+                    <exclude>mysql/**</exclude>
+                    <exclude>oracle/**</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
     </build>
 </project>

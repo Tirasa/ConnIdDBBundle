@@ -87,10 +87,13 @@ public class DatabaseTableConnection extends DatabaseConnection {
         if (StringUtil.isNotBlank(datasource)) {
             log.info("Get a new connection using datasource {0}", datasource);
             final String[] jndiProperties = config.getJndiProperties();
-            final ConnectorMessages connectorMessages = config.getConnectorMessages();
-            final Hashtable<String, String> prop = JNDIUtil.arrayToHashtable(jndiProperties, connectorMessages);
+            final ConnectorMessages connectorMessages = config.
+                    getConnectorMessages();
+            final Hashtable<String, String> prop = JNDIUtil.arrayToHashtable(
+                    jndiProperties, connectorMessages);
             if (StringUtil.isNotBlank(login) && password != null) {
-                connection = SQLUtil.getDatasourceConnection(datasource, login, password, prop);
+                connection = SQLUtil.getDatasourceConnection(datasource, login,
+                        password, prop);
             } else {
                 connection = SQLUtil.getDatasourceConnection(datasource, prop);
             }
@@ -98,9 +101,13 @@ public class DatabaseTableConnection extends DatabaseConnection {
         } else {
             final String driver = config.getJdbcDriver();
             final String connectionUrl = config.formatUrlTemplate();
-            log.info("Get a new connection using connection url {0} and user {1}", connectionUrl, login);
-            connection = SQLUtil.getDriverMangerConnection(driver, connectionUrl, login, password);
-            log.ok("The new connection using connection url {0} and user {1} created", connectionUrl, login);
+            log.info(
+                    "Get a new connection using connection url {0} and user {1}",
+                    connectionUrl, login);
+            connection = SQLUtil.getDriverMangerConnection(driver, connectionUrl,
+                    login, password);
+            log.ok("The new connection using connection url {0} and user {1} created",
+                    connectionUrl, login);
         }
 
         /* On Oracle enable the synonyms */
@@ -108,11 +115,15 @@ public class DatabaseTableConnection extends DatabaseConnection {
             Class<?> clazz = Class.forName("oracle.jdbc.OracleConnection");
             if (clazz != null && clazz.isAssignableFrom(connection.getClass())) {
                 try {
-                    final Method getIncludeSynonyms = clazz.getMethod("getIncludeSynonyms");
-                    final Object includeSynonyms = getIncludeSynonyms.invoke(connection);
-                    log.info("getIncludeSynonyms on ORACLE : {0}", includeSynonyms);
+                    final Method getIncludeSynonyms = clazz.getMethod(
+                            "getIncludeSynonyms");
+                    final Object includeSynonyms = getIncludeSynonyms.invoke(
+                            connection);
+                    log.info("getIncludeSynonyms on ORACLE : {0}",
+                            includeSynonyms);
                     if (Boolean.FALSE.equals(includeSynonyms)) {
-                        final Method setIncludeSynonyms = clazz.getMethod("setIncludeSynonyms", boolean.class);
+                        final Method setIncludeSynonyms = clazz.getMethod(
+                                "setIncludeSynonyms", boolean.class);
                         setIncludeSynonyms.invoke(connection, Boolean.TRUE);
                         log.ok("setIncludeSynonyms to true success");
                     }
@@ -126,7 +137,7 @@ public class DatabaseTableConnection extends DatabaseConnection {
 
         //Disable auto-commit mode
         try {
-            if ( connection.getAutoCommit() ) {
+            if (connection.getAutoCommit()) {
                 log.info("setAutoCommit(false)");
                 connection.setAutoCommit(false);
             }
@@ -200,7 +211,8 @@ public class DatabaseTableConnection extends DatabaseConnection {
      * @return the result of Column Values map
      * @throws SQLException
      */
-    public Map<String, SQLParam> getColumnValues(ResultSet result) throws SQLException {
+    public Map<String, SQLParam> getColumnValues(ResultSet result)
+            throws SQLException {
         return DatabaseTableSQLUtil.getColumnValues(sms, result);
     }
 
@@ -225,7 +237,8 @@ public class DatabaseTableConnection extends DatabaseConnection {
      *             an exception in statement
      */
     @Override
-    public CallableStatement prepareCall(final String sql, final List<SQLParam> params) throws SQLException {
+    public CallableStatement prepareCall(final String sql, final List<SQLParam> params)
+            throws SQLException {
         log.info("Prepare SQL Call : {0}", sql);
         final CallableStatement prepareCall = getConnection().prepareCall(sql);
         DatabaseTableSQLUtil.setParams(sms, prepareCall, params);
@@ -245,9 +258,11 @@ public class DatabaseTableConnection extends DatabaseConnection {
      *             an exception in statement
      */
     @Override
-    public PreparedStatement prepareStatement(final String sql, final List<SQLParam> params) throws SQLException {
+    public PreparedStatement prepareStatement(final String sql, final List<SQLParam> params)
+            throws SQLException {
         log.info("Prepare SQL Statement : {0}", sql);
-        final PreparedStatement prepareStatement = getConnection().prepareStatement(sql);
+        final PreparedStatement prepareStatement = getConnection().
+                prepareStatement(sql);
         DatabaseTableSQLUtil.setParams(sms, prepareStatement, params);
         log.ok("SQL Statement ok");
         return prepareStatement;
@@ -263,10 +278,11 @@ public class DatabaseTableConnection extends DatabaseConnection {
     @Override
     public void test() {
         String sql = config.getValidConnectionQuery();
-        
+
         // attempt through auto commit..
         if (StringUtil.isBlank(sql)) {
-            log.info("valid connection query is empty, test connection using default");
+            log.info(
+                    "valid connection query is empty, test connection using default");
             super.test();
         } else {
             Statement stmt = null;
@@ -278,17 +294,19 @@ public class DatabaseTableConnection extends DatabaseConnection {
                     // should have thrown if server was down don't get the
                     // ResultSet, we don't want it if we got to this point and
                     // the SQL was not a query, give a hint why we failed
-                    throw new ConnectorException(config.getMessage(MSG_QUERY_INVALID, sql));                            
+                    throw new ConnectorException(config.getMessage(
+                            MSG_QUERY_INVALID, sql));
                 }
-                log.ok("connection is valid");                
+                log.ok("connection is valid");
             } catch (Exception ex) {
                 // anything, not just SQLException
                 // nothing to do, just invalidate the connection
-                throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ, sql), ex);
+                throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ,
+                        sql), ex);
             } finally {
                 SQLUtil.closeQuietly(stmt);
             }
-        }        
+        }
     }
 
     /**
@@ -300,24 +318,27 @@ public class DatabaseTableConnection extends DatabaseConnection {
     void setSms(MappingStrategy sms) {
         this.sms = sms;
     }
-    
+
     /**
      * Close connection if pooled
      */
     void closeConnection() {
-        if( getConnection() != null && StringUtil.isNotBlank(config.getDatasource()) /*&& this.conn.getConnection() instanceof PooledConnection */) {
+        if (getConnection() != null && StringUtil.isNotBlank(config.
+                getDatasource()) /*&& this.conn.getConnection() instanceof PooledConnection */) {
             log.info("Close the pooled connection");
             dispose();
         }
     }
+
     /**
      * Create new connection if pooled and taken from the datasource
      * @throws SQLException
      */
-    void openConnection() throws SQLException {
+    void openConnection()
+            throws SQLException {
         if (getConnection() == null || getConnection().isClosed()) {
             log.info("Get new connection, it is closed");
             setConnection(getNativeConnection(config));
         }
-    }    
+    }
 }

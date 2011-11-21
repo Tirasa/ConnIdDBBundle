@@ -14,7 +14,6 @@ create table Accounts (
   jpegphoto   BLOB,
   activate    DATE,  
   opentime    TIME,      
-  enrolled    TIMESTAMP,      
   changed     TIMESTAMP NOT NULL,
   changelog   BIGINT
 )

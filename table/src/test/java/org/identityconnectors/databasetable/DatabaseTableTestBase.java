@@ -22,10 +22,14 @@
  */
 package org.identityconnectors.databasetable;
 
+import java.io.InputStream;
+import java.sql.Date;
 import static org.junit.Assert.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -34,6 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 
@@ -71,55 +76,108 @@ import org.junit.Test;
  * Attempts to test the Connector with the framework.
  */
 public abstract class DatabaseTableTestBase {
-   
+
     // Constants..
     static final String CHANGELOG = "changelog";
-    static final String ACCOUNTID = "accountId";
-    static final String PASSWORD = "password";
+
+    static final String KEYCOLUMN = "accountId";
+
+    static final String PASSWORDCOLUMN = "password";
+
     static final String MANAGER = "manager";
+
     static final String MIDDLENAME = "middlename";
+
     static final String FIRSTNAME = "firstname";
+
     static final String LASTNAME = "lastname";
+
     static final String EMAIL = "email";
+
     static final String DEPARTMENT = "department";
+
     static final String TITLE = "title";
+
     static final String AGE = "age";
+
     static final String SALARY = "salary";
-    static final String JPEGPHOTO = "jpegphoto";    
-    static final String ENROLLED = "enrolled";    
-    static final String ACTIVATE = "activate";   
-    static final String ACCESSED = "accessed";    
-    static final String OPENTIME = "opentime";    
+
+    static final String JPEGPHOTO = "jpegphoto";
+
+    static final String ACTIVATE = "activate";
+
+    static final String ACCESSED = "accessed";
+
+    static final String OPENTIME = "opentime";
+
     static final String CHANGED = "changed";
-    
+
     /**
      * Setup logging for the {@link DatabaseTableConnector}.
      */
-    static final Log log = Log.getLog(DatabaseTableConnector.class);   
-    
-    
+    static final Log log = Log.getLog(DatabaseTableConnector.class);
+
     // always seed that same for results..
     static final Random r = new Random(17);
-    
+
+    /**
+     * Get configuration & connection properties.
+     */
+    private final static Properties props = new Properties();
+
+    private final static String PROPERTIES = "/persistence.properties";
+
+    static {
+        try {
+            final InputStream is = DatabaseTableConfigurationTests.class.
+                    getResourceAsStream(PROPERTIES);
+            props.load(is);
+        } catch (Throwable t) {
+            log.error("Error retrieving configuration/connection properties", t);
+        }
+    }
+
+    static final String DB = props.getProperty("db");
+
+    static final String URL = props.getProperty("url");
+
+    static final String USER = props.getProperty("user", "");
+
+    static final String PASSWD = props.getProperty("password", "");
+
+    static final String DRIVER = props.getProperty("driver");
+
+    static final Boolean IS_EMPTY_STRING_SUPPORT = Boolean.parseBoolean(
+            props.getProperty("isEmptyStringSupported", "false"));
+
+    static final String ACCOUNTS = "accounts.sql";
+
+    static final String PURGE = "purge.sql";
+
+    //The tested table
+    static final String DB_TABLE = "Accounts";
+
     /**
      * The connector
      */
     DatabaseTableConnector con = null;
-    
+
     /**
      * Create the test configuration
      * @return the initialized configuration 
      * @throws Exception  anything wrong
      */
-    protected abstract DatabaseTableConfiguration getConfiguration() throws Exception;
- 
+    protected abstract DatabaseTableConfiguration getConfiguration()
+            throws Exception;
+
     /**
      * Create the test attribute sets
      * @param cfg 
      * @return the initialized attribute set
      * @throws Exception anything wrong 
      */
-    protected abstract Set<Attribute>  getCreateAttributeSet(DatabaseTableConfiguration cfg) throws Exception;
+    protected abstract Set<Attribute> getCreateAttributeSet(DatabaseTableConfiguration cfg)
+            throws Exception;
 
     /**
      * Create the test modify attribute set
@@ -127,14 +185,16 @@ public abstract class DatabaseTableTestBase {
      * @return the initialized attribute set
      * @throws Exception anything wrong
      */
-    protected abstract  Set<Attribute>  getModifyAttributeSet(DatabaseTableConfiguration cfg) throws Exception;
-   
+    protected abstract Set<Attribute> getModifyAttributeSet(DatabaseTableConfiguration cfg)
+            throws Exception;
+
     /**
      * The class load method
      * @param conn 
      * @throws Exception 
      */
-    protected void deleteAllFromAccounts(DatabaseTableConnection conn) throws Exception { 
+    protected void deleteAllFromAccounts(DatabaseTableConnection conn)
+            throws Exception {
         // update the last change
         final String SQL_TEMPLATE = "DELETE FROM ACCOUNTS";
         log.ok(SQL_TEMPLATE);
@@ -147,7 +207,7 @@ public abstract class DatabaseTableTestBase {
         }
         conn.commit();
     }
-    
+
     /**
      * The close connector after test method
      */
@@ -159,41 +219,40 @@ public abstract class DatabaseTableTestBase {
             con = null;
         }
     }
-    
+
     /**
      * test method
      * @throws Exception 
      */
     @Test
-    public void testConfiguration() throws Exception {
+    public void testConfiguration()
+            throws Exception {
         // attempt to test driver info..
         log.ok("testConfiguration");
         DatabaseTableConfiguration config = getConfiguration();
-        config.validate();      
-    }   
+        config.validate();
+    }
 
-
-    
     /**
      * test method
      * @throws Exception 
      */
     @Test
-    public void testTestMethod() throws Exception {
+    public void testTestMethod()
+            throws Exception {
         log.ok("testTestMethod");
         final DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
         con.test();
-    }  
-    
- 
+    }
 
     /**
      * For testing purposes we creating connection an not the framework.
      * @throws Exception 
      */
     @Test(expected = ConnectorException.class)
-    public void testInvalidConnectionQuery() throws Exception {
+    public void testInvalidConnectionQuery()
+            throws Exception {
         log.ok("testInvalidConnectionQuery");
         final DatabaseTableConfiguration cfg = getConfiguration();
         cfg.setValidConnectionQuery("INVALID");
@@ -201,13 +260,13 @@ public abstract class DatabaseTableTestBase {
         con.test();
     }
 
-
     /**
      * Make sure the Create call works..
      * @throws Exception 
      */
     @Test
-    public void testCreateCall() throws Exception {
+    public void testCreateCall()
+            throws Exception {
         log.ok("testCreateCall");
         DatabaseTableConfiguration cfg = getConfiguration();
         DatabaseTableConnector con = getConnector(cfg);
@@ -216,7 +275,8 @@ public abstract class DatabaseTableTestBase {
         Set<Attribute> expected = getCreateAttributeSet(cfg);
         Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
         // attempt to get the record back..
-        List<ConnectorObject> results = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
+        List<ConnectorObject> results = TestHelpers.searchToList(con,
+                ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
         assertTrue("expect 1 connector object", results.size() == 1);
         final ConnectorObject co = results.get(0);
         assertNotNull(co);
@@ -225,62 +285,79 @@ public abstract class DatabaseTableTestBase {
         attributeSetsEquals(con.schema(), expected, actual);
     }
 
-
     /**
      * Make sure the Create call works..
      * @throws Exception 
      */
     @Test(expected = ConnectorException.class)
-    public void testCreateCallNotNull() throws Exception {
+    public void testCreateCallNotNull()
+            throws Exception {
         log.ok("testCreateCallNotNull");
         DatabaseTableConfiguration cfg = getConfiguration();
-        DatabaseTableConnector con = getConnector(cfg);
+        DatabaseTableConnector c = getConnector(cfg);
         Set<Attribute> expected = getCreateAttributeSet(cfg);
         // create modified attribute set
-        Map<String, Attribute> chMap = new HashMap<String, Attribute>(AttributeUtil.toMap(expected));
-        chMap.put("firstname", AttributeBuilder.build(FIRSTNAME, (String) null));
+        Map<String, Attribute> chMap = new HashMap<String, Attribute>(AttributeUtil.
+                toMap(expected));
+        chMap.put(FIRSTNAME, AttributeBuilder.build(FIRSTNAME, (String) null));
         final Set<Attribute> changeSet = CollectionUtil.newSet(chMap.values());
-        con.create(ObjectClass.ACCOUNT, changeSet, null);
+        c.create(ObjectClass.ACCOUNT, changeSet, null);
     }
-    
+
     /**
      * Make sure the Create call works..
      * @throws Exception 
      */
     @Test
-    public void testCreateCallNotNullEnableEmptyString() throws Exception {
-        log.ok("testCreateCallNotNullEnableEmptyString");
-        DatabaseTableConfiguration cfg = getConfiguration();
-        cfg.setEnableEmptyString(true);
-        DatabaseTableConnector c = getConnector(cfg);
-        Set<Attribute> expected = getCreateAttributeSet(cfg);
-        // create modified attribute set
-        Map<String, Attribute> chMap = new HashMap<String, Attribute>(AttributeUtil.toMap(expected));
-        chMap.put(FIRSTNAME, AttributeBuilder.build(FIRSTNAME, (String) null));
-        chMap.put(LASTNAME, AttributeBuilder.build(LASTNAME, (String) null));
-        final Set<Attribute> changeSet = CollectionUtil.newSet(chMap.values());
-        Uid uid = c.create(ObjectClass.ACCOUNT, changeSet, null);
-        // attempt to get the record back..
-        List<ConnectorObject> results = TestHelpers.searchToList(c, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
-        assertTrue("expect 1 connector object", results.size() == 1);
-        final ConnectorObject co = results.get(0);
-        assertNotNull(co);
-        final Set<Attribute> actual = co.getAttributes();
-        assertNotNull(actual);
-        attributeSetsEquals(c.schema(), changeSet, actual, FIRSTNAME, LASTNAME);
-    }    
-    
+    public void testCreateCallNotNullEnableEmptyString()
+            throws Exception {
+        if (IS_EMPTY_STRING_SUPPORT) {
+            log.ok("testCreateCallNotNullEnableEmptyString");
+            DatabaseTableConfiguration cfg = getConfiguration();
+            cfg.setEnableEmptyString(true);
+            final DatabaseTableConnector c = getConnector(cfg);
+            final Set<Attribute> expected = getCreateAttributeSet(cfg);
+
+            // create modified attribute set
+            final Map<String, Attribute> chMap = new HashMap<String, Attribute>(
+                    AttributeUtil.toMap(expected));
+
+            chMap.put(FIRSTNAME,
+                    AttributeBuilder.build(FIRSTNAME, (String) null));
+            chMap.put(LASTNAME, AttributeBuilder.build(LASTNAME, (String) null));
+            final Set<Attribute> changeSet = CollectionUtil.newSet(
+                    chMap.values());
+
+            Uid uid = c.create(ObjectClass.ACCOUNT, changeSet, null);
+
+            // attempt to get the record back..
+            List<ConnectorObject> results = TestHelpers.searchToList(c,
+                    ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
+            assertTrue("expect 1 connector object", results.size() == 1);
+
+            final ConnectorObject co = results.get(0);
+            assertNotNull(co);
+
+            final Set<Attribute> actual = co.getAttributes();
+            assertNotNull(actual);
+
+            attributeSetsEquals(c.schema(), changeSet, actual, FIRSTNAME,
+                    LASTNAME);
+        }
+    }
+
     /**
      * Make sure the Create call works..
      * @throws Exception 
      */
     @Test(expected = IllegalArgumentException.class)
-    public void testCreateUnsuported() throws Exception {
+    public void testCreateUnsuported()
+            throws Exception {
         log.ok("testCreateUnsuported");
         DatabaseTableConfiguration cfg = getConfiguration();
-        DatabaseTableConnector con = getConnector(cfg);
+        DatabaseTableConnector c = getConnector(cfg);
         ObjectClass objClass = new ObjectClass("NOTSUPPORTED");
-        con.create(objClass, getCreateAttributeSet(cfg), null);
+        c.create(objClass, getCreateAttributeSet(cfg), null);
     }
 
     /**
@@ -288,7 +365,8 @@ public abstract class DatabaseTableTestBase {
      * @throws Exception 
      */
     @Test
-    public void testCreateWithName() throws Exception {
+    public void testCreateWithName()
+            throws Exception {
         log.ok("testCreateWithName");
         DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
@@ -298,14 +376,14 @@ public abstract class DatabaseTableTestBase {
         assertNotNull(uid);
         assertEquals(name.getNameValue(), uid.getUidValue());
     }
-  
 
     /**
      * Test creating of the connector object, searching using UID and delete
      * @throws Exception
      */
     @Test
-    public void testCreateAndDelete() throws Exception {
+    public void testCreateAndDelete()
+            throws Exception {
         log.ok("testCreateAndDelete");
         final String ERR1 = "Could not find new object.";
         final String ERR2 = "Found object that should not be there.";
@@ -316,7 +394,8 @@ public abstract class DatabaseTableTestBase {
         try {
             System.out.println("Uid: " + uid);
             // attempt to find the newly created object..
-            List<ConnectorObject> list = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
+            List<ConnectorObject> list = TestHelpers.searchToList(con,
+                    ObjectClass.ACCOUNT, new EqualsFilter(uid));
             assertTrue(ERR1, list.size() == 1);
 
             //Test the created attributes are equal the searched
@@ -331,8 +410,9 @@ public abstract class DatabaseTableTestBase {
             // attempt to find it again to make sure
             // it actually deleted the object..
             // attempt to find the newly created object..
-            List<ConnectorObject> list = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
-            assertTrue(ERR2, list.size() == 0);
+            List<ConnectorObject> list = TestHelpers.searchToList(con,
+                    ObjectClass.ACCOUNT, new EqualsFilter(uid));
+            assertTrue(ERR2, list.isEmpty());
             try {
                 // now attempt to delete an object that is not there..
                 con.delete(ObjectClass.ACCOUNT, uid, null);
@@ -349,7 +429,8 @@ public abstract class DatabaseTableTestBase {
      * @throws Exception 
      */
     @Test(expected = IllegalArgumentException.class)
-    public void testDeleteUnsupported() throws Exception {
+    public void testDeleteUnsupported()
+            throws Exception {
         log.ok("testDeleteUnsupported");
         final String ERR1 = "Could not find new object.";
         final DatabaseTableConfiguration cfg = getConfiguration();
@@ -360,7 +441,8 @@ public abstract class DatabaseTableTestBase {
         try {
             System.out.println("Uid: " + uid);
             // attempt to find the newly created object..
-            List<ConnectorObject> list = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
+            List<ConnectorObject> list = TestHelpers.searchToList(con,
+                    ObjectClass.ACCOUNT, new EqualsFilter(uid));
             assertTrue(ERR1, list.size() == 1);
         } finally {
             // attempt to delete the object..
@@ -374,7 +456,8 @@ public abstract class DatabaseTableTestBase {
      * @throws Exception 
      */
     @Test(expected = IllegalArgumentException.class)
-    public void testUpdateUnsupported() throws Exception {
+    public void testUpdateUnsupported()
+            throws Exception {
         log.ok("testUpdateUnsupported");
         final DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
@@ -385,7 +468,8 @@ public abstract class DatabaseTableTestBase {
         assertNotNull(uid);
 
         // retrieve the object
-        List<ConnectorObject> list = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
+        List<ConnectorObject> list = TestHelpers.searchToList(con,
+                ObjectClass.ACCOUNT, new EqualsFilter(uid));
         assertTrue(list.size() == 1);
 
         // create updated connector object
@@ -399,7 +483,8 @@ public abstract class DatabaseTableTestBase {
      * @throws Exception 
      */
     @Test
-    public void testUpdateNull() throws Exception {
+    public void testUpdateNull()
+            throws Exception {
         log.ok("testUpdateNull");
         final DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
@@ -410,31 +495,35 @@ public abstract class DatabaseTableTestBase {
         assertNotNull(uid);
 
         // retrieve the object
-        List<ConnectorObject> list = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
+        List<ConnectorObject> list = TestHelpers.searchToList(con,
+                ObjectClass.ACCOUNT, new EqualsFilter(uid));
         assertTrue(list.size() == 1);
 
         // create updated connector object
-        Map<String, Attribute> chMap = new HashMap<String, Attribute>(AttributeUtil.toMap(expected));
+        Map<String, Attribute> chMap = new HashMap<String, Attribute>(AttributeUtil.
+                toMap(expected));
         chMap.put(SALARY, AttributeBuilder.build(SALARY, (Integer) null));
         // do the update
         final Set<Attribute> changeSet = CollectionUtil.newSet(chMap.values());
         con.update(ObjectClass.ACCOUNT, uid, changeSet, null);
 
         // retrieve the object
-        List<ConnectorObject> list2 = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
+        List<ConnectorObject> list2 = TestHelpers.searchToList(con,
+                ObjectClass.ACCOUNT, new EqualsFilter(uid));
         assertNotNull(list2);
         assertTrue(list2.size() == 1);
         final Set<Attribute> actual = list2.get(0).getAttributes();
         attributeSetsEquals(con.schema(), changeSet, actual, SALARY);
     }
-    
+
     /**
      * Test creating of the connector object, searching using UID and update
      * 
      * @throws Exception
      */
     @Test
-    public void testCreateAndUpdate() throws Exception {
+    public void testCreateAndUpdate()
+            throws Exception {
         log.ok("testCreateAndUpdate");
         final DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
@@ -445,7 +534,8 @@ public abstract class DatabaseTableTestBase {
         assertNotNull(uid);
 
         // retrieve the object
-        List<ConnectorObject> list = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
+        List<ConnectorObject> list = TestHelpers.searchToList(con,
+                ObjectClass.ACCOUNT, new EqualsFilter(uid));
         assertTrue(list.size() == 1);
 
         // create updated connector object
@@ -453,20 +543,22 @@ public abstract class DatabaseTableTestBase {
         uid = con.update(ObjectClass.ACCOUNT, uid, changeSet, null);
 
         // retrieve the object
-        List<ConnectorObject> list2 = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
+        List<ConnectorObject> list2 = TestHelpers.searchToList(con,
+                ObjectClass.ACCOUNT, new EqualsFilter(uid));
         assertNotNull(list2);
         assertTrue(list2.size() == 1);
         final Set<Attribute> actual = list2.get(0).getAttributes();
         attributeSetsEquals(con.schema(), changeSet, actual);
     }
-    
+
     /**
      * Test method for
      * Test creating of the connector object, searching using UID and update
      * @throws Exception 
      */
     @Test
-    public void testAuthenticateOriginal() throws Exception {
+    public void testAuthenticateOriginal()
+            throws Exception {
         log.ok("testAuthenticateOriginal");
         final DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
@@ -477,31 +569,36 @@ public abstract class DatabaseTableTestBase {
         assertNotNull(uid);
 
         // retrieve the object
-        List<ConnectorObject> list = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
+        List<ConnectorObject> list = TestHelpers.searchToList(con,
+                ObjectClass.ACCOUNT, new EqualsFilter(uid));
         assertTrue(list.size() == 1);
 
         // check if authenticate operation is present (it should)
         Schema schema = con.schema();
-        Set<ObjectClassInfo> oci = schema.getSupportedObjectClassesByOperation(AuthenticationApiOp.class);
+        Set<ObjectClassInfo> oci = schema.getSupportedObjectClassesByOperation(
+                AuthenticationApiOp.class);
         assertTrue(oci.size() >= 1);
 
         // this should not throw any RuntimeException, on invalid authentication
         final Name name = AttributeUtil.getNameFromAttributes(expected);
-        final GuardedString passwordValue = AttributeUtil.getPasswordValue(expected);
-        final Uid auid = con.authenticate(ObjectClass.ACCOUNT, name.getNameValue(), passwordValue, null);
+        final GuardedString passwordValue = AttributeUtil.getPasswordValue(
+                expected);
+        final Uid auid = con.authenticate(ObjectClass.ACCOUNT,
+                name.getNameValue(), passwordValue, null);
         assertEquals(uid, auid);
 
         // cleanup (should not throw any exception.)
         con.delete(ObjectClass.ACCOUNT, uid, null);
     }
-    
+
     /**
      * Test method for
      * Test creating of the connector object, searching using UID and update
      * @throws Exception 
      */
     @Test
-    public void testResolveUsernameOriginal() throws Exception {
+    public void testResolveUsernameOriginal()
+            throws Exception {
         log.ok("testAuthenticateOriginal");
         final DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
@@ -512,44 +609,49 @@ public abstract class DatabaseTableTestBase {
         assertNotNull(uid);
 
         // retrieve the object
-        List<ConnectorObject> list = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
+        List<ConnectorObject> list = TestHelpers.searchToList(con,
+                ObjectClass.ACCOUNT, new EqualsFilter(uid));
         assertTrue(list.size() == 1);
 
         // check if authenticate operation is present (it should)
         Schema schema = con.schema();
-        Set<ObjectClassInfo> oci = schema.getSupportedObjectClassesByOperation(AuthenticationApiOp.class);
+        Set<ObjectClassInfo> oci = schema.getSupportedObjectClassesByOperation(
+                AuthenticationApiOp.class);
         assertTrue(oci.size() >= 1);
 
         // this should not throw any RuntimeException, on invalid authentication
         final Name name = AttributeUtil.getNameFromAttributes(expected);
-        final Uid auid = con.resolveUsername(ObjectClass.ACCOUNT, name.getNameValue(), null);
+        final Uid auid = con.resolveUsername(ObjectClass.ACCOUNT, name.
+                getNameValue(), null);
         assertEquals(uid, auid);
 
         // cleanup (should not throw any exception.)
         con.delete(ObjectClass.ACCOUNT, uid, null);
-    }    
+    }
 
     /**
      * Test method for
      * @throws Exception 
      */
     @Test(expected = InvalidCredentialException.class)
-    public void testAuthenticateWrongOriginal() throws Exception {
+    public void testAuthenticateWrongOriginal()
+            throws Exception {
         log.ok("testAuthenticateOriginal");
         final DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
         // this should throw InvalidCredentials exception, as we query a
         // non-existing user
-        con.authenticate(ObjectClass.ACCOUNT, "NON", new GuardedString("MOM".toCharArray()), null);
+        con.authenticate(ObjectClass.ACCOUNT, "NON", new GuardedString("MOM".
+                toCharArray()), null);
     }
 
-    
     /**
      * Test method for
      * @throws Exception 
      */
     @Test(expected = InvalidCredentialException.class)
-    public void testResolveUsernameWrongOriginal() throws Exception {
+    public void testResolveUsernameWrongOriginal()
+            throws Exception {
         log.ok("testAuthenticateOriginal");
         final DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
@@ -557,13 +659,14 @@ public abstract class DatabaseTableTestBase {
         // non-existing user
         con.resolveUsername(ObjectClass.ACCOUNT, "WRONG", null);
     }
-    
+
     /**
      * Test method for
      * @throws Exception 
      */
     @Test(expected = UnsupportedOperationException.class)
-    public void testNoPassColumnAutenticate() throws Exception {
+    public void testNoPassColumnAutenticate()
+            throws Exception {
         log.ok("testNoPassColumnAutenticate");
 
         final DatabaseTableConfiguration cfg = getConfiguration();
@@ -578,15 +681,18 @@ public abstract class DatabaseTableTestBase {
 
         // check if authenticate operation is present (it should NOT!)
         Schema schema = con.schema();
-        Set<ObjectClassInfo> oci = schema.getSupportedObjectClassesByOperation(AuthenticationApiOp.class);
+        Set<ObjectClassInfo> oci = schema.getSupportedObjectClassesByOperation(
+                AuthenticationApiOp.class);
         assertTrue(oci.size() == 0);
 
         // authentication should not be allowed -- will throw an
         // IllegalArgumentException
         // this should not throw any RuntimeException, on invalid authentication
         final Name name = AttributeUtil.getNameFromAttributes(expected);
-        final GuardedString passwordValue = AttributeUtil.getPasswordValue(expected);
-        con.authenticate(ObjectClass.ACCOUNT, name.getNameValue(), passwordValue, null);
+        final GuardedString passwordValue = AttributeUtil.getPasswordValue(
+                expected);
+        con.authenticate(ObjectClass.ACCOUNT, name.getNameValue(), passwordValue,
+                null);
 
         // cleanup (should not throw any exception.)
         con.delete(ObjectClass.ACCOUNT, uid, null);
@@ -597,7 +703,8 @@ public abstract class DatabaseTableTestBase {
      * @throws Exception 
      */
     @Test
-    public void testSearchByName() throws Exception {
+    public void testSearchByName()
+            throws Exception {
         log.ok("testSearchByName");
         final DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
@@ -607,7 +714,8 @@ public abstract class DatabaseTableTestBase {
         assertNotNull(uid);
 
         // retrieve the object
-        List<ConnectorObject> list = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
+        List<ConnectorObject> list = TestHelpers.searchToList(con,
+                ObjectClass.ACCOUNT, new EqualsFilter(uid));
         assertTrue(list.size() == 1);
         ConnectorObject actual = list.get(0);
         assertNotNull(actual);
@@ -619,14 +727,17 @@ public abstract class DatabaseTableTestBase {
      * @throws Exception
      */
     @Test
-    public void testSearchWithNullPassword() throws Exception {
+    public void testSearchWithNullPassword()
+            throws Exception {
         log.ok("testSearchWithNullPassword");
         final String SQL_TEMPLATE = "UPDATE {0} SET password = null WHERE {1} = ?";
         final DatabaseTableConfiguration cfg = getConfiguration();
-        final String sql = MessageFormat.format(SQL_TEMPLATE, cfg.getTable(), cfg.getKeyColumn());
+        final String sql = MessageFormat.format(SQL_TEMPLATE, cfg.getTable(),
+                cfg.getKeyColumn());
         con = getConnector(cfg);
         PreparedStatement ps = null;
-        DatabaseTableConnection conn = DatabaseTableConnection.createDBTableConnection(cfg);
+        DatabaseTableConnection conn = DatabaseTableConnection.
+                createDBTableConnection(cfg);
         final Set<Attribute> expected = getCreateAttributeSet(cfg);
         Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
 
@@ -642,7 +753,8 @@ public abstract class DatabaseTableTestBase {
             SQLUtil.closeQuietly(ps);
         }
         // attempt to get the record back..
-        List<ConnectorObject> results = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
+        List<ConnectorObject> results = TestHelpers.searchToList(con,
+                ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
         assertTrue("expect 1 connector object", results.size() == 1);
         final Set<Attribute> attributes = results.get(0).getAttributes();
         attributeSetsEquals(con.schema(), expected, attributes);
@@ -653,7 +765,8 @@ public abstract class DatabaseTableTestBase {
      * @throws Exception 
      */
     @Test
-    public void testSearchByNameAttributesToGet() throws Exception {
+    public void testSearchByNameAttributesToGet()
+            throws Exception {
         log.ok("testSearchByNameAttributesToGet");
         // create connector
         final DatabaseTableConfiguration cfg = getConfiguration();
@@ -667,7 +780,8 @@ public abstract class DatabaseTableTestBase {
         // attempt to get the record back..
         OperationOptionsBuilder opOption = new OperationOptionsBuilder();
         opOption.setAttributesToGet(FIRSTNAME, LASTNAME, MANAGER);
-        List<ConnectorObject> results = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid),
+        List<ConnectorObject> results = TestHelpers.searchToList(con,
+                ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid),
                 opOption.build());
         assertTrue("expect 1 connector object", results.size() == 1);
 
@@ -697,7 +811,8 @@ public abstract class DatabaseTableTestBase {
      * @throws Exception
      */
     @Test
-    public void testSearchByNameAttributesToGetExtended() throws Exception {
+    public void testSearchByNameAttributesToGetExtended()
+            throws Exception {
         log.ok("testSearchByNameAttributesToGetExtended");
         // create connector
         final DatabaseTableConfiguration cfg = getConfiguration();
@@ -712,7 +827,8 @@ public abstract class DatabaseTableTestBase {
         // attempt to get the record back..
         OperationOptionsBuilder opOption = new OperationOptionsBuilder();
         opOption.setAttributesToGet(FIRSTNAME, LASTNAME, MANAGER, JPEGPHOTO);
-        List<ConnectorObject> results = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid),
+        List<ConnectorObject> results = TestHelpers.searchToList(con,
+                ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid),
                 opOption.build());
         assertTrue("expect 1 connector object", results.size() == 1);
 
@@ -733,17 +849,18 @@ public abstract class DatabaseTableTestBase {
         assertNull(AttributeUtil.find(SALARY, actual));
         assertNull(AttributeUtil.find(TITLE, actual));
         assertNotNull(AttributeUtil.find(JPEGPHOTO, actual));
-        assertEquals(AttributeUtil.find(JPEGPHOTO, expected), AttributeUtil.find(JPEGPHOTO, actual));
+        assertEquals(AttributeUtil.find(JPEGPHOTO, expected),
+                AttributeUtil.find(JPEGPHOTO, actual));
     }
-    
+
     // TEest SYNCmethod    
-    
     /**
      * Test creating of the connector object, searching using UID and delete
      * @throws Exception 
      */
     @Test
-    public void testSyncFull() throws Exception {
+    public void testSyncFull()
+            throws Exception {
         final String ERR1 = "Could not find new object.";
 
         // create connector
@@ -773,8 +890,8 @@ public abstract class DatabaseTableTestBase {
             // attempt to find it again to make sure
 
             // attempt to find the newly created object..
-            List<ConnectorObject> results = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, FilterBuilder
-                    .equalTo(uid));
+            List<ConnectorObject> results = TestHelpers.searchToList(con,
+                    ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
             assertFalse("expect 1 connector object", results.size() == 1);
             try {
                 // now attempt to delete an object that is not there..
@@ -784,15 +901,16 @@ public abstract class DatabaseTableTestBase {
                 // should get here..
             }
         }
-    }    
-    
+    }
+
     /**
      * Test creating of the connector object, searching using UID and delete
      * @throws Exception 
      * @throws SQLException 
      */
     @Test
-    public void testSyncIncemental() throws Exception {
+    public void testSyncIncemental()
+            throws Exception {
         final String ERR1 = "Could not find new object.";
         final String SQL_TEMPLATE = "UPDATE Accounts SET changelog = ? WHERE accountId = ?";
         // create connector
@@ -807,11 +925,13 @@ public abstract class DatabaseTableTestBase {
 
         // update the last change
         PreparedStatement ps = null;
-        DatabaseTableConnection conn = DatabaseTableConnection.createDBTableConnection(cfg);
+        DatabaseTableConnection conn = DatabaseTableConnection.
+                createDBTableConnection(cfg);
         try {
             List<SQLParam> values = new ArrayList<SQLParam>();
             values.add(new SQLParam("changelog", changelog, Types.INTEGER));
-            values.add(new SQLParam("accountId", uid.getUidValue(), Types.VARCHAR));
+            values.add(new SQLParam("accountId", uid.getUidValue(),
+                    Types.VARCHAR));
             ps = conn.prepareStatement(SQL_TEMPLATE, values);
             ps.execute();
             conn.commit();
@@ -833,16 +953,16 @@ public abstract class DatabaseTableTestBase {
         // attempt to find the newly created object..
         con.sync(ObjectClass.ACCOUNT, ok.token, empt, null);
         assertFalse(ERR1, empt.found);
-    }      
-    
-    
+    }
+
     /**
      * Test creating of the connector object, searching using UID and delete
      * @throws Exception 
      * @throws SQLException 
      */
     @Test
-    public void testSyncUsingIntegerColumn() throws Exception {
+    public void testSyncUsingIntegerColumn()
+            throws Exception {
         final String ERR1 = "Could not find new object.";
         final String SQL_TEMPLATE = "UPDATE Accounts SET age = ? WHERE accountId = ?";
         final DatabaseTableConfiguration cfg = getConfiguration();
@@ -853,12 +973,14 @@ public abstract class DatabaseTableTestBase {
 
         // update the last change
         PreparedStatement ps = null;
-        DatabaseTableConnection conn = DatabaseTableConnection.createDBTableConnection(cfg);
+        DatabaseTableConnection conn = DatabaseTableConnection.
+                createDBTableConnection(cfg);
         Integer changed = new Long(System.currentTimeMillis()).intValue();
         try {
             List<SQLParam> values = new ArrayList<SQLParam>();
             values.add(new SQLParam("age", changed, Types.INTEGER));
-            values.add(new SQLParam("accountId", uid.getUidValue(), Types.VARCHAR));
+            values.add(new SQLParam("accountId", uid.getUidValue(),
+                    Types.VARCHAR));
             ps = conn.prepareStatement(SQL_TEMPLATE, values);
             ps.execute();
             conn.commit();
@@ -880,18 +1002,19 @@ public abstract class DatabaseTableTestBase {
         // attempt to find the newly created object..
         con.sync(ObjectClass.ACCOUNT, ok.token, empt, null);
         assertFalse(ERR1, empt.found);
-    }   
-   
-    
+    }
+
     /**
      * Test creating of the connector object, searching using UID and delete
      * @throws Exception 
      * @throws SQLException 
      */
     @Test
-    public void testSyncUsingLongColumn() throws Exception {
+    public void testSyncUsingLongColumn()
+            throws Exception {
         final String ERR1 = "Could not find new object.";
-        final String SQL_TEMPLATE = "UPDATE Accounts SET accessed = ? WHERE accountId = ?";
+        final String SQL_TEMPLATE =
+                "UPDATE Accounts SET accessed = ? WHERE accountId = ?";
 
         final DatabaseTableConfiguration cfg = getConfiguration();
         cfg.setChangeLogColumn(ACCESSED);
@@ -901,12 +1024,14 @@ public abstract class DatabaseTableTestBase {
 
         // update the last change
         PreparedStatement ps = null;
-        DatabaseTableConnection conn = DatabaseTableConnection.createDBTableConnection(cfg);
+        DatabaseTableConnection conn = DatabaseTableConnection.
+                createDBTableConnection(cfg);
         Integer changed = new Long(System.currentTimeMillis()).intValue();
         try {
             List<SQLParam> values = new ArrayList<SQLParam>();
             values.add(new SQLParam("accessed", changed, Types.INTEGER));
-            values.add(new SQLParam("accountId", uid.getUidValue(), Types.VARCHAR));
+            values.add(new SQLParam("accountId", uid.getUidValue(),
+                    Types.VARCHAR));
             ps = conn.prepareStatement(SQL_TEMPLATE, values);
             ps.execute();
             conn.commit();
@@ -927,12 +1052,9 @@ public abstract class DatabaseTableTestBase {
         // attempt to find the newly created object..
         con.sync(ObjectClass.ACCOUNT, ok.token, empt, null);
         assertFalse(ERR1, empt.found);
-    }       
-    
-    
-        
-    // Helper Methods/Classes
+    }
 
+    // Helper Methods/Classes
     /**
      * @param cfg
      * @return the connector
@@ -941,31 +1063,31 @@ public abstract class DatabaseTableTestBase {
         con = new DatabaseTableConnector();
         con.init(cfg);
         return con;
-    }    
+    }
 
-    
-    
     /**
      * @param schema a schema
      * @param expected an expected value
      * @param actual an actual value
      * @param ignore ignore list
      */
-    protected void attributeSetsEquals(final Schema schema, Set<Attribute> expected, Set<Attribute> actual, String ... ignore) {
-        attributeSetsEquals(schema, AttributeUtil.toMap(expected), AttributeUtil.toMap(actual), ignore);              
-    }    
-    
-     /**
+    protected void attributeSetsEquals(final Schema schema, Set<Attribute> expected, Set<Attribute> actual, String... ignore) {
+        attributeSetsEquals(schema, AttributeUtil.toMap(expected),
+                AttributeUtil.toMap(actual), ignore);
+    }
+
+    /**
      * @param schema a schema
      * @param expMap an expected value map
      * @param actMap an actual value map
      * @param ignore ignore list
      */
-    protected void attributeSetsEquals(final Schema schema, final Map<String, Attribute> expMap, final Map<String, Attribute> actMap, String ... ignore) {
+    protected void attributeSetsEquals(final Schema schema, final Map<String, Attribute> expMap, final Map<String, Attribute> actMap, String... ignore) {
         log.ok("attributeSetsEquals");
         final Set<String> ignoreSet = new HashSet<String>(Arrays.asList(ignore));
-        if(schema != null ) {
-            final ObjectClassInfo oci = schema.findObjectClassInfo(ObjectClass.ACCOUNT_NAME);
+        if (schema != null) {
+            final ObjectClassInfo oci = schema.findObjectClassInfo(
+                    ObjectClass.ACCOUNT_NAME);
             final Set<AttributeInfo> ais = oci.getAttributeInfo();
             for (AttributeInfo ai : ais) {
                 //ignore not returned by default
@@ -978,35 +1100,59 @@ public abstract class DatabaseTableTestBase {
                 }
             }
         }
-        
+
         Set<String> names = CollectionUtil.newCaseInsensitiveSet();
         names.addAll(expMap.keySet());
         names.addAll(actMap.keySet());
         names.removeAll(ignoreSet);
         names.remove(Uid.NAME);
-        int missing = 0; 
+        int missing = 0;
         List<String> mis = new ArrayList<String>();
-        List<String> extra = new ArrayList<String>();        
+        List<String> extra = new ArrayList<String>();
         for (String attrName : names) {
             final Attribute expAttr = expMap.get(attrName);
             final Attribute actAttr = actMap.get(attrName);
-            if(expAttr != null && actAttr != null ) {
-                assertEquals(attrName, expAttr, actAttr);
+            if (expAttr != null && actAttr != null) {
+
+                // This check is necessary to have the possibility to assert 
+                // equality between timestamp field actual and expected values.
+                // For instance, MySql and PostgreSQL handle timestamp fields
+                // with a little difference about milliseconds.
+                if (CHANGED.equalsIgnoreCase(attrName)) {
+                    assertEquals(
+                            attrName,
+                            Timestamp.valueOf(
+                            AttributeUtil.getStringValue(expAttr)),
+                            Timestamp.valueOf(
+                            AttributeUtil.getStringValue(actAttr)));
+                } else if (OPENTIME.equalsIgnoreCase(attrName)
+                        || ACTIVATE.equalsIgnoreCase(attrName)) {
+
+                    assertEquals(attrName,
+                            getTime(AttributeUtil.getStringValue(expAttr)),
+                            getTime(AttributeUtil.getStringValue(actAttr)));
+                } else {
+                    assertEquals(attrName,
+                            AttributeUtil.getSingleValue(expAttr).toString(),
+                            AttributeUtil.getSingleValue(actAttr).toString());
+                }
             } else {
                 missing = missing + 1;
-                if(expAttr != null) {
+                if (expAttr != null) {
                     mis.add(expAttr.getName());
                 }
-                if(actAttr != null) {
-                    extra.add(actAttr.getName());                    
+                if (actAttr != null) {
+                    extra.add(actAttr.getName());
                 }
             }
         }
-        assertEquals("missing attriburtes extra "+extra+" , missing "+mis, 0, missing); 
+        assertEquals("missing attriburtes extra " + extra + " , missing " + mis,
+                0, missing);
         log.ok("attributeSets are equal!");
-    }       
+    }
 
     protected static class FindUidSyncHandler implements SyncResultsHandler {
+
         /**
          * Determines if found..
          */
@@ -1031,7 +1177,7 @@ public abstract class DatabaseTableTestBase {
          * Attribute set to find
          */
         public Set<Attribute> attributes = null;
-        
+
         /**
          * @param uid
          */
@@ -1053,5 +1199,21 @@ public abstract class DatabaseTableTestBase {
             }
             return true;
         }
-    }      
+    }
+
+    private long getTime(final String date) {
+
+        final long time;
+
+        if (date.matches("\\d\\d:\\d\\d:\\d\\d")) {
+            time = Time.valueOf(date).getTime();
+        } else if (date.matches(
+                "\\d\\d\\d\\d-\\d\\d-\\d\\d")) {
+            time = Date.valueOf(date).getTime();
+        } else {
+            time = Timestamp.valueOf(date).getTime();
+        }
+
+        return time;
+    }
 }
