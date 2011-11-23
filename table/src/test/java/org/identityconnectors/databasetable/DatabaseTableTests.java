@@ -60,6 +60,7 @@ import org.identityconnectors.framework.common.objects.ConnectorObject;
 import org.identityconnectors.framework.common.objects.Name;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 import org.identityconnectors.framework.common.objects.ObjectClassInfo;
+import org.identityconnectors.framework.common.objects.OperationalAttributes;
 import org.identityconnectors.framework.common.objects.Schema;
 import org.identityconnectors.framework.common.objects.SyncToken;
 import org.identityconnectors.framework.common.objects.Uid;
@@ -163,6 +164,13 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         config.setConnectorMessages(TestHelpers.createDummyMessages());
         config.setDatabase(DB);
         config.setJdbcUrlTemplate(URL);
+
+        // status fields configuration
+        config.setStatusColumn(STATUS);
+        config.setEnabledStatusValue(ENABLEDSTATUS);
+        config.setEnabledStatusValue(DISABLEDSTATUS);
+        config.setDefaultStatusValue(DEFAULTSTATUS);
+
         return config;
     }
 
@@ -172,14 +180,20 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
     @Override
     protected Set<Attribute> getCreateAttributeSet(DatabaseTableConfiguration cfg)
             throws Exception {
-        Set<Attribute> ret = new HashSet<Attribute>();
+        final Set<Attribute> ret = new HashSet<Attribute>();
+        
+        // set __ENABLED__ attribute
+        ret.add(AttributeBuilder.buildEnabled(true));
+
         ret.add(AttributeBuilder.build(Name.NAME, randomString(50)));
+
         if (StringUtil.isNotBlank(cfg.getPasswordColumn())) {
-            ret.add(AttributeBuilder.buildPassword(new GuardedString(randomString(
-                    50).toCharArray())));
+            ret.add(AttributeBuilder.buildPassword(
+                    new GuardedString(randomString(50).toCharArray())));
         } else {
             ret.add(AttributeBuilder.build(PASSWORDCOLUMN, randomString(40)));
         }
+
         ret.add(AttributeBuilder.build(MANAGER, randomString(15)));
         ret.add(AttributeBuilder.build(MIDDLENAME, randomString(50)));
         ret.add(AttributeBuilder.build(FIRSTNAME, randomString(50)));
@@ -187,17 +201,20 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         ret.add(AttributeBuilder.build(EMAIL, randomString(50)));
         ret.add(AttributeBuilder.build(DEPARTMENT, randomString(50)));
         ret.add(AttributeBuilder.build(TITLE, randomString(50)));
+
         if (!cfg.getChangeLogColumn().equalsIgnoreCase(AGE)) {
             ret.add(AttributeBuilder.build(AGE, r.nextInt(100)));
         }
+
         if (!cfg.getChangeLogColumn().equalsIgnoreCase(ACCESSED)) {
             long v = r.nextLong();
 
             // Oracle conversion between long and BigDecimal is not exact 
             // in case of great longs (number of digits close to 19)
-            ret.add(AttributeBuilder.build(ACCESSED,
-                    v > 100000L || v < -100000L ? v / 10000L : v));
+            ret.add(AttributeBuilder.build(
+                    ACCESSED, v > 100000L || v < -100000L ? v / 10000L : v));
         }
+        
         ret.add(AttributeBuilder.build(SALARY, new BigDecimal("360536.75")));
         ret.add(AttributeBuilder.build(JPEGPHOTO, randomBytes(r, 2000)));
         ret.add(AttributeBuilder.build(OPENTIME, new java.sql.Time(
@@ -206,10 +223,12 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
                 System.currentTimeMillis()).toString()));
         ret.add(AttributeBuilder.build(CHANGED, new Timestamp(
                 System.currentTimeMillis() / 1000 * 1000).toString()));
+        
         if (!cfg.getChangeLogColumn().equalsIgnoreCase(CHANGELOG)) {
             ret.add(AttributeBuilder.build(CHANGELOG, new Timestamp(
                     System.currentTimeMillis()).getTime()));
         }
+        
         return ret;
     }
 
@@ -255,25 +274,34 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
     @Test
     public void testNoZeroSQLExceptions()
             throws Exception {
-        DatabaseTableConfiguration cfg = getConfiguration();
+        final DatabaseTableConfiguration cfg = getConfiguration();
         cfg.setRethrowAllSQLExceptions(false);
+
         con = getConnector(cfg);
 
-        final ExpectProxy<MappingStrategy> smse = new ExpectProxy<MappingStrategy>();
-        MappingStrategy sms = smse.getProxy(MappingStrategy.class);
+        final ExpectProxy<MappingStrategy> smse =
+                new ExpectProxy<MappingStrategy>();
+
+        final MappingStrategy sms = smse.getProxy(MappingStrategy.class);
+
         //Schema
-        for (int i = 0; i < 14; i++) {
+        for (int i = 0; i < 15; i++) {
             smse.expectAndReturn("getSQLAttributeType", String.class);
         }
+
         //Create fail
-        smse.expectAndThrow("setSQLParam", new SQLException("test reason", "0",
-                0));
+        smse.expectAndThrow(
+                "setSQLParam", new SQLException("test reason", "0", 0));
+
         //Update fail
-        smse.expectAndThrow("setSQLParam", new SQLException("test reason", "0",
-                0));
+        smse.expectAndThrow(
+                "setSQLParam", new SQLException("test reason", "0", 0));
+
         con.getConn().setSms(sms);
         Set<Attribute> expected = getCreateAttributeSet(cfg);
-        Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
+
+        final Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
+
         con.update(ObjectClass.ACCOUNT, uid, expected, null);
         assertTrue("setSQLParam not called", smse.isDone());
     }
@@ -285,20 +313,28 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
     @Test(expected = ConnectorException.class)
     public void testNonZeroSQLExceptions()
             throws Exception {
-        DatabaseTableConfiguration cfg = getConfiguration();
+        final DatabaseTableConfiguration cfg = getConfiguration();
         cfg.setRethrowAllSQLExceptions(false);
+
         con = getConnector(cfg);
 
-        final ExpectProxy<MappingStrategy> smse = new ExpectProxy<MappingStrategy>();
-        MappingStrategy sms = smse.getProxy(MappingStrategy.class);
-        for (int i = 0; i < 14; i++) {
+        final ExpectProxy<MappingStrategy> smse =
+                new ExpectProxy<MappingStrategy>();
+
+        final MappingStrategy sms = smse.getProxy(MappingStrategy.class);
+
+        for (int i = 0; i < 15; i++) {
             smse.expectAndReturn("getSQLAttributeType", String.class);
         }
-        smse.expectAndThrow("setSQLParam", new SQLException("test reason", "411",
-                411));
+
+        smse.expectAndThrow(
+                "setSQLParam", new SQLException("test reason", "411", 411));
+
         con.getConn().setSms(sms);
-        Set<Attribute> expected = getCreateAttributeSet(cfg);
+
+        final Set<Attribute> expected = getCreateAttributeSet(cfg);
         con.create(ObjectClass.ACCOUNT, expected, null);
+
         assertTrue("setSQLParam not called", smse.isDone());
     }
 
@@ -309,20 +345,28 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
     @Test(expected = ConnectorException.class)
     public void testRethrowAllSQLExceptions()
             throws Exception {
-        DatabaseTableConfiguration cfg = getConfiguration();
+        final DatabaseTableConfiguration cfg = getConfiguration();
+
         cfg.setRethrowAllSQLExceptions(true);
+
         con = getConnector(cfg);
 
         final ExpectProxy<MappingStrategy> smse = new ExpectProxy<MappingStrategy>();
-        MappingStrategy sms = smse.getProxy(MappingStrategy.class);
-        for (int i = 0; i < 14; i++) {
+
+        final MappingStrategy sms = smse.getProxy(MappingStrategy.class);
+
+        for (int i = 0; i < 15; i++) {
             smse.expectAndReturn("getSQLAttributeType", String.class);
         }
-        smse.expectAndThrow("setSQLParam", new SQLException("test reason", "0",
-                0));
+
+        smse.expectAndThrow(
+                "setSQLParam", new SQLException("test reason", "0", 0));
+
         con.getConn().setSms(sms);
+
         Set<Attribute> expected = getCreateAttributeSet(cfg);
         con.create(ObjectClass.ACCOUNT, expected, null);
+
         assertTrue("setSQLParam not called", smse.isDone());
     }
 
@@ -351,14 +395,19 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
             throws Exception {
         // Schema should not be null
         assertNotNull(schema);
-        Set<ObjectClassInfo> objectInfos = schema.getObjectClassInfo();
+
+        final Set<ObjectClassInfo> objectInfos = schema.getObjectClassInfo();
+
         assertNotNull(objectInfos);
         assertEquals(1, objectInfos.size());
+
         // get the fields from the test account
-        final Set<Attribute> attributeSet = getCreateAttributeSet(
-                getConfiguration());
+        final Set<Attribute> attributeSet =
+                getCreateAttributeSet(getConfiguration());
+
         final Map<String, Attribute> expected = AttributeUtil.toMap(attributeSet);
         final Set<String> keys = CollectionUtil.newCaseInsensitiveSet();
+
         keys.addAll(expected.keySet());
 
         // iterate through ObjectClassInfo Set
@@ -370,35 +419,40 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
             // iterate through AttributeInfo Set
             for (AttributeInfo attInfo : objectInfo.getAttributeInfo()) {
                 assertNotNull(attInfo);
-                String fieldName = attInfo.getName();
-                if (fieldName.equalsIgnoreCase(CHANGELOG)) {
-                    keys.remove(fieldName);
-                    continue;
-                }
-                assertTrue("Field:" + fieldName + " doesn't exist",
-                        keys.contains(fieldName));
-                keys.remove(fieldName);
-                Attribute fa = expected.get(fieldName);
-                assertNotNull("Field:" + fieldName + "  was duplicated", fa);
-                Object field = AttributeUtil.getSingleValue(fa);
-                Class<?> valueClass = field.getClass();
 
-                if (attInfo.getType().equals(BigDecimal.class)) {
-                    // Oracle return BigDecimal instead of Integer or Long or something else
-                    assertTrue("field: " + fieldName + ": "
-                            + valueClass + "/" + attInfo.getType(),
-                            valueClass.equals(Integer.class)
-                            || valueClass.equals(Long.class)
-                            || valueClass.equals(BigDecimal.class));
-                } else {
-                    assertEquals(
-                            "field: " + fieldName, valueClass, attInfo.getType());
+                final String fieldName = attInfo.getName();
+
+                keys.remove(fieldName);
+
+                final Attribute fa = expected.get(fieldName);
+
+                if (fa != null) {
+
+                    final Object field = AttributeUtil.getSingleValue(fa);
+
+                    final Class<?> valueClass =
+                            field != null ? field.getClass() : null;
+
+                    if (attInfo.getType().equals(BigDecimal.class)) {
+                        // Oracle return BigDecimal instead of Integer or Long 
+                        // or something else
+                        assertTrue("field: " + fieldName,
+                                valueClass == null
+                                || valueClass.equals(Integer.class)
+                                || valueClass.equals(Long.class)
+                                || valueClass.equals(BigDecimal.class));
+                    } else {
+                        assertTrue("field: " + fieldName,
+                                valueClass == null
+                                || OperationalAttributes.ENABLE_NAME.equals(attInfo.
+                                getName())
+                                || valueClass.equals(attInfo.getType()));
+                    }
                 }
             }
             // all the attribute has to be removed
-            assertEquals(
-                    "There are missing attributes which were not included in the schema:" + keys,
-                    0, keys.size());
+            assertTrue(
+                    "Missing attributes in the schema: " + keys, keys.isEmpty());
         }
     }
 
@@ -410,10 +464,15 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
     @Test
     public void testGetLatestSyncToken()
             throws Exception {
-        final String SQL_TEMPLATE = "UPDATE Accounts SET changelog = ? WHERE accountId = ?";
+        final String SQL_TEMPLATE =
+                "UPDATE Accounts SET changelog = ? WHERE accountId = ?";
+
         final DatabaseTableConfiguration cfg = getConfiguration();
+
         con = getConnector(cfg);
+
         deleteAllFromAccounts(con.getConn());
+
         final Set<Attribute> expected = getCreateAttributeSet(cfg);
 
         final Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
@@ -423,6 +482,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         // update the last change
         PreparedStatement ps = null;
         DatabaseTableConnection conn = null;
+
         try {
             conn = DatabaseTableConnection.createDBTableConnection(
                     getConfiguration());
@@ -438,10 +498,13 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
             SQLUtil.closeQuietly(ps);
             SQLUtil.closeQuietly(conn);
         }
+
         // attempt to find the newly created object..
-        final SyncToken latestSyncToken = con.getLatestSyncToken(
-                ObjectClass.ACCOUNT);
+        final SyncToken latestSyncToken =
+                con.getLatestSyncToken(ObjectClass.ACCOUNT);
+
         assertNotNull(latestSyncToken);
+
         final Object actual = latestSyncToken.getValue();
         assertEquals(changelog, actual);
     }
@@ -472,7 +535,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
             // This test is not applicable for this DBMS.
             return;
         }
-        
+
         log.ok("testCreateCall");
         DatabaseTableConfiguration cfg = getConfiguration();
         cfg.setNativeTimestamps(true);
@@ -522,7 +585,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
             // This test is not applicable for this DBMS.
             return;
         }
-        
+
         log.ok("testCreateCall");
         DatabaseTableConfiguration cfg = getConfiguration();
         cfg.setNativeTimestamps(false);

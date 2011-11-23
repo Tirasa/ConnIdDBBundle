@@ -211,7 +211,7 @@ public class DatabaseTableConnection extends DatabaseConnection {
      * @return the result of Column Values map
      * @throws SQLException
      */
-    public Map<String, SQLParam> getColumnValues(ResultSet result)
+    public Map<String, SQLParam> getColumnValues(final ResultSet result)
             throws SQLException {
         return DatabaseTableSQLUtil.getColumnValues(sms, result);
     }

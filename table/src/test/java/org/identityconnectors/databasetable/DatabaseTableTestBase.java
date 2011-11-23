@@ -27,7 +27,6 @@ import java.sql.Date;
 import static org.junit.Assert.*;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -60,6 +59,7 @@ import org.identityconnectors.framework.common.objects.Name;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 import org.identityconnectors.framework.common.objects.ObjectClassInfo;
 import org.identityconnectors.framework.common.objects.OperationOptionsBuilder;
+import org.identityconnectors.framework.common.objects.OperationalAttributes;
 import org.identityconnectors.framework.common.objects.Schema;
 import org.identityconnectors.framework.common.objects.SyncDelta;
 import org.identityconnectors.framework.common.objects.SyncDeltaType;
@@ -111,6 +111,14 @@ public abstract class DatabaseTableTestBase {
     static final String OPENTIME = "opentime";
 
     static final String CHANGED = "changed";
+
+    static final String STATUS = "status";
+
+    static final String ENABLEDSTATUS = "";
+
+    static final String DISABLEDSTATUS = "disabled";
+
+    static final String DEFAULTSTATUS = "";
 
     /**
      * Setup logging for the {@link DatabaseTableConnector}.
@@ -265,24 +273,144 @@ public abstract class DatabaseTableTestBase {
      * @throws Exception 
      */
     @Test
-    public void testCreateCall()
+    public void testCreateEnabledEntry()
             throws Exception {
-        log.ok("testCreateCall");
-        DatabaseTableConfiguration cfg = getConfiguration();
-        DatabaseTableConnector con = getConnector(cfg);
+        log.ok("create enabled entry");
 
-        deleteAllFromAccounts(con.getConn());
-        Set<Attribute> expected = getCreateAttributeSet(cfg);
-        Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
+        final DatabaseTableConfiguration cfg = getConfiguration();
+        final DatabaseTableConnector c = getConnector(cfg);
+
+        deleteAllFromAccounts(c.getConn());
+
+        final Set<Attribute> expected = getCreateAttributeSet(cfg);
+        final Uid uid = c.create(ObjectClass.ACCOUNT, expected, null);
+
         // attempt to get the record back..
-        List<ConnectorObject> results = TestHelpers.searchToList(con,
-                ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
+        final List<ConnectorObject> results = TestHelpers.searchToList(
+                c, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
         assertTrue("expect 1 connector object", results.size() == 1);
+
         final ConnectorObject co = results.get(0);
         assertNotNull(co);
+        assertTrue(AttributeUtil.isEnabled(co));
+
         final Set<Attribute> actual = co.getAttributes();
         assertNotNull(actual);
-        attributeSetsEquals(con.schema(), expected, actual);
+        attributeSetsEquals(c.schema(), expected, actual);
+    }
+
+    @Test
+    public void testCreateDisabledEntry()
+            throws Exception {
+        log.ok("create disabled entry");
+
+        final DatabaseTableConfiguration cfg = getConfiguration();
+        final DatabaseTableConnector c = getConnector(cfg);
+
+        deleteAllFromAccounts(c.getConn());
+
+        final Set<Attribute> expected = getCreateAttributeSet(cfg);
+
+        final Attribute status =
+                AttributeUtil.find(OperationalAttributes.ENABLE_NAME, expected);
+
+        if (status != null) {
+            expected.remove(status);
+        }
+
+        expected.add(AttributeBuilder.buildEnabled(false));
+
+        final Uid uid = c.create(ObjectClass.ACCOUNT, expected, null);
+
+        // attempt to get the record back..
+        final List<ConnectorObject> results = TestHelpers.searchToList(
+                c, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
+
+        assertTrue("expect 1 connector object", results.size() == 1);
+
+        final ConnectorObject co = results.get(0);
+        assertNotNull(co);
+        assertFalse(AttributeUtil.isEnabled(co));
+
+        final Set<Attribute> actual = co.getAttributes();
+        assertNotNull(actual);
+        attributeSetsEquals(c.schema(), expected, actual);
+    }
+
+    @Test
+    public void testCreateWithoutEnabledAttribute()
+            throws Exception {
+        log.ok("create without __ENABLED__ attribute");
+
+        final DatabaseTableConfiguration cfg = getConfiguration();
+        final DatabaseTableConnector c = getConnector(cfg);
+
+        deleteAllFromAccounts(c.getConn());
+
+        final Set<Attribute> expected = getCreateAttributeSet(cfg);
+
+        final Attribute status =
+                AttributeUtil.find(OperationalAttributes.ENABLE_NAME, expected);
+
+        if (status != null) {
+            expected.remove(status);
+        }
+
+        final Uid uid = c.create(ObjectClass.ACCOUNT, expected, null);
+
+        // attempt to get the record back..
+        final List<ConnectorObject> results = TestHelpers.searchToList(
+                c, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
+
+        assertTrue("expect 1 connector object", results.size() == 1);
+
+        final ConnectorObject co = results.get(0);
+        assertNotNull(co);
+        assertTrue(AttributeUtil.isEnabled(co));
+
+        final Set<Attribute> actual = co.getAttributes();
+        assertNotNull(actual);
+        attributeSetsEquals(c.schema(), expected, actual);
+    }
+
+    @Test
+    public void testCreateWithoutEnabledAttributeInConf()
+            throws Exception {
+        log.ok("create without __ENABLED__ attribute in configuration");
+
+        final DatabaseTableConfiguration cfg = getConfiguration();
+        cfg.setStatusColumn(null);
+        cfg.setEnabledStatusValue(null);
+        cfg.setDisabledStatusValue(null);
+        cfg.setDefaultStatusValue(null);
+
+        final DatabaseTableConnector c = getConnector(cfg);
+
+        deleteAllFromAccounts(c.getConn());
+
+        final Set<Attribute> expected = getCreateAttributeSet(cfg);
+
+        final Attribute status =
+                AttributeUtil.find(OperationalAttributes.ENABLE_NAME, expected);
+
+        if (status != null) {
+            expected.remove(status);
+        }
+
+        // this message should be ignored
+        expected.add(AttributeBuilder.buildEnabled(false));
+
+        final Uid uid = c.create(ObjectClass.ACCOUNT, expected, null);
+
+        // attempt to get the record back..
+        final List<ConnectorObject> results = TestHelpers.searchToList(
+                c, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
+
+        assertTrue("expect 1 connector object", results.size() == 1);
+
+        final ConnectorObject co = results.get(0);
+        assertNotNull(co);
+        assertNull(AttributeUtil.isEnabled(co));
     }
 
     /**
@@ -293,13 +421,17 @@ public abstract class DatabaseTableTestBase {
     public void testCreateCallNotNull()
             throws Exception {
         log.ok("testCreateCallNotNull");
-        DatabaseTableConfiguration cfg = getConfiguration();
-        DatabaseTableConnector c = getConnector(cfg);
-        Set<Attribute> expected = getCreateAttributeSet(cfg);
+
+        final DatabaseTableConfiguration cfg = getConfiguration();
+        final DatabaseTableConnector c = getConnector(cfg);
+        final Set<Attribute> expected = getCreateAttributeSet(cfg);
+
         // create modified attribute set
-        Map<String, Attribute> chMap = new HashMap<String, Attribute>(AttributeUtil.
-                toMap(expected));
+        final Map<String, Attribute> chMap =
+                new HashMap<String, Attribute>(AttributeUtil.toMap(expected));
+
         chMap.put(FIRSTNAME, AttributeBuilder.build(FIRSTNAME, (String) null));
+
         final Set<Attribute> changeSet = CollectionUtil.newSet(chMap.values());
         c.create(ObjectClass.ACCOUNT, changeSet, null);
     }
@@ -683,7 +815,7 @@ public abstract class DatabaseTableTestBase {
         Schema schema = con.schema();
         Set<ObjectClassInfo> oci = schema.getSupportedObjectClassesByOperation(
                 AuthenticationApiOp.class);
-        assertTrue(oci.size() == 0);
+        assertTrue(oci.isEmpty());
 
         // authentication should not be allowed -- will throw an
         // IllegalArgumentException
@@ -909,7 +1041,7 @@ public abstract class DatabaseTableTestBase {
      * @throws SQLException 
      */
     @Test
-    public void testSyncIncemental()
+    public void testSyncIncremental()
             throws Exception {
         final String ERR1 = "Could not find new object.";
         final String SQL_TEMPLATE = "UPDATE Accounts SET changelog = ? WHERE accountId = ?";
@@ -1071,9 +1203,17 @@ public abstract class DatabaseTableTestBase {
      * @param actual an actual value
      * @param ignore ignore list
      */
-    protected void attributeSetsEquals(final Schema schema, Set<Attribute> expected, Set<Attribute> actual, String... ignore) {
-        attributeSetsEquals(schema, AttributeUtil.toMap(expected),
-                AttributeUtil.toMap(actual), ignore);
+    protected void attributeSetsEquals(
+            final Schema schema,
+            final Set<Attribute> expected,
+            final Set<Attribute> actual,
+            final String... ignore) {
+
+        attributeSetsEquals(
+                schema,
+                AttributeUtil.toMap(expected),
+                AttributeUtil.toMap(actual),
+                ignore);
     }
 
     /**
@@ -1082,13 +1222,22 @@ public abstract class DatabaseTableTestBase {
      * @param actMap an actual value map
      * @param ignore ignore list
      */
-    protected void attributeSetsEquals(final Schema schema, final Map<String, Attribute> expMap, final Map<String, Attribute> actMap, String... ignore) {
+    protected void attributeSetsEquals(
+            final Schema schema,
+            final Map<String, Attribute> expMap,
+            final Map<String, Attribute> actMap,
+            final String... ignore) {
+
         log.ok("attributeSetsEquals");
+
         final Set<String> ignoreSet = new HashSet<String>(Arrays.asList(ignore));
+
         if (schema != null) {
-            final ObjectClassInfo oci = schema.findObjectClassInfo(
-                    ObjectClass.ACCOUNT_NAME);
+            final ObjectClassInfo oci =
+                    schema.findObjectClassInfo(ObjectClass.ACCOUNT_NAME);
+
             final Set<AttributeInfo> ais = oci.getAttributeInfo();
+
             for (AttributeInfo ai : ais) {
                 //ignore not returned by default
                 if (!ai.isReturnedByDefault()) {
@@ -1101,17 +1250,21 @@ public abstract class DatabaseTableTestBase {
             }
         }
 
-        Set<String> names = CollectionUtil.newCaseInsensitiveSet();
+        final Set<String> names = CollectionUtil.newCaseInsensitiveSet();
         names.addAll(expMap.keySet());
         names.addAll(actMap.keySet());
         names.removeAll(ignoreSet);
         names.remove(Uid.NAME);
+
         int missing = 0;
-        List<String> mis = new ArrayList<String>();
-        List<String> extra = new ArrayList<String>();
+
+        final List<String> mis = new ArrayList<String>();
+        final List<String> extra = new ArrayList<String>();
+
         for (String attrName : names) {
             final Attribute expAttr = expMap.get(attrName);
             final Attribute actAttr = actMap.get(attrName);
+
             if (expAttr != null && actAttr != null) {
 
                 // This check is necessary to have the possibility to assert 
@@ -1146,8 +1299,10 @@ public abstract class DatabaseTableTestBase {
                 }
             }
         }
-        assertEquals("missing attriburtes extra " + extra + " , missing " + mis,
+        assertEquals(
+                "missing attributes extra " + extra + " , missing " + mis,
                 0, missing);
+
         log.ok("attributeSets are equal!");
     }
 
@@ -1188,6 +1343,7 @@ public abstract class DatabaseTableTestBase {
         /* (non-Javadoc)
          * @see org.identityconnectors.framework.common.objects.SyncResultsHandler#handle(org.identityconnectors.framework.common.objects.SyncDelta)
          */
+        @Override
         public boolean handle(SyncDelta delta) {
             System.out.println("SyncDeltat: " + delta);
             if (delta.getUid().equals(uid)) {

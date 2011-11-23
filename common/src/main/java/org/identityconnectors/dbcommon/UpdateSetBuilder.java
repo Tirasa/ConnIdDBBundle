@@ -22,12 +22,10 @@
  */
 package org.identityconnectors.dbcommon;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.identityconnectors.common.CollectionUtil;
-
 
 /**
  * The update set builder create the database update statement.
@@ -36,10 +34,12 @@ import org.identityconnectors.common.CollectionUtil;
  * @version $Revision 1.0$
  * @since 1.0
  */
-public class UpdateSetBuilder {
+public class UpdateSetBuilder extends OperationBuilder {
+
     private List<SQLParam> params = new ArrayList<SQLParam>();
+
     private StringBuilder set = new StringBuilder();
-    
+
     /**
      * Add column name and value pair
      * The names are quoted using the {@link #columnQuote} value
@@ -49,7 +49,8 @@ public class UpdateSetBuilder {
      * @param sqlType
      * @return self
      */
-    public UpdateSetBuilder addBind(SQLParam param) {
+    @Override
+    public UpdateSetBuilder addBind(final SQLParam param) {
         return addBind(param, "?");
     }
 
@@ -61,14 +62,14 @@ public class UpdateSetBuilder {
      * @return self
      */
     public UpdateSetBuilder addBind(SQLParam param, String expression) {
-        if(set.length()>0) {
+        if (set.length() > 0) {
             set.append(" , ");
         }
         set.append(param.getName()).append(" = ").append(expression);
         params.add(param);
         return this;
-    }    
-    
+    }
+
     /**
      * Build the set SQL 
      * @return The update set clause 
@@ -85,12 +86,10 @@ public class UpdateSetBuilder {
         params.add(param);
     }
 
-    
     /**
      * @return the param values
      */
     public List<SQLParam> getParams() {
         return CollectionUtil.newReadOnlyList(params);
     }
-
 }

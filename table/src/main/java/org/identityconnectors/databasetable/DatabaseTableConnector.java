@@ -53,6 +53,7 @@ import org.identityconnectors.dbcommon.SQLParam;
 import org.identityconnectors.dbcommon.SQLUtil;
 import org.identityconnectors.dbcommon.UpdateSetBuilder;
 import org.identityconnectors.dbcommon.DatabaseQueryBuilder.OrderBy;
+import org.identityconnectors.dbcommon.OperationBuilder;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.exceptions.InvalidCredentialException;
 import org.identityconnectors.framework.common.exceptions.UnknownUidException;
@@ -157,6 +158,7 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
     /**
      * {@inheritDoc}
      */
+    @Override
     public Configuration getConfiguration() {
         return this.config;
     }
@@ -165,6 +167,7 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
      * Init the connector
      * {@inheritDoc}
      */
+    @Override
     public void init(Configuration cfg) {
         log.info("init DatabaseTable connector");
         this.config = (DatabaseTableConfiguration) cfg;
@@ -177,6 +180,7 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
     /**
      * {@inheritDoc}
      */
+    @Override
     public void checkAlive() {
         log.info("checkAlive DatabaseTable connector");
         try {
@@ -213,6 +217,7 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
      * Disposes of the {@link DatabaseTableConnector}'s resources.
      * {@inheritDoc}
      */
+    @Override
     public void dispose() {
         log.info("dispose DatabaseTable connector");
         if (conn != null) {
@@ -228,6 +233,7 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
      * Creates a row in the database representing an account.
      * {@inheritDoc}
      */
+    @Override
     public Uid create(ObjectClass oclass, Set<Attribute> attrs, OperationOptions options) {
         log.info("create account, check the ObjectClass");
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
@@ -243,10 +249,12 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
         log.ok("Attribute set is not empty");
 
         //Name must be present in attribute set or must be generated UID set on
-        Name name = AttributeUtil.getNameFromAttributes(attrs);
+        final Name name = AttributeUtil.getNameFromAttributes(attrs);
+
         if (name == null) {
             throw new IllegalArgumentException(config.getMessage(MSG_NAME_BLANK));
         }
+
         final String accountName = name.getNameValue();
         log.ok("Required Name attribure value {0} for create", accountName);
 
@@ -255,83 +263,66 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
         final InsertIntoBuilder bld = new InsertIntoBuilder();
 
         log.info("Creating account: {0}", accountName);
-        Set<String> missingRequiredColumns = CollectionUtil.
-                newCaseInsensitiveSet();
+
+        final Set<String> missingRequiredColumns =
+                CollectionUtil.newCaseInsensitiveSet();
+
         if (config.isEnableEmptyString()) {
             final Set<String> mrc = getStringColumnReguired();
-            log.info("Empty String is enabled, add missing required columns {0}",
-                    mrc);
+            log.info("Add missing required columns {0}", mrc);
             missingRequiredColumns.addAll(mrc);
         }
+
         log.info("process and check the Attribute Set");
+
+        // If status column is specified attibute __ENABLED__ must be specified.
+        // If attribute __ENABLED__ is not specified a default value must be
+        // provided.
+        if (StringUtil.isNotBlank(config.getStatusColumn())) {
+            final Attribute enabled = AttributeUtil.find(
+                    OperationalAttributes.ENABLE_NAME, attrs);
+
+            if (enabled == null) {
+                attrs.add(AttributeBuilder.build(
+                        OperationalAttributes.ENABLE_NAME,
+                        isEnabled(config.getDefaultStatusValue())));
+            }
+        }
+
         //All attribute names should be in create columns statement 
         for (Attribute attr : attrs) {
             // quoted column name
             final String columnName = getColumnName(attr.getName());
-            Object value = AttributeUtil.getSingleValue(attr);
-            //Empty String
-            if (isToBeEmpty(columnName, value)) {
-                log.info(
-                        "create account, attribute for a column {0} is null and should be empty",
-                        columnName);
-                value = DatabaseTableConstants.EMPTY_STR;
+
+            if (StringUtil.isNotBlank(columnName)) {
+
+                handleAttribute(bld, attr, columnName);
+
+                missingRequiredColumns.remove(columnName);
+
+                log.ok("Attribute {0} was added to insert",
+                        attr.getName());
+            } else {
+                log.ok("Attribute {0} ignored. Missing internal mapping",
+                        attr.getName());
             }
-
-            final int sqlType = getColumnType(columnName);
-
-            log.info("attribute {0} fit column {1} and sql type {2}", attr.
-                    getName(), columnName, sqlType);
-
-            Long time = null;
-            try {
-                boolean isDate = sqlType == 91 || sqlType == 93 || sqlType == 92;
-
-                if (isDate) {
-                    if (value.toString().matches("\\d\\d:\\d\\d:\\d\\d")) {
-                        time = Time.valueOf((String) value).getTime();
-                    } else if (value.toString().matches(
-                            "\\d\\d\\d\\d-\\d\\d-\\d\\d")) {
-                        time = Date.valueOf((String) value).getTime();
-                    } else {
-                        time = Timestamp.valueOf((String) value).getTime();
-                    }
-                } else {
-                    time = null;
-                }
-            } catch (Throwable t) {
-                log.error(t, "AAAAAAAAAAAAAA {0} {1} {2}", columnName, sqlType,
-                        value);
-            }
-
-//            bld.addBind(new SQLParam(quoteName(columnName),
-//                    sqlType == 91 ? Date.valueOf((String) value)
-//                    : (sqlType == 92 ? Time.valueOf((String) value)
-//                    : (sqlType == 93 ? Timestamp.valueOf((String) value) : value)),
-//                    sqlType));
-
-            bld.addBind(new SQLParam(quoteName(columnName),
-                    sqlType == 91 ? new Date(time)
-                    : (sqlType == 92 ? new Time(time)
-                    : (sqlType == 93 ? new Timestamp(time) : value)),
-                    sqlType));
-
-//            bld.addBind(new SQLParam(quoteName(columnName),value, sqlType));
-            missingRequiredColumns.remove(columnName);
-            log.ok("attribute {0} was added to insert", attr.getName());
         }
 
         // Bind empty string for not-null columns which are not in attribute set list
         if (config.isEnableEmptyString()) {
-            log.info(
-                    "there are columns not matched in attribute set which should be empty");
+            log.info("Some columns should be empty");
+
             for (String mCol : missingRequiredColumns) {
-                bld.addBind(new SQLParam(quoteName(mCol),
+                bld.addBind(
+                        new SQLParam(quoteName(mCol),
                         DatabaseTableConstants.EMPTY_STR, getColumnType(mCol)));
+
                 log.ok("Required empty value to column {0} added", mCol);
             }
         }
 
         final String SQL_INSERT = "INSERT INTO {0} ( {1} ) VALUES ( {2} )";
+
         // create the prepared statement..
         final String sql = MessageFormat.format(SQL_INSERT, tblname,
                 bld.getInto(), bld.getValues());
@@ -487,61 +478,25 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
 
         log.info("process and check the Attribute Set");
         UpdateSetBuilder updateSet = new UpdateSetBuilder();
-        for (Attribute attribute : attrs) {
+        for (Attribute attr : attrs) {
             // All attributes needs to be updated except the UID
-            if (!attribute.is(Uid.NAME)) {
-                final String attributeName = attribute.getName();
+            if (!attr.is(Uid.NAME)) {
+                final String attributeName = attr.getName();
                 final String columnName = getColumnName(attributeName);
-                Object value = AttributeUtil.getSingleValue(attribute);
-                // Handle the empty string values
-                if (isToBeEmpty(columnName, value)) {
-                    log.info(
-                            "Append empty attribute {0} for required columnName {1}",
-                            attributeName, columnName);
-                    value = DatabaseTableConstants.EMPTY_STR;
+
+                if (StringUtil.isNotBlank(columnName)) {
+
+                    handleAttribute(updateSet, attr, columnName);
+
+                    log.ok("Attribute {0} was added to update",
+                            attr.getName());
+                } else {
+                    log.ok("Attribute {0} ignored. Missing internal mapping",
+                            attr.getName());
                 }
-                final Integer sqlType = getColumnType(columnName);
-
-                Long time = null;
-                try {
-                    boolean isDate = sqlType == 91 || sqlType == 93 || sqlType == 92;
-
-                    if (isDate) {
-                        if (value.toString().matches("\\d\\d:\\d\\d:\\d\\d")) {
-                            time = Time.valueOf((String) value).getTime();
-                        } else if (value.toString().matches(
-                                "\\d\\d\\d\\d-\\d\\d-\\d\\d")) {
-                            time = Date.valueOf((String) value).getTime();
-                        } else {
-                            time = Timestamp.valueOf((String) value).getTime();
-                        }
-                    } else {
-                        time = null;
-                    }
-                } catch (Throwable t) {
-                    log.error(t, "AAAAAAAAAAAAAA {0} {1} {2}", columnName,
-                            sqlType,
-                            value);
-                }
-
-//updateSet.addBind(new SQLParam(quoteName(columnName),
-//                        sqlType == 91 ? Date.valueOf((String) value)
-//                        : (sqlType == 92 ? Time.valueOf((String) value)
-//                        : (sqlType == 93 ? Timestamp.valueOf((String) value) : value)),
-//                        sqlType));
-
-                updateSet.addBind(new SQLParam(quoteName(columnName),
-                        sqlType == 91 ? new Date(time)
-                        : (sqlType == 92 ? new Time(time)
-                        : (sqlType == 93 ? new Timestamp(time) : value)),
-                        sqlType));
-
-
-
-                log.ok("Appended to update statement the attribute {0} for columnName {1} and sqlType {2}",
-                        attributeName, columnName, sqlType);
             }
         }
+
         log.info("Update account {1}", accountName);
 
         // Format the update query
@@ -595,6 +550,7 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
      * Search for rows 
      * {@inheritDoc}
      */
+    @Override
     public void executeQuery(ObjectClass oclass, FilterWhereBuilder where, ResultsHandler handler,
             OperationOptions options) {
         log.info("check the ObjectClass and result handler");
@@ -613,10 +569,11 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
         //Names
         final String tblname = config.getTable();
         final Set<String> columnNamesToGet = resolveColumnNamesToGet(options);
+
         log.ok("Column Names {0} To Get", columnNamesToGet);
         // For all account query there is no need to replace or quote anything
-        final DatabaseQueryBuilder query = new DatabaseQueryBuilder(tblname,
-                columnNamesToGet);
+        final DatabaseQueryBuilder query =
+                new DatabaseQueryBuilder(tblname, columnNamesToGet);
         query.setWhere(where);
 
         ResultSet result = null;
@@ -627,12 +584,15 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
             result = statement.executeQuery();
             log.ok("executeQuery {0} on {1}", query.getSQL(), oclass);
             while (result.next()) {
-                final Map<String, SQLParam> columnValues = getConn().
-                        getColumnValues(result);
+                final Map<String, SQLParam> columnValues =
+                        getConn().getColumnValues(result);
+
                 log.ok("Column values {0} from result set ", columnValues);
+
                 // create the connector object
-                final ConnectorObjectBuilder bld = buildConnectorObject(
-                        columnValues);
+                final ConnectorObjectBuilder bld =
+                        buildConnectorObject(columnValues);
+
                 if (!handler.handle(bld.build())) {
                     log.ok("Stop processing of the result set");
                     break;
@@ -659,6 +619,7 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
     /**
      * {@inheritDoc}
      */
+    @Override
     public void sync(ObjectClass oclass, SyncToken token, SyncResultsHandler handler, OperationOptions options) {
         log.info("check the ObjectClass and result handler");
         // Contract tests    
@@ -683,9 +644,12 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
         // Names
         final String tblname = config.getTable();
         final String changeLogColumnName = quoteName(config.getChangeLogColumn());
-        log.ok("Change log attribute {0} map to column name {1}", config.
-                getChangeLogColumn(), changeLogColumnName);
+
+        log.ok("Change log attribute {0} map to column name {1}",
+                config.getChangeLogColumn(), changeLogColumnName);
+
         final Set<String> columnNames = resolveColumnNamesToGet(options);
+
         log.ok("Column Names {0} To Get", columnNames);
 
         final List<OrderBy> orderBy = new ArrayList<OrderBy>();
@@ -703,8 +667,9 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
             where.addBind(new SQLParam(changeLogColumnName, tokenVal, sqlType),
                     ">");
         }
-        final DatabaseQueryBuilder query = new DatabaseQueryBuilder(tblname,
-                columnNames);
+        final DatabaseQueryBuilder query =
+                new DatabaseQueryBuilder(tblname, columnNames);
+
         query.setWhere(where);
         query.setOrderBy(orderBy);
 
@@ -719,10 +684,12 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
             while (result.next()) {
                 final Map<String, SQLParam> columnValues = getConn().
                         getColumnValues(result);
+
                 log.ok("Column values {0} from sync result set ", columnValues);
 
                 // create the connector object..
                 final SyncDeltaBuilder sdb = buildSyncDelta(columnValues);
+
                 if (!handler.handle(sdb.build())) {
                     log.ok("Stop processing of the sync result set");
                     break;
@@ -784,7 +751,7 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
                 // Parse as string to be independent of DBMS.
                 final Object value = rset.getString(1) != null
                         ? Long.parseLong(rset.getString(1)) : null;
-                
+
                 if (value != null) {
                     log.ok("New token value {0}", value);
                     ret = new SyncToken(SQLUtil.jdbc2AttributeValue(value));
@@ -1082,6 +1049,10 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
             log.ok("attribute name {0} map to password column", attributeName);
             return config.getPasswordColumn();
         }
+        if (OperationalAttributes.ENABLE_NAME.equalsIgnoreCase(attributeName)) {
+            log.ok("attribute __ENABLE__ {0} map to key column", attributeName);
+            return config.getStatusColumn();
+        }
         return attributeName;
     }
 
@@ -1217,15 +1188,32 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
                 attrInfo.add(OperationalAttributeInfos.PASSWORD);
                 log.ok("password column in password attribute in the schema");
             } else if (name.equalsIgnoreCase(config.getChangeLogColumn())) {
-                // skip changelog column from the schema. It is not part of the contract
+                // skip changelog column from the schema.
                 log.ok("skip changelog column from the schema");
+            } else if (name.equalsIgnoreCase(config.getStatusColumn())) {
+                // status attribute
+                final Class<?> dataType =
+                        getConn().getSms().getSQLAttributeType(columnType);
+
+                attrBld.setType(dataType);
+                attrBld.setName(OperationalAttributes.ENABLE_NAME);
+
+                final boolean required =
+                        meta.isNullable(i) == ResultSetMetaData.columnNoNulls;
+
+                attrBld.setRequired(required);
+
+                attrBld.setReturnedByDefault(true);
+                attrInfo.add(attrBld.build());
             } else {
                 // All other attributed taken from the table
-                final Class<?> dataType = getConn().getSms().getSQLAttributeType(
-                        columnType);
+                final Class<?> dataType =
+                        getConn().getSms().getSQLAttributeType(columnType);
+
                 attrBld.setType(dataType);
                 attrBld.setName(name);
-                final boolean required = meta.isNullable(i) == ResultSetMetaData.columnNoNulls;
+                final boolean required =
+                        meta.isNullable(i) == ResultSetMetaData.columnNoNulls;
                 attrBld.setRequired(required);
                 if (required && dataType.isAssignableFrom(String.class)) {
                     log.ok("the column name {0} is string type and required",
@@ -1258,13 +1246,18 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
      * @param columnValues from the result set
      * @return ConnectorObjectBuilder object
      */
-    private ConnectorObjectBuilder buildConnectorObject(Map<String, SQLParam> columnValues) {
+    private ConnectorObjectBuilder buildConnectorObject(
+            final Map<String, SQLParam> columnValues) {
+
         log.info("build ConnectorObject");
+
         String uidValue = null;
         ConnectorObjectBuilder bld = new ConnectorObjectBuilder();
+
         for (Map.Entry<String, SQLParam> colValue : columnValues.entrySet()) {
             final String columnName = colValue.getKey();
             final SQLParam param = colValue.getValue();
+
             // Map the special
             if (columnName.equalsIgnoreCase(config.getKeyColumn())) {
                 if (param == null || param.getValue() == null) {
@@ -1279,11 +1272,17 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
                 log.ok("No Password in the result object");
             } else if (columnName.equalsIgnoreCase(config.getChangeLogColumn())) {
                 //No changelogcolumn attribute in the results
-                log.ok("changelogcolumn attribute in the result");
+                log.ok("No changelogColumn attribute in the result");
+            } else if (columnName.equalsIgnoreCase(config.getStatusColumn())) {
+                log.ok("statusColumn attribute in the result");
+                if (param != null && param.getValue() != null) {
+                    bld.addAttribute(AttributeBuilder.buildEnabled(
+                            isEnabled(param.getValue().toString())));
+                }
             } else {
                 if (param != null && param.getValue() != null) {
-                    bld.addAttribute(AttributeBuilder.build(columnName, param.
-                            getValue()));
+                    bld.addAttribute(
+                            AttributeBuilder.build(columnName, param.getValue()));
                 } else {
                     bld.addAttribute(AttributeBuilder.build(columnName));
                 }
@@ -1352,8 +1351,17 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
         Set<String> columnNamesToGet = new HashSet<String>();
         for (String attributeName : attributesToGet) {
             final String columnName = getColumnName(attributeName);
-            columnNamesToGet.add(quoteName(columnName));
+
+            if (StringUtil.isNotBlank(columnName)) {
+                columnNamesToGet.add(quoteName(columnName));
+            }
         }
+
+        if (StringUtil.isNotBlank(config.getStatusColumn())
+                && !columnNamesToGet.contains(config.getStatusColumn())) {
+            columnNamesToGet.add(config.getStatusColumn());
+        }
+
         return columnNamesToGet;
     }
 
@@ -1379,5 +1387,96 @@ public class DatabaseTableConnector implements PoolableConnector, CreateOp, Sear
         }
         assert stringColumnRequired != null;
         return stringColumnRequired;
+    }
+
+    /**
+     * Return true if and only if status is not equals to 'disabledStatusValued'.
+     * @param status.
+     * @return 'true' if enabled; 'false' otherwise.
+     */
+    private boolean isEnabled(final String status) {
+        if (StringUtil.isBlank(status)) {
+            return StringUtil.isNotBlank(config.getDisabledStatusValue());
+        } else {
+            return !status.equalsIgnoreCase(config.getDisabledStatusValue());
+        }
+    }
+
+    /**
+     * Return entry status based on given parameter.
+     * @param enabled should be the value of __ENABLED__
+     * @return status column value.
+     */
+    private String getStatusColumnValue(final String enabled) {
+        if ("TRUE".equalsIgnoreCase(enabled)) {
+            return config.getEnabledStatusValue();
+        } else {
+            return config.getDisabledStatusValue();
+        }
+    }
+
+    private <T extends OperationBuilder> void handleAttribute(
+            final T builder,
+            final Attribute attribute,
+            final String columnName) {
+
+        Object value = AttributeUtil.getSingleValue(attribute);
+
+        //Empty String
+        if (isToBeEmpty(columnName, value)) {
+            log.info("Attribute {0} should be empty", columnName);
+            value = DatabaseTableConstants.EMPTY_STR;
+        }
+
+        final int sqlType = getColumnType(columnName);
+
+        log.info("attribute {0} fit column {1} and sql type {2}",
+                attribute.getName(), columnName, sqlType);
+
+        try {
+
+            final boolean isDate =
+                    sqlType == 91 || sqlType == 93 || sqlType == 92;
+
+            if (isDate) {
+                Long time = null;
+
+                if (value.toString().matches("\\d\\d:\\d\\d:\\d\\d")) {
+                    time = Time.valueOf((String) value).getTime();
+                } else if (value.toString().matches(
+                        "\\d\\d\\d\\d-\\d\\d-\\d\\d")) {
+                    time = Date.valueOf((String) value).getTime();
+                } else {
+                    time = Timestamp.valueOf((String) value).getTime();
+                }
+
+                if (time != null) {
+                    builder.addBind(new SQLParam(
+                            quoteName(columnName),
+                            sqlType == 91 ? new Date(time)
+                            : (sqlType == 92 ? new Time(time)
+                            : new Timestamp(time)),
+                            sqlType));
+                } else {
+                    log.error("Invalid Date/Time/Timestamp format");
+                }
+            } else {
+                if (columnName.equalsIgnoreCase(
+                        config.getStatusColumn())) {
+
+                    builder.addBind(new SQLParam(
+                            quoteName(columnName),
+                            getStatusColumnValue(value.toString()),
+                            sqlType));
+                } else {
+                    builder.addBind(new SQLParam(
+                            quoteName(columnName), value, sqlType));
+                }
+            }
+
+        } catch (Throwable t) {
+            log.error(t, "Error parsing value '{0}' of attribute {1}:{2}",
+                    value, columnName, sqlType);
+        }
     }
 }

@@ -33,7 +33,6 @@ import org.identityconnectors.framework.spi.Configuration;
 import org.identityconnectors.framework.spi.ConfigurationProperty;
 import org.identityconnectors.framework.spi.operations.SyncOp;
 
-
 /**
  * Implements the {@link Configuration} interface to provide all the necessary
  * parameters to initialize the JDBC Connector.
@@ -48,7 +47,6 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     // =======================================================================
     // DatabaseTableConfiguration
     // =======================================================================
-
     /**
      * How to quote a column in SQL statements. Possible values can be NONE, SINGLE, DOUBLE, BRACKETS, BACKSLASH
      */
@@ -59,9 +57,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * 
      * @return quoting value
      */
-    @ConfigurationProperty(order = 1, 
-                           displayMessageKey = "QUOTING_DISPLAY", 
-                           helpMessageKey = "QUOTING_HELP")
+    @ConfigurationProperty(order = 1,
+    displayMessageKey = "QUOTING_DISPLAY",
+    helpMessageKey = "QUOTING_HELP")
     public String getQuoting() {
         return this.quoting;
     }
@@ -73,7 +71,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     public void setQuoting(String value) {
         this.quoting = value;
     }
-    
+
     /**
      * The host value
      */
@@ -84,9 +82,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * 
      * @return quoting value
      */
-    @ConfigurationProperty(order = 2, 
-                           displayMessageKey = "HOST_DISPLAY", 
-                           helpMessageKey = "HOST_HELP")
+    @ConfigurationProperty(order = 2,
+    displayMessageKey = "HOST_DISPLAY",
+    helpMessageKey = "HOST_HELP")
     public String getHost() {
         return this.host;
     }
@@ -97,9 +95,8 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     public void setHost(String value) {
         this.host = value;
-    }    
-    
-    
+    }
+
     /**
      * The port value
      */
@@ -110,9 +107,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * 
      * @return quoting value
      */
-    @ConfigurationProperty(order = 3, 
-                           displayMessageKey = "PORT_DISPLAY", 
-                           helpMessageKey = "PORT_HELP")
+    @ConfigurationProperty(order = 3,
+    displayMessageKey = "PORT_DISPLAY",
+    helpMessageKey = "PORT_HELP")
     public String getPort() {
         return this.port;
     }
@@ -123,8 +120,8 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     public void setPort(String value) {
         this.port = value;
-    }     
-    
+    }
+
     /**
      * Database Login User name. This user name is used to connect to database. The provided user name and password 
      * should have rights to insert/update/delete the rows in the configured identity holder table.
@@ -136,8 +133,8 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * @return user value
      */
     @ConfigurationProperty(order = 4,
-            displayMessageKey = "USER_DISPLAY", 
-            helpMessageKey = "USER_HELP")
+    displayMessageKey = "USER_DISPLAY",
+    helpMessageKey = "USER_HELP")
     public String getUser() {
         return this.user;
     }
@@ -159,9 +156,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * @return password value
      */
-    @ConfigurationProperty ( order=5, confidential=true,
-            displayMessageKey = "PASSWORD_DISPLAY", 
-            helpMessageKey = "PASSWORD_HELP")
+    @ConfigurationProperty(order = 5, confidential = true,
+    displayMessageKey = "PASSWORD_DISPLAY",
+    helpMessageKey = "PASSWORD_HELP")
     public GuardedString getPassword() {
         return this.password;
     }
@@ -171,31 +168,29 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     public void setPassword(GuardedString value) {
         this.password = value;
-    }    
-    
-    
+    }
+
     /**
      * Database name.  
-      */
+     */
     private String database = EMPTY_STR;
 
     /**
      * @return user value
      */
     @ConfigurationProperty(order = 6,
-            displayMessageKey = "DATABASE_DISPLAY", 
-            helpMessageKey = "DATABASE_HELP")
+    displayMessageKey = "DATABASE_DISPLAY",
+    helpMessageKey = "DATABASE_HELP")
     public String getDatabase() {
         return this.database;
     }
-    
+
     /**
      * @param value
      */
     public void setDatabase(String value) {
         this.database = value;
-    }    
-    
+    }
 
     /**
      * Database Table name. The name of the identity holder table (Integration table). 
@@ -207,9 +202,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * @return the user account table name
      * Please notice, there are used non default message keys
      */
-    @ConfigurationProperty(order = 7, required=true, 
-            displayMessageKey = "TABLE_DISPLAY", 
-            helpMessageKey = "TABLE_HELP")
+    @ConfigurationProperty(order = 7, required = true,
+    displayMessageKey = "TABLE_DISPLAY",
+    helpMessageKey = "TABLE_HELP")
     public String getTable() {
         return this.table;
     }
@@ -222,7 +217,6 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         this.table = table;
     }
 
-
     /**
      * Key Column, The name of the key column is required
      * This non empty value must be validated
@@ -234,8 +228,8 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * @return keyColumn value
      */
     @ConfigurationProperty(order = 8, required = true,
-            displayMessageKey = "KEY_COLUMN_DISPLAY", 
-            helpMessageKey = "KEY_COLUMN_HELP")
+    displayMessageKey = "KEY_COLUMN_DISPLAY",
+    helpMessageKey = "KEY_COLUMN_HELP")
     public String getKeyColumn() {
         return this.keyColumn;
     }
@@ -246,7 +240,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     public void setKeyColumn(String keyColumn) {
         this.keyColumn = keyColumn;
-    }    
+    }
 
     /**
      * Password Column. If non empty, password is supported in the schema
@@ -260,8 +254,8 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * @return passwordColumn value
      */
     @ConfigurationProperty(order = 9,
-            displayMessageKey = "PASSWORD_COLUMN_DISPLAY", 
-            helpMessageKey = "PASSWORD_COLUMN_HELP")
+    displayMessageKey = "PASSWORD_COLUMN_DISPLAY",
+    helpMessageKey = "PASSWORD_COLUMN_HELP")
     public String getPasswordColumn() {
         return this.passwordColumn;
     }
@@ -273,8 +267,115 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     public void setPasswordColumn(String value) {
         this.passwordColumn = value;
-    }    
-    
+    }
+
+    /**
+     * Status column. 
+     * If not empty it indicates table column used to describe entry status.
+     * Disabled status value are given by property 'disabledStatusValue'.
+     * Enabled status value are given by property 'enabledStatusValue'.
+     * Default value will be 'defaultSatusValue'.
+     */
+    private String statusColumn = EMPTY_STR;
+
+    /**
+     * Status Column getter
+     * 
+     * @return statusColumn value
+     */
+    @ConfigurationProperty(order = 10,
+    displayMessageKey = "STATUS_COLUMN_DISPLAY",
+    helpMessageKey = "STATUS_COLUMN_HELP")
+    public String getStatusColumn() {
+        return statusColumn;
+    }
+
+    /**
+     * Status Column setter
+     * @param statusColumn value
+     */
+    public void setStatusColumn(final String statusColumn) {
+        this.statusColumn = statusColumn;
+    }
+
+    /**
+     * Value for 'statusColumn' field to indicate disabled entries.
+     * Default 'false'.
+     */
+    private String disabledStatusValue = "false";
+
+    /**
+     * Disabled status value getter.
+     * 
+     * @return disabled status value.
+     */
+    @ConfigurationProperty(order = 11,
+    displayMessageKey = "DISABLED_STATUS_VALUE_DISPLAY",
+    helpMessageKey = "DISABLED_STATUS_VALUE_HELP")
+    public String getDisabledStatusValue() {
+        return disabledStatusValue;
+    }
+
+    /**
+     * Disabled status value setter.
+     * @param disabled status value.
+     */
+    public void setDisabledStatusValue(final String disabledStatusValue) {
+        this.disabledStatusValue = disabledStatusValue;
+    }
+
+    /**
+     * Value for 'statusColumn' field to indicate disabled entries.
+     * Default 'true'.
+     */
+    private String enabledStatusValue = "true";
+
+    /**
+     * Enabled status value getter.
+     * 
+     * @return enabled status value.
+     */
+    @ConfigurationProperty(order = 12,
+    displayMessageKey = "ENABLED_STATUS_VALUE_DISPLAY",
+    helpMessageKey = "ENABLED_STATUS_VALUE_HELP")
+    public String getEnabledStatusValue() {
+        return enabledStatusValue;
+    }
+
+    /**
+     * Enabled status value setter.
+     * @param enabled status value.
+     */
+    public void setEnabledStatusValue(final String enabledStatusValue) {
+        this.enabledStatusValue = enabledStatusValue;
+    }
+
+    /**
+     * Default value for 'statusColumn' field.
+     * Default 'true';
+     */
+    private String defaultStatusValue = "true";
+
+    /**
+     * Default status value getter.
+     * 
+     * @return default status value.
+     */
+    @ConfigurationProperty(order = 13,
+    displayMessageKey = "DEFAULT_STATUS_VALUE_DISPLAY",
+    helpMessageKey = "DEFAULT_STATUS_VALUE_HELP")
+    public String getDefaultStatusValue() {
+        return defaultStatusValue;
+    }
+
+    /**
+     * Default status value setter.
+     * @param default status value.
+     */
+    public void setDefaultStatusValue(final String defaultStatusValue) {
+        this.defaultStatusValue = defaultStatusValue;
+    }
+
     /**
      * The Driver class. The jdbcDriver is located by connector framework to connect to database.
      * Required configuration property, and should be validated
@@ -284,9 +385,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * @return jdbcDriver value
      */
-    @ConfigurationProperty(order = 10,
-            displayMessageKey = "JDBC_DRIVER_DISPLAY", 
-            helpMessageKey = "JDBC_DRIVER_HELP")
+    @ConfigurationProperty(order = 14,
+    displayMessageKey = "JDBC_DRIVER_DISPLAY",
+    helpMessageKey = "JDBC_DRIVER_HELP")
     public String getJdbcDriver() {
         return this.jdbcDriver;
     }
@@ -296,8 +397,8 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     public void setJdbcDriver(String value) {
         this.jdbcDriver = value;
-    }    
-        
+    }
+
     /**
      * Database connection URL. The url is used to connect to database.
      * Required configuration property, and should be validated
@@ -308,20 +409,20 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * Return the jdbcUrlTemplate 
      * @return url value
      */
-    @ConfigurationProperty(order = 11,
-            displayMessageKey = "URL_TEMPLATE_DISPLAY", 
-            helpMessageKey = "URL_TEMPLATE_HELP")
+    @ConfigurationProperty(order = 15,
+    displayMessageKey = "URL_TEMPLATE_DISPLAY",
+    helpMessageKey = "URL_TEMPLATE_HELP")
     public String getJdbcUrlTemplate() {
         return jdbcUrlTemplate;
-    }    
-   
+    }
+
     /**
      * @param value
      */
     public void setJdbcUrlTemplate(String value) {
         this.jdbcUrlTemplate = value;
-    }    
-    
+    }
+
     /**
      * The empty string setting
      * allow conversion of a null into an empty string for not-null char columns
@@ -332,9 +433,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * Accessor for the enableEmptyString property
      * @return the enableEmptyString
      */
-    @ConfigurationProperty(order = 12,
-            displayMessageKey = "ENABLE_EMPTY_STRING_DISPLAY", 
-            helpMessageKey = "ENABLE_EMPTY_STRING_HELP")
+    @ConfigurationProperty(order = 16,
+    displayMessageKey = "ENABLE_EMPTY_STRING_DISPLAY",
+    helpMessageKey = "ENABLE_EMPTY_STRING_HELP")
     public boolean isEnableEmptyString() {
         return enableEmptyString;
     }
@@ -358,9 +459,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * Accessor for the rethrowAllSQLExceptions property
      * @return the rethrowAllSQLExceptions
      */
-    @ConfigurationProperty(order = 14,
-            displayMessageKey = "RETHROW_ALL_SQLEXCEPTIONS_DISPLAY", 
-            helpMessageKey = "RETHROW_ALL_SQLEXCEPTIONS_HELP")
+    @ConfigurationProperty(order = 17,
+    displayMessageKey = "RETHROW_ALL_SQLEXCEPTIONS_DISPLAY",
+    helpMessageKey = "RETHROW_ALL_SQLEXCEPTIONS_HELP")
     public boolean isRethrowAllSQLExceptions() {
         return rethrowAllSQLExceptions;
     }
@@ -372,21 +473,21 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     public void setRethrowAllSQLExceptions(boolean rethrowAllSQLExceptions) {
         this.rethrowAllSQLExceptions = rethrowAllSQLExceptions;
     }
-    
+
     /**
      * Some JDBC drivers (ex: Oracle) may not be able to get correct string representation of
      * TIMESTAMP data type of the column from the database table.
      * To get correct value , one needs to use rs.getTimestamp() rather rs.getString().
      */
     public boolean nativeTimestamps = false;
-    
+
     /**
      * Accessor for the nativeTimestamps property
      * @return the nativeTimestamps
      */
-    @ConfigurationProperty(order = 15,
-            displayMessageKey = "NATIVE_TIMESTAMPS_DISPLAY", 
-            helpMessageKey = "NATIVE_TIMESTAMPS_HELP")
+    @ConfigurationProperty(order = 18,
+    displayMessageKey = "NATIVE_TIMESTAMPS_DISPLAY",
+    helpMessageKey = "NATIVE_TIMESTAMPS_HELP")
     public boolean isNativeTimestamps() {
         return nativeTimestamps;
     }
@@ -398,21 +499,20 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     public void setNativeTimestamps(boolean nativeTimestamps) {
         this.nativeTimestamps = nativeTimestamps;
     }
-    
+
     /**
      * Some JDBC drivers (ex: DerbyDB) may need to access all the datatypes with native types 
      * to get correct value.
      */
     public boolean allNative = false;
-    
 
     /**
      * Accessor for the allNativeproperty
      * @return the allNative
      */
-    @ConfigurationProperty(order = 16,
-            displayMessageKey = "ALL_NATIVE_DISPLAY", 
-            helpMessageKey = "ALL_NATIVE_HELP")
+    @ConfigurationProperty(order = 19,
+    displayMessageKey = "ALL_NATIVE_DISPLAY",
+    helpMessageKey = "ALL_NATIVE_HELP")
     public boolean isAllNative() {
         return allNative;
     }
@@ -423,8 +523,8 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     public void setAllNative(boolean allNative) {
         this.allNative = allNative;
-    } 
-    
+    }
+
     /**
      * The new connection validation query. The query can be empty. Then the auto commit true/false 
      * command is applied by default. This can be unsufficient on some database drivers because of caching
@@ -436,9 +536,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * connection validation query getter
      * @return validConnectionQuery value
      */
-    @ConfigurationProperty(order = 17,
-            displayMessageKey = "VALID_CONNECTION_QUERY_DISPLAY", 
-            helpMessageKey = "VALID_CONNECTION_QUERY_HELP")
+    @ConfigurationProperty(order = 20,
+    displayMessageKey = "VALID_CONNECTION_QUERY_DISPLAY",
+    helpMessageKey = "VALID_CONNECTION_QUERY_HELP")
     public String getValidConnectionQuery() {
         return this.validConnectionQuery;
     }
@@ -462,9 +562,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * Log Column is required be SyncOp
      * @return Log Column 
      */
-    @ConfigurationProperty(order = 19, operations = SyncOp.class,
-            displayMessageKey = "CHANGE_LOG_COLUMN_DISPLAY", 
-            helpMessageKey = "CHANGE_LOG_COLUMN_HELP")
+    @ConfigurationProperty(order = 21, operations = SyncOp.class,
+    displayMessageKey = "CHANGE_LOG_COLUMN_DISPLAY",
+    helpMessageKey = "CHANGE_LOG_COLUMN_HELP")
     public String getChangeLogColumn() {
         return this.changeLogColumn;
     }
@@ -479,7 +579,6 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     // =======================================================================
     // DataSource
     // =======================================================================
-    
     /**
      * The datasource name is used to connect to database.
      */
@@ -489,9 +588,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * Return the datasource 
      * @return datasource value
      */
-    @ConfigurationProperty(order = 20,
-            displayMessageKey = "DATASOURCE_DISPLAY", 
-            helpMessageKey = "DATASOURCE_HELP")
+    @ConfigurationProperty(order = 22,
+    displayMessageKey = "DATASOURCE_DISPLAY",
+    helpMessageKey = "DATASOURCE_HELP")
     public String getDatasource() {
         return datasource;
     }
@@ -502,8 +601,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     public void setDatasource(String value) {
         this.datasource = value;
     }
-    
-    
+
     /**
      * The jndiFactory name is used to connect to database.
      */
@@ -513,9 +611,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * Return the jndiFactory 
      * @return jndiFactory value
      */
-    @ConfigurationProperty(order = 21,
-            displayMessageKey = "JNDI_PROPERTIES_DISPLAY", 
-            helpMessageKey = "JNDI_PROPERTIES_HELP")
+    @ConfigurationProperty(order = 23,
+    displayMessageKey = "JNDI_PROPERTIES_DISPLAY",
+    helpMessageKey = "JNDI_PROPERTIES_HELP")
     public String[] getJndiProperties() {
         return jndiProperties;
     }
@@ -535,121 +633,135 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     @Override
     public void validate() {
-        log.info("Validate DatabaseTableConfiguration");        
+        log.info("Validate DatabaseTableConfiguration");
         // check that there is a table to query..
         if (StringUtil.isBlank(getTable())) {
             throw new IllegalArgumentException(getMessage(MSG_TABLE_BLANK));
-         }      
+        }
         // check the url is configured
         if (StringUtil.isBlank(getJdbcUrlTemplate())) {
-            throw new IllegalArgumentException(getMessage(MSG_JDBC_TEMPLATE_BLANK));
-        }   
+            throw new IllegalArgumentException(getMessage(
+                    MSG_JDBC_TEMPLATE_BLANK));
+        }
         // determine if you can get a key column
         if (StringUtil.isBlank(getKeyColumn())) {
-           throw new IllegalArgumentException(getMessage(MSG_KEY_COLUMN_BLANK));
+            throw new IllegalArgumentException(getMessage(MSG_KEY_COLUMN_BLANK));
         } else {
             if (getKeyColumn().equalsIgnoreCase(getChangeLogColumn())) {
-                throw new IllegalArgumentException(getMessage(MSG_KEY_COLUMN_EQ_CHANGE_LOG_COLUMN));               
-            }                       
+                throw new IllegalArgumentException(getMessage(
+                        MSG_KEY_COLUMN_EQ_CHANGE_LOG_COLUMN));
+            }
         }
         // key column, password column
         if (StringUtil.isNotBlank(getPasswordColumn())) {
-           if (getPasswordColumn().equalsIgnoreCase(getKeyColumn())) {
-               throw new IllegalArgumentException(getMessage(MSG_PASSWD_COLUMN_EQ_KEY_COLUMN));               
-           }
-           
-           if (getPasswordColumn().equalsIgnoreCase(getChangeLogColumn())) {
-               throw new IllegalArgumentException(getMessage(MSG_PASSWD_COLUMN_EQ_CHANGE_LOG_COLUMN));               
-           }           
-        }        
+            if (getPasswordColumn().equalsIgnoreCase(getKeyColumn())) {
+                throw new IllegalArgumentException(getMessage(
+                        MSG_PASSWD_COLUMN_EQ_KEY_COLUMN));
+            }
+
+            if (getPasswordColumn().equalsIgnoreCase(getChangeLogColumn())) {
+                throw new IllegalArgumentException(getMessage(
+                        MSG_PASSWD_COLUMN_EQ_CHANGE_LOG_COLUMN));
+            }
+        }
+
         // check that there is not a datasource
-        if(StringUtil.isBlank(getDatasource())){ 
-            log.info("Validate driver configuration.");        
-            
+        if (StringUtil.isBlank(getDatasource())) {
+            log.info("Validate driver configuration.");
+
             // determine if you can get a connection to the database..
             if (getUser() == null) {
                 throw new IllegalArgumentException(getMessage(MSG_USER_BLANK));
-             }
+            }
             // check that there is a pwd to query..
             if (getPassword() == null) {
-                throw new IllegalArgumentException(getMessage(MSG_PASSWORD_BLANK));
-             }
+                throw new IllegalArgumentException(
+                        getMessage(MSG_PASSWORD_BLANK));
+            }
 
             // host required
             if (getJdbcUrlTemplate().contains("%h")) {
                 if (StringUtil.isBlank(getHost())) {
-                    throw new IllegalArgumentException(getMessage(MSG_HOST_BLANK));
+                    throw new IllegalArgumentException(
+                            getMessage(MSG_HOST_BLANK));
                 }
             }
             // port required
-            if(getJdbcUrlTemplate().contains("%p")) {
+            if (getJdbcUrlTemplate().contains("%p")) {
                 if (StringUtil.isBlank(getPort())) {
-                    throw new IllegalArgumentException(getMessage(MSG_PORT_BLANK));
-                }                
+                    throw new IllegalArgumentException(
+                            getMessage(MSG_PORT_BLANK));
+                }
             }
             // database required            
-            if(getJdbcUrlTemplate().contains("%d")) {
+            if (getJdbcUrlTemplate().contains("%d")) {
                 if (StringUtil.isBlank(getDatabase())) {
-                    throw new IllegalArgumentException(getMessage(MSG_DATABASE_BLANK));
-                }                   
+                    throw new IllegalArgumentException(getMessage(
+                            MSG_DATABASE_BLANK));
+                }
             }
             // make sure the jdbcDriver is in the class path..
             if (StringUtil.isBlank(getJdbcDriver())) {
-                throw new IllegalArgumentException(getMessage(MSG_JDBC_DRIVER_BLANK));
-            }   
+                throw new IllegalArgumentException(getMessage(
+                        MSG_JDBC_DRIVER_BLANK));
+            }
             try {
                 Class.forName(getJdbcDriver());
             } catch (ClassNotFoundException e) {
-                throw new IllegalArgumentException(getMessage(MSG_JDBC_DRIVER_NOT_FOUND));
+                throw new IllegalArgumentException(getMessage(
+                        MSG_JDBC_DRIVER_NOT_FOUND));
             }
-            log.ok("driver configuration is ok");        
+            log.ok("driver configuration is ok");
         } else {
-            log.info("Validate datasource configuration");        
+            log.info("Validate datasource configuration");
             //Validate the JNDI properties
-            JNDIUtil.arrayToHashtable(getJndiProperties(), getConnectorMessages());
-            log.ok("datasource configuration is ok");        
+            JNDIUtil.arrayToHashtable(getJndiProperties(),
+                    getConnectorMessages());
+            log.ok("datasource configuration is ok");
         }
-        
+
         try {
             DatabaseTableSQLUtil.quoteName(getQuoting(), "test");
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(getMessage(MSG_INVALID_QUOTING, getQuoting()));
+            throw new IllegalArgumentException(getMessage(MSG_INVALID_QUOTING,
+                    getQuoting()));
         }
-        log.ok("Configuration is valid");        
+        log.ok("Configuration is valid");
     }
-    
+
     /**
      * Format a URL given a template. Recognized template characters are:
      *  % literal % h host p port d database
      * @return the database url 
      */
     public String formatUrlTemplate() {
-        log.info("format UrlTemplate");        
+        log.info("format UrlTemplate");
         final StringBuffer b = new StringBuffer();
         final String url = getJdbcUrlTemplate();
         final int len = url.length();
         for (int i = 0; i < len; i++) {
             char ch = url.charAt(i);
-            if (ch != '%')
+            if (ch != '%') {
                 b.append(ch);
-            else if (i + 1 < len) {
+            } else if (i + 1 < len) {
                 i++;
                 ch = url.charAt(i);
-                if (ch == '%')
+                if (ch == '%') {
                     b.append(ch);
-                else if (ch == 'h')
+                } else if (ch == 'h') {
                     b.append(getHost());
-                else if (ch == 'p')
+                } else if (ch == 'p') {
                     b.append(getPort());
-                else if (ch == 'd')
+                } else if (ch == 'd') {
                     b.append(getDatabase());
+                }
             }
         }
         String formattedURL = b.toString();
-        log.ok("UrlTemplate is formated to {0}", formattedURL);        
+        log.ok("UrlTemplate is formated to {0}", formattedURL);
         return formattedURL;
     }
-    
+
     /**
      * Format the connector message
      * @param key key of the message
@@ -657,10 +769,10 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     public String getMessage(String key) {
         final String fmt = getConnectorMessages().format(key, key);
-        log.ok("Get for a key {0} connector message {1}", key, fmt);        
+        log.ok("Get for a key {0} connector message {1}", key, fmt);
         return fmt;
     }
-    
+
     /**
      * Format message with arguments 
      * @param key key of the message
@@ -669,7 +781,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     public String getMessage(String key, Object... objects) {
         final String fmt = getConnectorMessages().format(key, key, objects);
-        log.ok("Get for a key {0} connector message {1}", key, fmt);        
+        log.ok("Get for a key {0} connector message {1}", key, fmt);
         return fmt;
-    }    
+    }
 }

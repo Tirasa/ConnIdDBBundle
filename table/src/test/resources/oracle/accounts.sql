@@ -15,5 +15,6 @@ create table Accounts (
   activate    DATE,
   opentime    DATE,      
   changed     TIMESTAMP NOT NULL,
-  changelog   NUMBER
+  changelog   NUMBER,
+  status      VARCHAR(10)
 )

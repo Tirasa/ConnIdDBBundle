@@ -207,10 +207,6 @@
                     <includes>
                         <include>**/*Tests.java</include>
                     </includes>
-                    <!-- In order to run these tests, you would need the Oracle JDBC driver -->
-                    <excludes>
-                        <exclude>**/*Oracle*Tests.java</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
 

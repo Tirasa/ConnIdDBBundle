@@ -22,12 +22,10 @@
  */
 package org.identityconnectors.dbcommon;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.identityconnectors.common.CollectionUtil;
-
 
 /**
  * The update set builder create the database update statement.
@@ -36,12 +34,16 @@ import org.identityconnectors.common.CollectionUtil;
  * @version $Revision 1.0$
  * @since 1.0
  */
-public class InsertIntoBuilder {
+public class InsertIntoBuilder extends OperationBuilder {
+
     private List<SQLParam> params = new ArrayList<SQLParam>();
+
     private StringBuilder into = new StringBuilder();
+
     private StringBuilder values = new StringBuilder();
+
     private boolean first = true;
-       
+
     /**
      * Add column name and value pair
      * 
@@ -50,8 +52,9 @@ public class InsertIntoBuilder {
      * @param sqlType 
      * @return self, builder pattern
      */
-    public InsertIntoBuilder addBind(SQLParam param) {
-        if(!first) {
+    @Override
+    public InsertIntoBuilder addBind(final SQLParam param) {
+        if (!first) {
             into.append(", ");
             values.append(", ");
         }
@@ -61,7 +64,7 @@ public class InsertIntoBuilder {
         first = false;
         return this;
     }
-    
+
     /**
      * Build the into 
      * @return The SQL part 

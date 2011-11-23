@@ -28,7 +28,6 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * This is a Test helper class for testing expected method calls and return values of interfaces
  * <p>Limitation:</p><p>First implementation supports just a method name checking</p> 
@@ -40,7 +39,9 @@ import java.util.List;
 public class ExpectProxy<T> implements InvocationHandler {
 
     private List<String> methodNames = new ArrayList<String>();
+
     private List<Object> retVals = new ArrayList<Object>();
+
     private int count = 0;
 
     /**
@@ -49,7 +50,8 @@ public class ExpectProxy<T> implements InvocationHandler {
      * @param retVal the expected return value or proxy
      * @return the proxy
      */
-    public ExpectProxy<T> expectAndReturn(final String methodName, final Object retVal) {
+    public ExpectProxy<T> expectAndReturn(
+            final String methodName, final Object retVal) {
         this.methodNames.add(methodName);
         this.retVals.add(retVal);
         return this;
@@ -67,17 +69,17 @@ public class ExpectProxy<T> implements InvocationHandler {
         return this;
     }
 
-
     /**
      * Program the expected method call
      * @param methodName the expected method name
      * @param throwEx the expected exception
      * @return the proxy
      */
-    public ExpectProxy<T> expectAndThrow(final String methodName, final Throwable throwEx) {
+    public ExpectProxy<T> expectAndThrow(
+            final String methodName, final Throwable throwEx) {
         return this.expectAndReturn(methodName, throwEx);
-    }    
-    
+    }
+
     /**
      * Test that all expected was called in the order
      * @return true/false all was called
@@ -89,7 +91,8 @@ public class ExpectProxy<T> implements InvocationHandler {
     /**
      * The InvocationHandler method
      */
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args)
+            throws Throwable {
         String ext = "";
         if (methodNames.size() > count) {
             final String mname = this.methodNames.get(count);
@@ -102,7 +105,8 @@ public class ExpectProxy<T> implements InvocationHandler {
                 return ret;
             }
         }
-        throw new AssertionError("The call of method :" + method + " was not expected." + ext
+        throw new AssertionError(
+                "The call of method :" + method + " was not expected." + ext
                 + " Please call expectAndReturn(methodName,retVal) to fix it");
     }
 
@@ -114,7 +118,7 @@ public class ExpectProxy<T> implements InvocationHandler {
     @SuppressWarnings("unchecked")
     public T getProxy(Class<T> clazz) {
         ClassLoader cl = getClass().getClassLoader();
-        Class<?> intef[] = new Class<?>[] { clazz };
+        Class<?> intef[] = new Class<?>[]{clazz};
         return (T) Proxy.newProxyInstance(cl, intef, this);
     }
 }

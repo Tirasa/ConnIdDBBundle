@@ -22,6 +22,7 @@
  */
 package org.identityconnectors.databasetable;
 
+import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.dbcommon.DatabaseFilterTranslator;
 import org.identityconnectors.dbcommon.SQLParam;
 import org.identityconnectors.framework.common.objects.Attribute;
@@ -38,6 +39,7 @@ import org.identityconnectors.framework.common.objects.OperationOptions;
 public class DatabaseTableFilterTranslator extends DatabaseFilterTranslator {
 
     DatabaseTableConnector connector;
+
     /**
      * @param connector the database table connector
      * @param oclass
@@ -55,10 +57,15 @@ public class DatabaseTableFilterTranslator extends DatabaseFilterTranslator {
     protected SQLParam getSQLParam(Attribute attribute, ObjectClass oclass, OperationOptions options) {
         final Object value = AttributeUtil.getSingleValue(attribute);
         final String columnName = connector.getColumnName(attribute.getName());
-        final Integer columnType = connector.getColumnType(columnName);
-        String quoting = ((DatabaseTableConfiguration)  this.connector.getConfiguration()).getQuoting();
-        String quotedName = DatabaseTableSQLUtil.quoteName(quoting, columnName);
-        return new SQLParam(columnName, value,columnType,quotedName);
+        if (StringUtil.isNotBlank(columnName)) {
+            final Integer columnType = connector.getColumnType(columnName);
+            String quoting = ((DatabaseTableConfiguration) this.connector.
+                    getConfiguration()).getQuoting();
+            String quotedName = DatabaseTableSQLUtil.quoteName(quoting,
+                    columnName);
+            return new SQLParam(columnName, value, columnType, quotedName);
+        } else {
+            return null;
+        }
     }
-
 }
