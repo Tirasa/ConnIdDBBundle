@@ -48,6 +48,7 @@ import org.identityconnectors.common.IOUtil;
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.databasetable.mapping.MappingStrategy;
+import org.identityconnectors.databasetable.security.AES;
 import org.identityconnectors.dbcommon.ExpectProxy;
 import org.identityconnectors.dbcommon.SQLParam;
 import org.identityconnectors.dbcommon.SQLUtil;
@@ -171,6 +172,11 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         config.setEnabledStatusValue(DISABLEDSTATUS);
         config.setDefaultStatusValue(DEFAULTSTATUS);
 
+        // password managemnet configuration
+        config.setCipherAlgorithm(AES.class.getName());
+        config.setCipherKey("cipherkeytoencodeanddecodepassword");
+        config.setRetrievePassword(true);
+
         return config;
     }
 
@@ -181,7 +187,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
     protected Set<Attribute> getCreateAttributeSet(DatabaseTableConfiguration cfg)
             throws Exception {
         final Set<Attribute> ret = new HashSet<Attribute>();
-        
+
         // set __ENABLED__ attribute
         ret.add(AttributeBuilder.buildEnabled(true));
 
@@ -214,7 +220,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
             ret.add(AttributeBuilder.build(
                     ACCESSED, v > 100000L || v < -100000L ? v / 10000L : v));
         }
-        
+
         ret.add(AttributeBuilder.build(SALARY, new BigDecimal("360536.75")));
         ret.add(AttributeBuilder.build(JPEGPHOTO, randomBytes(r, 2000)));
         ret.add(AttributeBuilder.build(OPENTIME, new java.sql.Time(
@@ -223,12 +229,12 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
                 System.currentTimeMillis()).toString()));
         ret.add(AttributeBuilder.build(CHANGED, new Timestamp(
                 System.currentTimeMillis() / 1000 * 1000).toString()));
-        
+
         if (!cfg.getChangeLogColumn().equalsIgnoreCase(CHANGELOG)) {
             ret.add(AttributeBuilder.build(CHANGELOG, new Timestamp(
                     System.currentTimeMillis()).getTime()));
         }
-        
+
         return ret;
     }
 

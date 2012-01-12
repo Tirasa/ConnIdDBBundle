@@ -20,7 +20,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  * ====================
  */
-package org.identityconnectors.databasetable;
+package org.identityconnectors.databasetable.util;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -36,10 +36,9 @@ import org.identityconnectors.common.CollectionUtil;
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
+import org.identityconnectors.databasetable.DatabaseTableConnector;
 import org.identityconnectors.databasetable.mapping.MappingStrategy;
 import org.identityconnectors.dbcommon.SQLParam;
-
-
 
 /**
  * The SQL helper/util class
@@ -47,19 +46,19 @@ import org.identityconnectors.dbcommon.SQLParam;
  * @since 1.0
  */
 public final class DatabaseTableSQLUtil {
-    
+
     /**
      * Setup logging for the {@link DatabaseTableConnector}.
      */
     static final Log log = Log.getLog(DatabaseTableSQLUtil.class);
-   
+
     /**
      * Never allow this to be instantiated.
      */
     private DatabaseTableSQLUtil() {
         throw new AssertionError();
     }
- 
+
     /**
      * <p>
      * This method binds the "?" markers in SQL statement with the parameters given as <i>values</i>. It
@@ -71,8 +70,9 @@ public final class DatabaseTableSQLUtil {
      * @param params a <CODE>List</CODE> of the object arguments
      * @throws SQLException an exception in statement
      */
-    public static void setParams(final MappingStrategy sms, final PreparedStatement statement, final List<SQLParam> params) throws SQLException {
-        if(statement == null || params == null) {
+    public static void setParams(final MappingStrategy sms, final PreparedStatement statement, final List<SQLParam> params)
+            throws SQLException {
+        if (statement == null || params == null) {
             return;
         }
         for (int i = 0; i < params.size(); i++) {
@@ -93,10 +93,11 @@ public final class DatabaseTableSQLUtil {
      * @param params a <CODE>List</CODE> of the object arguments
      * @throws SQLException an exception in statement
      */
-    public static void setParams(final MappingStrategy sms, final CallableStatement statement, final List<SQLParam> params) throws SQLException {
+    public static void setParams(final MappingStrategy sms, final CallableStatement statement, final List<SQLParam> params)
+            throws SQLException {
         //The same as for prepared statements
         setParams(sms, (PreparedStatement) statement, params);
-    }    
+    }
 
     /**
      * Set the statement parameter
@@ -107,13 +108,14 @@ public final class DatabaseTableSQLUtil {
      * @param parm a parameter Value
      * @throws SQLException a SQL exception 
      */
-    static void setParam(final MappingStrategy sms, final PreparedStatement stmt, final int idx, SQLParam parm) throws SQLException {
+    static void setParam(final MappingStrategy sms, final PreparedStatement stmt, final int idx, SQLParam parm)
+            throws SQLException {
         // Guarded string conversion
         if (parm.getValue() instanceof GuardedString) {
             setGuardedStringParam(sms, stmt, idx, parm);
         } else {
-          sms.setSQLParam(stmt, idx, parm);
-        }       
+            sms.setSQLParam(stmt, idx, parm);
+        }
     }
 
     /**
@@ -123,9 +125,11 @@ public final class DatabaseTableSQLUtil {
      * @return The transformed column values map
      * @throws SQLException 
      */
-    public static Map<String, SQLParam> getColumnValues(final MappingStrategy sms, ResultSet resultSet) throws SQLException {
-        Assertions.nullCheck(resultSet,"resultSet");
-        Map<String, SQLParam> ret = CollectionUtil.<SQLParam>newCaseInsensitiveMap();
+    public static Map<String, SQLParam> getColumnValues(final MappingStrategy sms, ResultSet resultSet)
+            throws SQLException {
+        Assertions.nullCheck(resultSet, "resultSet");
+        Map<String, SQLParam> ret = CollectionUtil.<SQLParam>
+                newCaseInsensitiveMap();
         final ResultSetMetaData meta = resultSet.getMetaData();
         int count = meta.getColumnCount();
         for (int i = 1; i <= count; i++) {
@@ -136,7 +140,7 @@ public final class DatabaseTableSQLUtil {
         }
         return ret;
     }
-    
+
     /**
      * The helper guardedString bind method
      * @param sms 
@@ -151,10 +155,13 @@ public final class DatabaseTableSQLUtil {
         final String name = param.getName();
         try {
             guard.access(new GuardedString.Accessor() {
+
+                @Override
                 public void access(char[] clearChars) {
                     try {
                         //Never use setString, the DB2 database will fail for secured columns
-                        sms.setSQLParam(stmt, idx, new SQLParam(name, new String(clearChars), Types.VARCHAR));
+                        sms.setSQLParam(stmt, idx, new SQLParam(name,
+                                new String(clearChars), Types.VARCHAR));
                     } catch (SQLException e) {
                         // checked exception are not allowed in the access method 
                         // Lets use the exception softening pattern
@@ -171,7 +178,6 @@ public final class DatabaseTableSQLUtil {
         }
     }
 
-    
     /**
      * Used to escape the table or column name.
      * @param quoting the string double, single, back, brackets
@@ -200,4 +206,3 @@ public final class DatabaseTableSQLUtil {
         return bld.toString();
     }
 }
-

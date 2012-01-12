@@ -22,11 +22,12 @@
  */
 package org.identityconnectors.databasetable;
 
-import static org.identityconnectors.databasetable.DatabaseTableConstants.*;
+import static org.identityconnectors.databasetable.util.DatabaseTableConstants.*;
 
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
+import org.identityconnectors.databasetable.util.DatabaseTableSQLUtil;
 import org.identityconnectors.dbcommon.JNDIUtil;
 import org.identityconnectors.framework.spi.AbstractConfiguration;
 import org.identityconnectors.framework.spi.Configuration;
@@ -624,10 +625,49 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     public void setJndiProperties(String[] value) {
         this.jndiProperties = value;
     }
+
+    private String cipherAlgorithm;
+
+    @ConfigurationProperty(order = 24, required = true,
+    displayMessageKey = "CIPHER_ALGORITHM_DISPLAY",
+    helpMessageKey = "CIPHER_ALGORITHM_HELP")
+    public String getCipherAlgorithm() {
+        return cipherAlgorithm;
+    }
+
+    public void setCipherAlgorithm(String cipherAlgorithm) {
+        this.cipherAlgorithm = cipherAlgorithm;
+    }
+
+    private String cipherKey;
+
+    @ConfigurationProperty(order = 25, required = true,
+    displayMessageKey = "CIPHER_KEY_DISPLAY",
+    helpMessageKey = "CIPHER_KEY_HELP")
+    public String getCipherKey() {
+        return cipherKey;
+    }
+
+    public void setCipherKey(String cipherKey) {
+        this.cipherKey = cipherKey;
+    }
+
+    private boolean retrievePassword;
+
+    @ConfigurationProperty(order = 25, required = true,
+    displayMessageKey = "RETRIEVE_PASSWORD_DISPLAY",
+    helpMessageKey = "RETRIEVE_PASSWORD_HELP")
+    public boolean isRetrievePassword() {
+        return retrievePassword;
+    }
+
+    public void setRetrievePassword(boolean retrievePassword) {
+        this.retrievePassword = retrievePassword;
+    }
+
     // =======================================================================
     // Configuration Interface
     // =======================================================================
-
     /**
      * Attempt to validate the arguments added to the Configuration.
      */

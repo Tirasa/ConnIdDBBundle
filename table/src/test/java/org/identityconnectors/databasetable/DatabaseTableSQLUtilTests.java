@@ -43,6 +43,7 @@ import org.identityconnectors.common.Pair;
 import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.databasetable.mapping.DefaultStrategy;
 import org.identityconnectors.databasetable.mapping.MappingStrategy;
+import org.identityconnectors.databasetable.util.DatabaseTableSQLUtil;
 import org.identityconnectors.dbcommon.ExpectProxy;
 import org.identityconnectors.dbcommon.SQLParam;
 import org.junit.Test;

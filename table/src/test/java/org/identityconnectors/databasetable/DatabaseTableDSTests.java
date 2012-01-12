@@ -27,12 +27,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.DriverManager;
 
-import java.util.Hashtable;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 import javax.sql.DataSource;
 
+import org.identityconnectors.databasetable.security.AES;
 import org.identityconnectors.test.common.TestHelpers;
 
 /**
@@ -72,6 +72,11 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
         config.setEnabledStatusValue(DISABLEDSTATUS);
         config.setDefaultStatusValue(DEFAULTSTATUS);
 
+        // password managemnet configuration
+        config.setCipherAlgorithm(AES.class.getName());
+        config.setCipherKey("cipherkeytoencodeanddecodepassword");
+        config.setRetrievePassword(true);
+
         return config;
     }
 
@@ -80,12 +85,14 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
      */
     public static class MockContextFactory implements InitialContextFactory {
 
-        @SuppressWarnings("unchecked")
-        public Context getInitialContext(Hashtable environment)
+        @SuppressWarnings("UseOfObsoleteCollectionType")
+        @Override
+        public Context getInitialContext(java.util.Hashtable environment)
                 throws NamingException {
-            Context context = (Context) Proxy.newProxyInstance(getClass().
-                    getClassLoader(),
-                    new Class[]{Context.class}, new ContextIH());
+            final Context context = (Context) Proxy.newProxyInstance(
+                    getClass().getClassLoader(),
+                    new Class[]{Context.class},
+                    new ContextIH());
             return context;
         }
     }
@@ -96,6 +103,7 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
      */
     static class ContextIH implements InvocationHandler {
 
+        @Override
         public Object invoke(Object proxy, Method method, Object[] args)
                 throws Throwable {
             if (method.getName().equals("lookup")) {
@@ -113,6 +121,7 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
      */
     static class DataSourceIH implements InvocationHandler {
 
+        @Override
         public Object invoke(Object proxy, Method method, Object[] args)
                 throws Throwable {
             if (method.getName().equals("getConnection")) {

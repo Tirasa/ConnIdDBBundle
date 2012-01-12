@@ -23,6 +23,7 @@
 package org.identityconnectors.databasetable;
 
 import org.identityconnectors.common.StringUtil;
+import org.identityconnectors.databasetable.util.DatabaseTableSQLUtil;
 import org.identityconnectors.dbcommon.DatabaseFilterTranslator;
 import org.identityconnectors.dbcommon.SQLParam;
 import org.identityconnectors.framework.common.objects.Attribute;

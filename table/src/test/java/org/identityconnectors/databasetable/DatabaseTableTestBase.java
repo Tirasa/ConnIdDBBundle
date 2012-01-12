@@ -24,9 +24,11 @@ package org.identityconnectors.databasetable;
 
 import java.io.InputStream;
 import java.sql.Date;
+import org.identityconnectors.databasetable.security.PasswordEncodingException;
 import static org.junit.Assert.*;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -44,6 +46,7 @@ import java.util.Set;
 import org.identityconnectors.common.CollectionUtil;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
+import org.identityconnectors.databasetable.security.MD5;
 import org.identityconnectors.dbcommon.SQLParam;
 import org.identityconnectors.dbcommon.SQLUtil;
 import org.identityconnectors.framework.api.operations.AuthenticationApiOp;
@@ -1001,21 +1004,53 @@ public abstract class DatabaseTableTestBase {
 
         final Set<Attribute> expected = getCreateAttributeSet(cfg);
 
+        final Attribute password =
+                AttributeUtil.find(OperationalAttributes.PASSWORD_NAME, expected);
+
+        if (password != null) {
+            expected.remove(password);
+        }
+
+        expected.add(AttributeBuilder.buildPassword(
+                new GuardedString("password".toCharArray())));
+
+
         // create the object
         final Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
         assertNotNull(uid);
         try {
             System.out.println("Uid: " + uid);
             FindUidSyncHandler handler = new FindUidSyncHandler(uid);
+
             // attempt to find the newly created object..
             con.sync(ObjectClass.ACCOUNT, null, handler, null);
             assertTrue(ERR1, handler.found);
             assertEquals(0L, handler.token.getValue());
-            // assertEquals(expected, handler.deltaType); // not definned till now 
 
             //Test the created attributes are equal the searched
             assertNotNull(handler.attributes);
             attributeSetsEquals(con.schema(), expected, handler.attributes);
+
+            // --------------------------------------------
+            // Verify password synchronization
+            // --------------------------------------------
+            final Attribute pwd = AttributeUtil.find(
+                    OperationalAttributes.PASSWORD_NAME, handler.attributes);
+
+            assertNotNull(pwd);
+            assertNotNull(pwd.getValue());
+            assertEquals(1, pwd.getValue().size());
+
+            final GuardedString guarded = (GuardedString) pwd.getValue().get(0);
+            guarded.access(new GuardedString.Accessor() {
+
+                @Override
+                public void access(char[] clearChars) {
+                    assertEquals("password", new String(clearChars));
+                }
+            });
+            // --------------------------------------------
+
         } finally {
             // attempt to delete the object..
             con.delete(ObjectClass.ACCOUNT, uid, null);
@@ -1184,6 +1219,194 @@ public abstract class DatabaseTableTestBase {
         // attempt to find the newly created object..
         con.sync(ObjectClass.ACCOUNT, ok.token, empt, null);
         assertFalse(ERR1, empt.found);
+    }
+
+    @Test
+    public void testPwdNotReversibleAlgorithm()
+            throws Exception {
+        log.ok("testPasswordManagement");
+
+        final DatabaseTableConfiguration cfg = getConfiguration();
+        cfg.setCipherAlgorithm("MD5");
+        cfg.setCipherKey(null);
+
+        con = getConnector(cfg);
+
+        final Set<Attribute> expected = getCreateAttributeSet(cfg);
+
+        final Attribute password =
+                AttributeUtil.find(OperationalAttributes.PASSWORD_NAME, expected);
+
+        if (password != null) {
+            expected.remove(password);
+        }
+
+        expected.add(AttributeBuilder.buildPassword(
+                new GuardedString("password".toCharArray())));
+
+        final Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
+
+        try {
+            final OperationOptionsBuilder op = new OperationOptionsBuilder();
+            op.setAttributesToGet(OperationalAttributes.PASSWORD_NAME);
+
+            List<ConnectorObject> rs = TestHelpers.searchToList(
+                    con, ObjectClass.ACCOUNT, new EqualsFilter(uid), op.build());
+
+            assertNotNull(rs);
+            assertTrue("Could not find new object", rs.size() == 1);
+
+            //Test the created attributes are equal the searched
+            ConnectorObject co = rs.get(0);
+            assertNotNull(co);
+
+            Attribute actual =
+                    co.getAttributeByName(OperationalAttributes.PASSWORD_NAME);
+
+            assertNotNull(actual);
+            assertNotNull(actual.getValue());
+            assertEquals(1, actual.getValue().size());
+
+            final GuardedString guarded =
+                    (GuardedString) actual.getValue().get(0);
+
+            guarded.access(new GuardedString.Accessor() {
+
+                @Override
+                public void access(char[] clearChars) {
+                    String md5str = null;
+
+                    try {
+
+                        md5str = new MD5().encode("password");
+                        assertFalse("password".equalsIgnoreCase(md5str));
+
+                    } catch (PasswordEncodingException ex) {
+                        assertFalse(true);
+                    }
+
+                    assertNotNull(md5str);
+                    assertEquals(md5str, new String(clearChars));
+                }
+            });
+
+            final Set<Attribute> changeSet = new HashSet<Attribute>();
+            changeSet.add(AttributeBuilder.buildPassword("123pwd".toCharArray()));
+
+            con.update(ObjectClass.ACCOUNT, uid, changeSet, null);
+
+            rs = TestHelpers.searchToList(
+                    con, ObjectClass.ACCOUNT, new EqualsFilter(uid), op.build());
+
+            co = rs.get(0);
+            actual = co.getAttributeByName(OperationalAttributes.PASSWORD_NAME);
+
+            ((GuardedString) actual.getValue().get(0)).access(
+                    new GuardedString.Accessor() {
+
+                        @Override
+                        public void access(char[] clearChars) {
+                            String md5str = null;
+
+                            try {
+
+                                md5str = new MD5().encode("123pwd");
+                                assertFalse("123pwd".equalsIgnoreCase(md5str));
+
+                            } catch (PasswordEncodingException ex) {
+                                assertFalse(true);
+                            }
+
+                            assertNotNull(md5str);
+                            assertEquals(md5str, new String(clearChars));
+                        }
+                    });
+
+
+        } finally {
+            con.delete(ObjectClass.ACCOUNT, uid, null);
+        }
+
+    }
+
+    @Test
+    public void testPwdReversibleAlgorithm()
+            throws Exception {
+        log.ok("testPasswordManagement");
+
+        final DatabaseTableConfiguration cfg = getConfiguration();
+        con = getConnector(cfg);
+
+        final Set<Attribute> expected = getCreateAttributeSet(cfg);
+
+        final Attribute password =
+                AttributeUtil.find(OperationalAttributes.PASSWORD_NAME, expected);
+
+        if (password != null) {
+            expected.remove(password);
+        }
+
+        expected.add(AttributeBuilder.buildPassword(
+                new GuardedString("password".toCharArray())));
+
+        final Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
+
+        try {
+            final OperationOptionsBuilder op = new OperationOptionsBuilder();
+            op.setAttributesToGet(OperationalAttributes.PASSWORD_NAME);
+
+            List<ConnectorObject> rs = TestHelpers.searchToList(
+                    con, ObjectClass.ACCOUNT, new EqualsFilter(uid), op.build());
+
+            assertNotNull(rs);
+            assertTrue("Could not find new object", rs.size() == 1);
+
+            //Test the created attributes are equal the searched
+            ConnectorObject co = rs.get(0);
+            assertNotNull(co);
+
+            Attribute actual =
+                    co.getAttributeByName(OperationalAttributes.PASSWORD_NAME);
+
+            assertNotNull(actual);
+            assertNotNull(actual.getValue());
+            assertEquals(1, actual.getValue().size());
+
+            final GuardedString guarded =
+                    (GuardedString) actual.getValue().get(0);
+
+            guarded.access(new GuardedString.Accessor() {
+
+                @Override
+                public void access(char[] clearChars) {
+                    assertEquals("password", new String(clearChars));
+                }
+            });
+
+            final Set<Attribute> changeSet = new HashSet<Attribute>();
+            changeSet.add(AttributeBuilder.buildPassword("123pwd".toCharArray()));
+
+            con.update(ObjectClass.ACCOUNT, uid, changeSet, null);
+
+            rs = TestHelpers.searchToList(
+                    con, ObjectClass.ACCOUNT, new EqualsFilter(uid), op.build());
+
+            co = rs.get(0);
+            actual = co.getAttributeByName(OperationalAttributes.PASSWORD_NAME);
+
+            ((GuardedString) actual.getValue().get(0)).access(
+                    new GuardedString.Accessor() {
+
+                        @Override
+                        public void access(char[] clearChars) {
+                            assertEquals("123pwd", new String(clearChars));
+                        }
+                    });
+
+        } finally {
+            con.delete(ObjectClass.ACCOUNT, uid, null);
+        }
+
     }
 
     // Helper Methods/Classes

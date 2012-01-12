@@ -1,6 +1,6 @@
 create table Accounts (
   accountId   VARCHAR(50) NOT NULL,
-  password    VARCHAR(50),
+  password    VARCHAR(100),
   manager     VARCHAR(50),
   middlename  VARCHAR(50),
   firstname   VARCHAR(50) NOT NULL,

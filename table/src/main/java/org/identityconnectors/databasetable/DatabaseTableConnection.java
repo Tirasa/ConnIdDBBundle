@@ -22,9 +22,8 @@
  */
 package org.identityconnectors.databasetable;
 
-import static org.identityconnectors.databasetable.DatabaseTableConstants.MSG_CAN_NOT_READ;
-import static org.identityconnectors.databasetable.DatabaseTableConstants.MSG_QUERY_INVALID;
-
+import static org.identityconnectors.databasetable.util.DatabaseTableConstants.MSG_CAN_NOT_READ;
+import static org.identityconnectors.databasetable.util.DatabaseTableConstants.MSG_QUERY_INVALID;
 import java.lang.reflect.Method;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -45,6 +44,7 @@ import org.identityconnectors.databasetable.mapping.JdbcConvertor;
 import org.identityconnectors.databasetable.mapping.MappingStrategy;
 import org.identityconnectors.databasetable.mapping.NativeTimestampsStrategy;
 import org.identityconnectors.databasetable.mapping.StringStrategy;
+import org.identityconnectors.databasetable.util.DatabaseTableSQLUtil;
 import org.identityconnectors.dbcommon.DatabaseConnection;
 import org.identityconnectors.dbcommon.JNDIUtil;
 import org.identityconnectors.dbcommon.SQLParam;
