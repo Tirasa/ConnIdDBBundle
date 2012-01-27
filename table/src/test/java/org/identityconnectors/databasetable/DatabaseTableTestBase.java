@@ -28,7 +28,6 @@ import org.identityconnectors.databasetable.security.PasswordEncodingException;
 import static org.junit.Assert.*;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -373,7 +372,9 @@ public abstract class DatabaseTableTestBase {
 
         final Set<Attribute> actual = co.getAttributes();
         assertNotNull(actual);
-        attributeSetsEquals(c.schema(), expected, actual);
+
+        attributeSetsEquals(c.schema(), expected, actual,
+                new String[]{OperationalAttributes.ENABLE_NAME});
     }
 
     @Test

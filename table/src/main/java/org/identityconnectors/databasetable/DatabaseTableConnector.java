@@ -282,22 +282,24 @@ public class DatabaseTableConnector implements
 
         LOG.info("process and check the Attribute Set");
 
+        Set<Attribute> attrToBeProcessed = new HashSet<Attribute>(attrs);
+                
         // If status column is specified attibute __ENABLED__ must be specified.
         // If attribute __ENABLED__ is not specified a default value must be
         // provided.
         if (StringUtil.isNotBlank(config.getStatusColumn())) {
             final Attribute enabled = AttributeUtil.find(
-                    OperationalAttributes.ENABLE_NAME, attrs);
+                    OperationalAttributes.ENABLE_NAME, attrToBeProcessed);
 
             if (enabled == null) {
-                attrs.add(AttributeBuilder.build(
+                attrToBeProcessed.add(AttributeBuilder.build(
                         OperationalAttributes.ENABLE_NAME,
                         isEnabled(config.getDefaultStatusValue())));
             }
         }
 
         //All attribute names should be in create columns statement 
-        for (Attribute attr : attrs) {
+        for (Attribute attr : attrToBeProcessed) {
             // quoted column name
             final String columnName = getColumnName(attr.getName());
 
@@ -457,12 +459,14 @@ public class DatabaseTableConnector implements
             throw new IllegalArgumentException(config.getMessage(
                     MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
         }
+        
         LOG.ok("The ObjectClass is ok");
 
         if (attrs == null || attrs.isEmpty()) {
             throw new IllegalArgumentException(config.getMessage(
                     MSG_INVALID_ATTRIBUTE_SET));
         }
+        
         LOG.ok("Attribute set is not empty");
 
         final String accountUid = uid.getUidValue();
