@@ -641,7 +641,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     private String cipherKey;
 
-    @ConfigurationProperty(order = 25, required = true,
+    @ConfigurationProperty(order = 25, required = false,
     displayMessageKey = "CIPHER_KEY_DISPLAY",
     helpMessageKey = "CIPHER_KEY_HELP")
     public String getCipherKey() {
