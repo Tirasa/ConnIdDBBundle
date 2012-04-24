@@ -24,10 +24,8 @@ package org.identityconnectors.databasetable;
 
 import java.io.InputStream;
 import java.sql.Date;
-import org.identityconnectors.databasetable.security.PasswordEncodingException;
-import static org.junit.Assert.*;
-
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -41,11 +39,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
-
 import org.identityconnectors.common.CollectionUtil;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.databasetable.security.MD5;
+import org.identityconnectors.databasetable.security.PasswordEncodingException;
 import org.identityconnectors.dbcommon.SQLParam;
 import org.identityconnectors.dbcommon.SQLUtil;
 import org.identityconnectors.framework.api.operations.AuthenticationApiOp;
@@ -72,6 +70,7 @@ import org.identityconnectors.framework.common.objects.filter.EqualsFilter;
 import org.identityconnectors.framework.common.objects.filter.FilterBuilder;
 import org.identityconnectors.test.common.TestHelpers;
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
@@ -139,8 +138,7 @@ public abstract class DatabaseTableTestBase {
 
     static {
         try {
-            final InputStream is = DatabaseTableConfigurationTests.class.
-                    getResourceAsStream(PROPERTIES);
+            final InputStream is = DatabaseTableConfigurationTests.class.getResourceAsStream(PROPERTIES);
             props.load(is);
         } catch (Throwable t) {
             log.error("Error retrieving configuration/connection properties", t);
@@ -174,23 +172,26 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Create the test configuration
-     * @return the initialized configuration 
-     * @throws Exception  anything wrong
+     *
+     * @return the initialized configuration
+     * @throws Exception anything wrong
      */
     protected abstract DatabaseTableConfiguration getConfiguration()
             throws Exception;
 
     /**
      * Create the test attribute sets
-     * @param cfg 
+     *
+     * @param cfg
      * @return the initialized attribute set
-     * @throws Exception anything wrong 
+     * @throws Exception anything wrong
      */
     protected abstract Set<Attribute> getCreateAttributeSet(DatabaseTableConfiguration cfg)
             throws Exception;
 
     /**
      * Create the test modify attribute set
+     *
      * @param cfg the configuration
      * @return the initialized attribute set
      * @throws Exception anything wrong
@@ -200,8 +201,9 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * The class load method
-     * @param conn 
-     * @throws Exception 
+     *
+     * @param conn
+     * @throws Exception
      */
     protected void deleteAllFromAccounts(DatabaseTableConnection conn)
             throws Exception {
@@ -232,7 +234,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * test method
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test
     public void testConfiguration()
@@ -245,7 +248,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * test method
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test
     public void testTestMethod()
@@ -258,7 +262,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * For testing purposes we creating connection an not the framework.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test(expected = ConnectorException.class)
     public void testInvalidConnectionQuery()
@@ -272,7 +277,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Make sure the Create call works..
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test
     public void testCreateEnabledEntry()
@@ -419,7 +425,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Make sure the Create call works..
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test(expected = ConnectorException.class)
     public void testCreateCallNotNull()
@@ -442,7 +449,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Make sure the Create call works..
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test
     public void testCreateCallNotNullEnableEmptyString()
@@ -484,7 +492,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Make sure the Create call works..
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test(expected = IllegalArgumentException.class)
     public void testCreateUnsuported()
@@ -498,7 +507,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * test method
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test
     public void testCreateWithName()
@@ -515,6 +525,7 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test creating of the connector object, searching using UID and delete
+     *
      * @throws Exception
      */
     @Test
@@ -562,7 +573,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test creating of the connector object, searching using UID and delete
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test(expected = IllegalArgumentException.class)
     public void testDeleteUnsupported()
@@ -589,7 +601,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test creating of the connector object, searching using UID and update
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test(expected = IllegalArgumentException.class)
     public void testUpdateUnsupported()
@@ -616,7 +629,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test creating of the connector object, searching using UID and update
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test
     public void testUpdateNull()
@@ -636,8 +650,7 @@ public abstract class DatabaseTableTestBase {
         assertTrue(list.size() == 1);
 
         // create updated connector object
-        Map<String, Attribute> chMap = new HashMap<String, Attribute>(AttributeUtil.
-                toMap(expected));
+        Map<String, Attribute> chMap = new HashMap<String, Attribute>(AttributeUtil.toMap(expected));
         chMap.put(SALARY, AttributeBuilder.build(SALARY, (Integer) null));
         // do the update
         final Set<Attribute> changeSet = CollectionUtil.newSet(chMap.values());
@@ -654,7 +667,7 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test creating of the connector object, searching using UID and update
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -688,9 +701,9 @@ public abstract class DatabaseTableTestBase {
     }
 
     /**
-     * Test method for
-     * Test creating of the connector object, searching using UID and update
-     * @throws Exception 
+     * Test method for Test creating of the connector object, searching using UID and update
+     *
+     * @throws Exception
      */
     @Test
     public void testAuthenticateOriginal()
@@ -705,22 +718,18 @@ public abstract class DatabaseTableTestBase {
         assertNotNull(uid);
 
         // retrieve the object
-        List<ConnectorObject> list = TestHelpers.searchToList(con,
-                ObjectClass.ACCOUNT, new EqualsFilter(uid));
+        List<ConnectorObject> list = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
         assertTrue(list.size() == 1);
 
         // check if authenticate operation is present (it should)
         Schema schema = con.schema();
-        Set<ObjectClassInfo> oci = schema.getSupportedObjectClassesByOperation(
-                AuthenticationApiOp.class);
+        Set<ObjectClassInfo> oci = schema.getSupportedObjectClassesByOperation(AuthenticationApiOp.class);
         assertTrue(oci.size() >= 1);
 
         // this should not throw any RuntimeException, on invalid authentication
         final Name name = AttributeUtil.getNameFromAttributes(expected);
-        final GuardedString passwordValue = AttributeUtil.getPasswordValue(
-                expected);
-        final Uid auid = con.authenticate(ObjectClass.ACCOUNT,
-                name.getNameValue(), passwordValue, null);
+        final GuardedString passwordValue = AttributeUtil.getPasswordValue(expected);
+        final Uid auid = con.authenticate(ObjectClass.ACCOUNT, name.getNameValue(), passwordValue, null);
         assertEquals(uid, auid);
 
         // cleanup (should not throw any exception.)
@@ -728,9 +737,9 @@ public abstract class DatabaseTableTestBase {
     }
 
     /**
-     * Test method for
-     * Test creating of the connector object, searching using UID and update
-     * @throws Exception 
+     * Test method for Test creating of the connector object, searching using UID and update
+     *
+     * @throws Exception
      */
     @Test
     public void testResolveUsernameOriginal()
@@ -745,20 +754,17 @@ public abstract class DatabaseTableTestBase {
         assertNotNull(uid);
 
         // retrieve the object
-        List<ConnectorObject> list = TestHelpers.searchToList(con,
-                ObjectClass.ACCOUNT, new EqualsFilter(uid));
+        List<ConnectorObject> list = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid));
         assertTrue(list.size() == 1);
 
         // check if authenticate operation is present (it should)
         Schema schema = con.schema();
-        Set<ObjectClassInfo> oci = schema.getSupportedObjectClassesByOperation(
-                AuthenticationApiOp.class);
+        Set<ObjectClassInfo> oci = schema.getSupportedObjectClassesByOperation(AuthenticationApiOp.class);
         assertTrue(oci.size() >= 1);
 
         // this should not throw any RuntimeException, on invalid authentication
         final Name name = AttributeUtil.getNameFromAttributes(expected);
-        final Uid auid = con.resolveUsername(ObjectClass.ACCOUNT, name.
-                getNameValue(), null);
+        final Uid auid = con.resolveUsername(ObjectClass.ACCOUNT, name.getNameValue(), null);
         assertEquals(uid, auid);
 
         // cleanup (should not throw any exception.)
@@ -767,7 +773,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test method for
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test(expected = InvalidCredentialException.class)
     public void testAuthenticateWrongOriginal()
@@ -777,13 +784,13 @@ public abstract class DatabaseTableTestBase {
         con = getConnector(cfg);
         // this should throw InvalidCredentials exception, as we query a
         // non-existing user
-        con.authenticate(ObjectClass.ACCOUNT, "NON", new GuardedString("MOM".
-                toCharArray()), null);
+        con.authenticate(ObjectClass.ACCOUNT, "NON", new GuardedString("MOM".toCharArray()), null);
     }
 
     /**
      * Test method for
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test(expected = InvalidCredentialException.class)
     public void testResolveUsernameWrongOriginal()
@@ -798,7 +805,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test method for
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test(expected = UnsupportedOperationException.class)
     public void testNoPassColumnAutenticate()
@@ -836,7 +844,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test method
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test
     public void testSearchByName()
@@ -860,6 +869,7 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test method to issue #238
+     *
      * @throws Exception
      */
     @Test
@@ -872,8 +882,7 @@ public abstract class DatabaseTableTestBase {
                 cfg.getKeyColumn());
         con = getConnector(cfg);
         PreparedStatement ps = null;
-        DatabaseTableConnection conn = DatabaseTableConnection.
-                createDBTableConnection(cfg);
+        DatabaseTableConnection conn = DatabaseTableConnection.createDBTableConnection(cfg);
         final Set<Attribute> expected = getCreateAttributeSet(cfg);
         Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
 
@@ -898,7 +907,8 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test method, issue #186
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test
     public void testSearchByNameAttributesToGet()
@@ -943,7 +953,7 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test method, issue #186
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -992,7 +1002,8 @@ public abstract class DatabaseTableTestBase {
     // TEest SYNCmethod    
     /**
      * Test creating of the connector object, searching using UID and delete
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test
     public void testSyncFull()
@@ -1005,15 +1016,13 @@ public abstract class DatabaseTableTestBase {
 
         final Set<Attribute> expected = getCreateAttributeSet(cfg);
 
-        final Attribute password =
-                AttributeUtil.find(OperationalAttributes.PASSWORD_NAME, expected);
+        final Attribute password = AttributeUtil.find(OperationalAttributes.PASSWORD_NAME, expected);
 
         if (password != null) {
             expected.remove(password);
         }
 
-        expected.add(AttributeBuilder.buildPassword(
-                new GuardedString("password".toCharArray())));
+        expected.add(AttributeBuilder.buildPassword(new GuardedString("password".toCharArray())));
 
 
         // create the object
@@ -1035,8 +1044,7 @@ public abstract class DatabaseTableTestBase {
             // --------------------------------------------
             // Verify password synchronization
             // --------------------------------------------
-            final Attribute pwd = AttributeUtil.find(
-                    OperationalAttributes.PASSWORD_NAME, handler.attributes);
+            final Attribute pwd = AttributeUtil.find(OperationalAttributes.PASSWORD_NAME, handler.attributes);
 
             assertNotNull(pwd);
             assertNotNull(pwd.getValue());
@@ -1058,9 +1066,10 @@ public abstract class DatabaseTableTestBase {
             // attempt to find it again to make sure
 
             // attempt to find the newly created object..
-            List<ConnectorObject> results = TestHelpers.searchToList(con,
-                    ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
+            List<ConnectorObject> results =
+                    TestHelpers.searchToList(con, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
             assertFalse("expect 1 connector object", results.size() == 1);
+
             try {
                 // now attempt to delete an object that is not there..
                 con.delete(ObjectClass.ACCOUNT, uid, null);
@@ -1073,8 +1082,9 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test creating of the connector object, searching using UID and delete
-     * @throws Exception 
-     * @throws SQLException 
+     *
+     * @throws Exception
+     * @throws SQLException
      */
     @Test
     public void testSyncIncremental()
@@ -1093,13 +1103,11 @@ public abstract class DatabaseTableTestBase {
 
         // update the last change
         PreparedStatement ps = null;
-        DatabaseTableConnection conn = DatabaseTableConnection.
-                createDBTableConnection(cfg);
+        DatabaseTableConnection conn = DatabaseTableConnection.createDBTableConnection(cfg);
         try {
             List<SQLParam> values = new ArrayList<SQLParam>();
             values.add(new SQLParam("changelog", changelog, Types.INTEGER));
-            values.add(new SQLParam("accountId", uid.getUidValue(),
-                    Types.VARCHAR));
+            values.add(new SQLParam("accountId", uid.getUidValue(), Types.VARCHAR));
             ps = conn.prepareStatement(SQL_TEMPLATE, values);
             ps.execute();
             conn.commit();
@@ -1125,8 +1133,9 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test creating of the connector object, searching using UID and delete
-     * @throws Exception 
-     * @throws SQLException 
+     *
+     * @throws Exception
+     * @throws SQLException
      */
     @Test
     public void testSyncUsingIntegerColumn()
@@ -1141,8 +1150,7 @@ public abstract class DatabaseTableTestBase {
 
         // update the last change
         PreparedStatement ps = null;
-        DatabaseTableConnection conn = DatabaseTableConnection.
-                createDBTableConnection(cfg);
+        DatabaseTableConnection conn = DatabaseTableConnection.createDBTableConnection(cfg);
         Integer changed = new Long(System.currentTimeMillis()).intValue();
         try {
             List<SQLParam> values = new ArrayList<SQLParam>();
@@ -1174,8 +1182,9 @@ public abstract class DatabaseTableTestBase {
 
     /**
      * Test creating of the connector object, searching using UID and delete
-     * @throws Exception 
-     * @throws SQLException 
+     *
+     * @throws Exception
+     * @throws SQLException
      */
     @Test
     public void testSyncUsingLongColumn()
@@ -1192,8 +1201,7 @@ public abstract class DatabaseTableTestBase {
 
         // update the last change
         PreparedStatement ps = null;
-        DatabaseTableConnection conn = DatabaseTableConnection.
-                createDBTableConnection(cfg);
+        DatabaseTableConnection conn = DatabaseTableConnection.createDBTableConnection(cfg);
         Integer changed = new Long(System.currentTimeMillis()).intValue();
         try {
             List<SQLParam> values = new ArrayList<SQLParam>();
@@ -1235,8 +1243,7 @@ public abstract class DatabaseTableTestBase {
 
         final Set<Attribute> expected = getCreateAttributeSet(cfg);
 
-        final Attribute password =
-                AttributeUtil.find(OperationalAttributes.PASSWORD_NAME, expected);
+        final Attribute password = AttributeUtil.find(OperationalAttributes.PASSWORD_NAME, expected);
 
         if (password != null) {
             expected.remove(password);
@@ -1296,8 +1303,7 @@ public abstract class DatabaseTableTestBase {
 
             con.update(ObjectClass.ACCOUNT, uid, changeSet, null);
 
-            rs = TestHelpers.searchToList(
-                    con, ObjectClass.ACCOUNT, new EqualsFilter(uid), op.build());
+            rs = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid), op.build());
 
             co = rs.get(0);
             actual = co.getAttributeByName(OperationalAttributes.PASSWORD_NAME);
@@ -1322,12 +1328,80 @@ public abstract class DatabaseTableTestBase {
                             assertEquals(md5str, new String(clearChars));
                         }
                     });
-
-
         } finally {
             con.delete(ObjectClass.ACCOUNT, uid, null);
         }
+    }
 
+    @Test
+    public void testPwdEncodeUpperCase()
+            throws Exception {
+        log.ok("testPasswordEncodeToUpperCase");
+
+        final DatabaseTableConfiguration cfg = getConfiguration();
+        cfg.setCipherAlgorithm("MD5");
+        cfg.setCipherKey(null);
+        cfg.setPwdEncodeToUpperCase(true);
+
+        con = getConnector(cfg);
+
+        final Set<Attribute> expected = getCreateAttributeSet(cfg);
+
+        final Attribute password = AttributeUtil.find(OperationalAttributes.PASSWORD_NAME, expected);
+
+        if (password != null) {
+            expected.remove(password);
+        }
+
+        expected.add(AttributeBuilder.buildPassword(new GuardedString("password".toCharArray())));
+
+        final Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
+
+        try {
+            final OperationOptionsBuilder op = new OperationOptionsBuilder();
+            op.setAttributesToGet(OperationalAttributes.PASSWORD_NAME);
+
+            List<ConnectorObject> rs =
+                    TestHelpers.searchToList(con, ObjectClass.ACCOUNT, new EqualsFilter(uid), op.build());
+
+            assertNotNull(rs);
+            assertTrue("Could not find new object", rs.size() == 1);
+
+            //Test the created attributes are equal the searched
+            ConnectorObject co = rs.get(0);
+            assertNotNull(co);
+
+            Attribute actual = co.getAttributeByName(OperationalAttributes.PASSWORD_NAME);
+
+            assertNotNull(actual);
+            assertNotNull(actual.getValue());
+            assertEquals(1, actual.getValue().size());
+
+            final GuardedString guarded = (GuardedString) actual.getValue().get(0);
+
+            guarded.access(new GuardedString.Accessor() {
+
+                @Override
+                public void access(char[] clearChars) {
+                    String md5str = null;
+
+                    try {
+
+                        md5str = new MD5().encode("password");
+                        assertFalse("password".equalsIgnoreCase(md5str));
+
+                    } catch (PasswordEncodingException ex) {
+                        assertFalse(true);
+                    }
+
+                    assertNotNull(md5str);
+                    assertFalse(md5str.equals(new String(clearChars)));
+                    assertEquals(md5str.toUpperCase(), new String(clearChars));
+                }
+            });
+        } finally {
+            con.delete(ObjectClass.ACCOUNT, uid, null);
+        }
     }
 
     @Test
@@ -1407,7 +1481,6 @@ public abstract class DatabaseTableTestBase {
         } finally {
             con.delete(ObjectClass.ACCOUNT, uid, null);
         }
-
     }
 
     // Helper Methods/Classes
@@ -1543,7 +1616,7 @@ public abstract class DatabaseTableTestBase {
         public final Uid uid;
 
         /**
-         * 
+         *
          */
         public SyncDeltaType deltaType;
 
@@ -1564,8 +1637,9 @@ public abstract class DatabaseTableTestBase {
             this.uid = uid;
         }
 
-        /* (non-Javadoc)
-         * @see org.identityconnectors.framework.common.objects.SyncResultsHandler#handle(org.identityconnectors.framework.common.objects.SyncDelta)
+        /*
+         * (non-Javadoc) @see
+         * org.identityconnectors.framework.common.objects.SyncResultsHandler#handle(org.identityconnectors.framework.common.objects.SyncDelta)
          */
         @Override
         public boolean handle(SyncDelta delta) {

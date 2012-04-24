@@ -35,8 +35,8 @@ import org.identityconnectors.framework.spi.ConfigurationProperty;
 import org.identityconnectors.framework.spi.operations.SyncOp;
 
 /**
- * Implements the {@link Configuration} interface to provide all the necessary
- * parameters to initialize the JDBC Connector.
+ * Implements the {@link Configuration} interface to provide all the necessary parameters to initialize the JDBC
+ * Connector.
  */
 public class DatabaseTableConfiguration extends AbstractConfiguration {
 
@@ -55,7 +55,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * NameQoute getter
-     * 
+     *
      * @return quoting value
      */
     @ConfigurationProperty(order = 1,
@@ -67,6 +67,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * NameQuote Setter
+     *
      * @param value
      */
     public void setQuoting(String value) {
@@ -80,7 +81,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * NameQoute getter
-     * 
+     *
      * @return quoting value
      */
     @ConfigurationProperty(order = 2,
@@ -92,6 +93,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * NameQuote Setter
+     *
      * @param value
      */
     public void setHost(String value) {
@@ -105,7 +107,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * NameQoute getter
-     * 
+     *
      * @return quoting value
      */
     @ConfigurationProperty(order = 3,
@@ -117,6 +119,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * NameQuote Setter
+     *
      * @param value
      */
     public void setPort(String value) {
@@ -124,9 +127,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Database Login User name. This user name is used to connect to database. The provided user name and password 
-     * should have rights to insert/update/delete the rows in the configured identity holder table.
-     * Required configuration property, and should be validated
+     * Database Login User name. This user name is used to connect to database. The provided user name and password
+     * should have rights to insert/update/delete the rows in the configured identity holder table. Required
+     * configuration property, and should be validated
      */
     private String user = EMPTY_STR;
 
@@ -148,9 +151,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Database access Password. This password is used to connect to database. The provided user name and password 
-     * should have rights to insert/update/delete the rows in the configured identity holder table.
-     * Required configuration property, and should be validated      
+     * Database access Password. This password is used to connect to database. The provided user name and password
+     * should have rights to insert/update/delete the rows in the configured identity holder table. Required
+     * configuration property, and should be validated
      */
     private GuardedString password;
 
@@ -172,7 +175,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Database name.  
+     * Database name.
      */
     private String database = EMPTY_STR;
 
@@ -194,14 +197,14 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Database Table name. The name of the identity holder table (Integration table). 
+     * Database Table name. The name of the identity holder table (Integration table).
      */
     private String table = EMPTY_STR;
 
     /**
      * The table name
-     * @return the user account table name
-     * Please notice, there are used non default message keys
+     *
+     * @return the user account table name Please notice, there are used non default message keys
      */
     @ConfigurationProperty(order = 7, required = true,
     displayMessageKey = "TABLE_DISPLAY",
@@ -212,6 +215,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Table setter
+     *
      * @param table name value
      */
     public void setTable(String table) {
@@ -219,13 +223,13 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Key Column, The name of the key column is required
-     * This non empty value must be validated
+     * Key Column, The name of the key column is required This non empty value must be validated
      */
     private String keyColumn = EMPTY_STR;
 
     /**
      * Key Column getter
+     *
      * @return keyColumn value
      */
     @ConfigurationProperty(order = 8, required = true,
@@ -237,6 +241,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Key Column setter
+     *
      * @param keyColumn value
      */
     public void setKeyColumn(String keyColumn) {
@@ -244,14 +249,14 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Password Column. If non empty, password is supported in the schema
-     * empty password column means, the password is not supported and also should not be in the schema    
+     * Password Column. If non empty, password is supported in the schema empty password column means, the password is
+     * not supported and also should not be in the schema
      */
     private String passwordColumn = EMPTY_STR;
 
     /**
      * Password Column getter
-     * 
+     *
      * @return passwordColumn value
      */
     @ConfigurationProperty(order = 9,
@@ -263,7 +268,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Password Column setter
-     * 
+     *
      * @param value
      */
     public void setPasswordColumn(String value) {
@@ -271,17 +276,15 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Status column. 
-     * If not empty it indicates table column used to describe entry status.
-     * Disabled status value are given by property 'disabledStatusValue'.
-     * Enabled status value are given by property 'enabledStatusValue'.
-     * Default value will be 'defaultSatusValue'.
+     * Status column. If not empty it indicates table column used to describe entry status. Disabled status value are
+     * given by property 'disabledStatusValue'. Enabled status value are given by property 'enabledStatusValue'. Default
+     * value will be 'defaultSatusValue'.
      */
     private String statusColumn = EMPTY_STR;
 
     /**
      * Status Column getter
-     * 
+     *
      * @return statusColumn value
      */
     @ConfigurationProperty(order = 10,
@@ -293,6 +296,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Status Column setter
+     *
      * @param statusColumn value
      */
     public void setStatusColumn(final String statusColumn) {
@@ -300,14 +304,13 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Value for 'statusColumn' field to indicate disabled entries.
-     * Default 'false'.
+     * Value for 'statusColumn' field to indicate disabled entries. Default 'false'.
      */
     private String disabledStatusValue = "false";
 
     /**
      * Disabled status value getter.
-     * 
+     *
      * @return disabled status value.
      */
     @ConfigurationProperty(order = 11,
@@ -319,6 +322,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Disabled status value setter.
+     *
      * @param disabled status value.
      */
     public void setDisabledStatusValue(final String disabledStatusValue) {
@@ -326,14 +330,13 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Value for 'statusColumn' field to indicate disabled entries.
-     * Default 'true'.
+     * Value for 'statusColumn' field to indicate disabled entries. Default 'true'.
      */
     private String enabledStatusValue = "true";
 
     /**
      * Enabled status value getter.
-     * 
+     *
      * @return enabled status value.
      */
     @ConfigurationProperty(order = 12,
@@ -345,6 +348,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Enabled status value setter.
+     *
      * @param enabled status value.
      */
     public void setEnabledStatusValue(final String enabledStatusValue) {
@@ -352,14 +356,13 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Default value for 'statusColumn' field.
-     * Default 'true';
+     * Default value for 'statusColumn' field. Default 'true';
      */
     private String defaultStatusValue = "true";
 
     /**
      * Default status value getter.
-     * 
+     *
      * @return default status value.
      */
     @ConfigurationProperty(order = 13,
@@ -371,6 +374,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Default status value setter.
+     *
      * @param default status value.
      */
     public void setDefaultStatusValue(final String defaultStatusValue) {
@@ -378,8 +382,8 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * The Driver class. The jdbcDriver is located by connector framework to connect to database.
-     * Required configuration property, and should be validated
+     * The Driver class. The jdbcDriver is located by connector framework to connect to database. Required configuration
+     * property, and should be validated
      */
     private String jdbcDriver = DEFAULT_DRIVER;
 
@@ -401,13 +405,14 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Database connection URL. The url is used to connect to database.
-     * Required configuration property, and should be validated
+     * Database connection URL. The url is used to connect to database. Required configuration property, and should be
+     * validated
      */
     private String jdbcUrlTemplate = DEFAULT_TEMPLATE;
 
     /**
-     * Return the jdbcUrlTemplate 
+     * Return the jdbcUrlTemplate
+     *
      * @return url value
      */
     @ConfigurationProperty(order = 15,
@@ -425,13 +430,13 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * The empty string setting
-     * allow conversion of a null into an empty string for not-null char columns
+     * The empty string setting allow conversion of a null into an empty string for not-null char columns
      */
     public boolean enableEmptyString = false;
 
     /**
      * Accessor for the enableEmptyString property
+     *
      * @return the enableEmptyString
      */
     @ConfigurationProperty(order = 16,
@@ -443,6 +448,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Setter for the enableEmptyString property.
+     *
      * @param enableEmptyString the enableEmptyString to set
      */
     public void setEnableEmptyString(boolean enableEmptyString) {
@@ -450,14 +456,14 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Some database drivers will throw the SQLError when setting the
-     * parameters to the statement with zero ErrorCode. This mean no error.
-     * This switch allow to switch off ignoring this SQLError 
+     * Some database drivers will throw the SQLError when setting the parameters to the statement with zero ErrorCode.
+     * This mean no error. This switch allow to switch off ignoring this SQLError
      */
     public boolean rethrowAllSQLExceptions = true;
 
     /**
      * Accessor for the rethrowAllSQLExceptions property
+     *
      * @return the rethrowAllSQLExceptions
      */
     @ConfigurationProperty(order = 17,
@@ -469,6 +475,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Setter for the rethrowAllSQLExceptions property.
+     *
      * @param rethrowAllSQLExceptions the rethrowAllSQLExceptions to set
      */
     public void setRethrowAllSQLExceptions(boolean rethrowAllSQLExceptions) {
@@ -476,14 +483,14 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Some JDBC drivers (ex: Oracle) may not be able to get correct string representation of
-     * TIMESTAMP data type of the column from the database table.
-     * To get correct value , one needs to use rs.getTimestamp() rather rs.getString().
+     * Some JDBC drivers (ex: Oracle) may not be able to get correct string representation of TIMESTAMP data type of the
+     * column from the database table. To get correct value , one needs to use rs.getTimestamp() rather rs.getString().
      */
     public boolean nativeTimestamps = false;
 
     /**
      * Accessor for the nativeTimestamps property
+     *
      * @return the nativeTimestamps
      */
     @ConfigurationProperty(order = 18,
@@ -495,6 +502,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Setter for the nativeTimestamps property.
+     *
      * @param nativeTimestamps the nativeTimestamps to set
      */
     public void setNativeTimestamps(boolean nativeTimestamps) {
@@ -502,13 +510,13 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Some JDBC drivers (ex: DerbyDB) may need to access all the datatypes with native types 
-     * to get correct value.
+     * Some JDBC drivers (ex: DerbyDB) may need to access all the datatypes with native types to get correct value.
      */
     public boolean allNative = false;
 
     /**
      * Accessor for the allNativeproperty
+     *
      * @return the allNative
      */
     @ConfigurationProperty(order = 19,
@@ -520,6 +528,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Setter for the allNative property.
+     *
      * @param allNative the allNative to set
      */
     public void setAllNative(boolean allNative) {
@@ -527,14 +536,15 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * The new connection validation query. The query can be empty. Then the auto commit true/false 
-     * command is applied by default. This can be unsufficient on some database drivers because of caching
-     * Then the validation query is required.     
+     * The new connection validation query. The query can be empty. Then the auto commit true/false command is applied
+     * by default. This can be unsufficient on some database drivers because of caching Then the validation query is
+     * required.
      */
     private String validConnectionQuery;
 
     /**
      * connection validation query getter
+     *
      * @return validConnectionQuery value
      */
     @ConfigurationProperty(order = 20,
@@ -546,6 +556,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Connection validation query setter
+     *
      * @param value
      */
     public void setValidConnectionQuery(String value) {
@@ -553,15 +564,15 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Change Log Column (should automatically add ORDER BY)
-     * If the value is non empty, the SyncOp should be supported
+     * Change Log Column (should automatically add ORDER BY) If the value is non empty, the SyncOp should be supported
      * It could be nativeTimestamps.
      */
     private String changeLogColumn = EMPTY_STR;
 
     /**
      * Log Column is required be SyncOp
-     * @return Log Column 
+     *
+     * @return Log Column
      */
     @ConfigurationProperty(order = 21, operations = SyncOp.class,
     displayMessageKey = "CHANGE_LOG_COLUMN_DISPLAY",
@@ -586,7 +597,8 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     private String datasource = EMPTY_STR;
 
     /**
-     * Return the datasource 
+     * Return the datasource
+     *
      * @return datasource value
      */
     @ConfigurationProperty(order = 22,
@@ -609,7 +621,8 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     private String[] jndiProperties;
 
     /**
-     * Return the jndiFactory 
+     * Return the jndiFactory
+     *
      * @return jndiFactory value
      */
     @ConfigurationProperty(order = 23,
@@ -652,9 +665,35 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         this.cipherKey = cipherKey;
     }
 
+    private boolean pwdEncodeToUpperCase;
+
+    @ConfigurationProperty(order = 25, required = false,
+    displayMessageKey = "PWD_ENCODE_UPPERCASE_DISPLAY",
+    helpMessageKey = "PWD_ENCODE_UPPERCASE_HELP")
+    public boolean isPwdEncodeToUpperCase() {
+        return pwdEncodeToUpperCase;
+    }
+
+    public void setPwdEncodeToUpperCase(boolean pwdEncodeToUpperCase) {
+        this.pwdEncodeToUpperCase = pwdEncodeToUpperCase;
+    }
+    
+    private boolean pwdEncodeToLowerCase;
+
+    @ConfigurationProperty(order = 26, required = false,
+    displayMessageKey = "PWD_ENCODE_LOWERCASE_DISPLAY",
+    helpMessageKey = "PWD_ENCODE_LOWERCASE_HELP")
+    public boolean isPwdEncodeToLowerCase() {
+        return pwdEncodeToLowerCase;
+    }
+
+    public void setPwdEncodeToLowerCase(boolean pwdEncodeToLowerCase) {
+        this.pwdEncodeToLowerCase = pwdEncodeToLowerCase;
+    }
+
     private boolean retrievePassword;
 
-    @ConfigurationProperty(order = 25, required = true,
+    @ConfigurationProperty(order = 27, required = true,
     displayMessageKey = "RETRIEVE_PASSWORD_DISPLAY",
     helpMessageKey = "RETRIEVE_PASSWORD_HELP")
     public boolean isRetrievePassword() {
@@ -770,9 +809,9 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Format a URL given a template. Recognized template characters are:
-     *  % literal % h host p port d database
-     * @return the database url 
+     * Format a URL given a template. Recognized template characters are: % literal % h host p port d database
+     *
+     * @return the database url
      */
     public String formatUrlTemplate() {
         log.info("format UrlTemplate");
@@ -804,6 +843,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * Format the connector message
+     *
      * @param key key of the message
      * @return return the formated message
      */
@@ -814,7 +854,8 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Format message with arguments 
+     * Format message with arguments
+     *
      * @param key key of the message
      * @param objects arguments
      * @return the localized message string

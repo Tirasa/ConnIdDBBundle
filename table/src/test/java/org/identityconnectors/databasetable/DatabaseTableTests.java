@@ -22,12 +22,6 @@
  */
 package org.identityconnectors.databasetable;
 
-import static org.identityconnectors.common.ByteUtil.randomBytes;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -42,7 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import static org.identityconnectors.common.ByteUtil.randomBytes;
 import org.identityconnectors.common.CollectionUtil;
 import org.identityconnectors.common.IOUtil;
 import org.identityconnectors.common.StringUtil;
@@ -68,6 +62,7 @@ import org.identityconnectors.framework.common.objects.Uid;
 import org.identityconnectors.framework.common.objects.filter.FilterBuilder;
 import org.identityconnectors.test.common.TestHelpers;
 import org.junit.AfterClass;
+import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

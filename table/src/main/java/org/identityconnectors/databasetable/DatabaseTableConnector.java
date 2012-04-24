@@ -99,17 +99,11 @@ import org.identityconnectors.framework.spi.operations.UpdateOp;
 
 /**
  * The database table {@link DatabaseTableConnector} is a basic, but easy to use
- * {@link DatabaseTableConnector} for accounts in a relational database.
- * <p>
- * It supports create, update, search, and delete operations. It can also be
- * used for pass-thru authentication, although it assumes the password is in
- * clear text in the database.
- * <p>
- * This connector assumes that all account data is stored in a single database
- * table. The delete action is implemented to simply remove the row from the
- * table.
- * <p>
- * 
+ * {@link DatabaseTableConnector} for accounts in a relational database. <p> It supports create, update, search, and
+ * delete operations. It can also be used for pass-thru authentication, although it assumes the password is in clear
+ * text in the database. <p> This connector assumes that all account data is stored in a single database table. The
+ * delete action is implemented to simply remove the row from the table. <p>
+ *
  * @author Will Droste
  * @author Keith Yarbrough
  * @version $Revision $
@@ -125,7 +119,7 @@ public class DatabaseTableConnector implements
     /**
      * Setup logging for the {@link DatabaseTableConnector}.
      */
-    static Log LOG = Log.getLog(DatabaseTableConnector.class);
+    private static Log LOG = Log.getLog(DatabaseTableConnector.class);
 
     /**
      * Place holder for the {@link Connection} passed into the callback
@@ -155,7 +149,7 @@ public class DatabaseTableConnector implements
     private Map<String, Integer> columnSQLTypes;
 
     /**
-     * Cached value for required columns 
+     * Cached value for required columns
      */
     private Set<String> stringColumnRequired;
 
@@ -171,8 +165,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Init the connector
-     * {@inheritDoc}
+     * Init the connector {@inheritDoc}
      */
     @Override
     public void init(Configuration cfg) {
@@ -207,6 +200,7 @@ public class DatabaseTableConnector implements
 
     /**
      * The connector connection access method
+     *
      * @return connection
      */
     DatabaseTableConnection getConn() {
@@ -221,8 +215,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Disposes of the {@link DatabaseTableConnector}'s resources.
-     * {@inheritDoc}
+     * Disposes of the {@link DatabaseTableConnector}'s resources. {@inheritDoc}
      */
     @Override
     public void dispose() {
@@ -237,8 +230,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Creates a row in the database representing an account.
-     * {@inheritDoc}
+     * Creates a row in the database representing an account. {@inheritDoc}
      */
     @Override
     public Uid create(ObjectClass oclass, Set<Attribute> attrs, OperationOptions options) {
@@ -283,7 +275,7 @@ public class DatabaseTableConnector implements
         LOG.info("process and check the Attribute Set");
 
         Set<Attribute> attrToBeProcessed = new HashSet<Attribute>(attrs);
-                
+
         // If status column is specified attibute __ENABLED__ must be specified.
         // If attribute __ENABLED__ is not specified a default value must be
         // provided.
@@ -363,6 +355,7 @@ public class DatabaseTableConnector implements
 
     /**
      * Test to throw the exception
+     *
      * @param e exception
      * @return
      */
@@ -372,6 +365,7 @@ public class DatabaseTableConnector implements
 
     /**
      * Test is value is null and must be empty
+     *
      * @param columnName the column name
      * @param value the value to tests
      * @return true/false
@@ -382,8 +376,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Deletes a row from the table.
-     * {@inheritDoc}
+     * Deletes a row from the table. {@inheritDoc}
      */
     @Override
     public void delete(final ObjectClass oclass, final Uid uid, final OperationOptions options) {
@@ -445,8 +438,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Update the database row with the data provided.
-     * {@inheritDoc}
+     * Update the database row with the data provided. {@inheritDoc}
      */
     @Override
     public Uid update(ObjectClass oclass, Uid uid, Set<Attribute> attrs, OperationOptions options) {
@@ -459,14 +451,14 @@ public class DatabaseTableConnector implements
             throw new IllegalArgumentException(config.getMessage(
                     MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
         }
-        
+
         LOG.ok("The ObjectClass is ok");
 
         if (attrs == null || attrs.isEmpty()) {
             throw new IllegalArgumentException(config.getMessage(
                     MSG_INVALID_ATTRIBUTE_SET));
         }
-        
+
         LOG.ok("Attribute set is not empty");
 
         final String accountUid = uid.getUidValue();
@@ -544,8 +536,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Creates a Database Table filter translator.
-     * {@inheritDoc}
+     * Creates a Database Table filter translator. {@inheritDoc}
      */
     @Override
     public FilterTranslator<FilterWhereBuilder> createFilterTranslator(ObjectClass oclass, OperationOptions options) {
@@ -559,8 +550,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Search for rows 
-     * {@inheritDoc}
+     * Search for rows {@inheritDoc}
      */
     @Override
     public void executeQuery(ObjectClass oclass, FilterWhereBuilder where, ResultsHandler handler,
@@ -821,8 +811,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Test the configuration and connection
-     * {@inheritDoc}
+     * Test the configuration and connection {@inheritDoc}
      */
     @Override
     public void test() {
@@ -841,7 +830,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * 
+     *
      */
     private void closeConnection() {
         getConn().closeConnection();
@@ -864,8 +853,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Attempts to authenticate the given username combination
-     * {@inheritDoc}
+     * Attempts to authenticate the given username combination {@inheritDoc}
      */
     @Override
     public Uid authenticate(
@@ -910,12 +898,10 @@ public class DatabaseTableConnector implements
 
         final String keyColumnName = quoteName(config.getKeyColumn());
         final String passwordColumnName = quoteName(config.getPasswordColumn());
-        String sql = MessageFormat.format(SQL_AUTH_QUERY, keyColumnName, config.
-                getTable(), passwordColumnName);
+        String sql = MessageFormat.format(SQL_AUTH_QUERY, keyColumnName, config.getTable(), passwordColumnName);
 
         final List<SQLParam> values = new ArrayList<SQLParam>();
-        values.add(new SQLParam(keyColumnName, username, getColumnType(config.
-                getKeyColumn()))); // real username
+        values.add(new SQLParam(keyColumnName, username, getColumnType(config.getKeyColumn()))); // real username
 
         values.add(new SQLParam(passwordColumnName, encodedPwd)); // real password
 
@@ -958,8 +944,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Attempts to resolve the given username
-     * {@inheritDoc}
+     * Attempts to resolve the given username {@inheritDoc}
      */
     @Override
     public Uid resolveUsername(ObjectClass oclass, String username, OperationOptions options) {
@@ -984,12 +969,10 @@ public class DatabaseTableConnector implements
 
         final String keyColumnName = quoteName(config.getKeyColumn());
         final String passwordColumnName = quoteName(config.getPasswordColumn());
-        String sql = MessageFormat.format(SQL_AUTH_QUERY, keyColumnName, config.
-                getTable(), passwordColumnName);
+        String sql = MessageFormat.format(SQL_AUTH_QUERY, keyColumnName, config.getTable(), passwordColumnName);
 
         final List<SQLParam> values = new ArrayList<SQLParam>();
-        values.add(new SQLParam(keyColumnName, username, getColumnType(config.
-                getKeyColumn()))); // real username
+        values.add(new SQLParam(keyColumnName, username, getColumnType(config.getKeyColumn()))); // real username
 
         PreparedStatement stmt = null;
         ResultSet result = null;
@@ -1031,6 +1014,7 @@ public class DatabaseTableConnector implements
 
     /**
      * Used to escape the table or column name.
+     *
      * @param value Value to be quoted
      * @return the quoted column name
      */
@@ -1040,6 +1024,7 @@ public class DatabaseTableConnector implements
 
     /**
      * The required type is cached
+     *
      * @param columnName the column name
      * @return the cached column type
      */
@@ -1059,7 +1044,7 @@ public class DatabaseTableConnector implements
 
     /**
      * Convert the attribute name to resource specific columnName
-     * 
+     *
      * @param attributeName
      * @return the Column Name value
      */
@@ -1087,7 +1072,7 @@ public class DatabaseTableConnector implements
 
     /**
      * Cache schema, defaultAtributesToGet, columnClassNamens
-     * 
+     *
      */
     private void cacheSchema() {
         /*
@@ -1128,7 +1113,7 @@ public class DatabaseTableConnector implements
 
         /*
          * Note: AuthenticateOp, and all the 'SPIOperation'-s are by default added by Reflection API to the Schema.
-         * 
+         *
          * See for details: SchemaBuilder.defineObjectClass() --> FrameworkUtil.getDefaultSupportedOperations()
          * ReflectionUtil.getAllInterfaces(connector); is the line that *does* acquire the implemented interfaces by the
          * connector class.
@@ -1149,7 +1134,7 @@ public class DatabaseTableConnector implements
 
     /**
      * Get the schema using a SELECT query.
-     * 
+     *
      * @return Schema based on a empty SELECT query.
      */
     private Set<AttributeInfo> buildSelectBasedAttributeInfos() {
@@ -1191,10 +1176,11 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Return the set of AttributeInfo based on the database query meta-data. 
+     * Return the set of AttributeInfo based on the database query meta-data.
+     *
      * @param rset
      * @return
-     * @throws SQLException  
+     * @throws SQLException
      */
     private Set<AttributeInfo> buildAttributeInfoSet(ResultSet rset)
             throws SQLException {
@@ -1264,8 +1250,8 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Decide if should be returned by default
-     * Generally all byte arrays are not returned by default 
+     * Decide if should be returned by default Generally all byte arrays are not returned by default
+     *
      * @param dataType the type of the attribute type
      * @return
      */
@@ -1274,9 +1260,8 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Construct a connector object
-     * <p>Taking care about special attributes</p>
-     *  
+     * Construct a connector object <p>Taking care about special attributes</p>
+     *
      * @param columnValues from the result set
      * @return ConnectorObjectBuilder object
      */
@@ -1307,8 +1292,7 @@ public class DatabaseTableConnector implements
 
                     try {
                         if (param != null && param.getValue() != null) {
-                            bld.addAttribute(AttributeBuilder.buildPassword(
-                                    decodePassword(pwd).toCharArray()));
+                            bld.addAttribute(AttributeBuilder.buildPassword(decodePassword(pwd).toCharArray()));
                         }
                     } catch (Exception e) {
                         LOG.error(e, "Error decoding password");
@@ -1354,9 +1338,8 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Construct a SyncDeltaBuilder the sync builder
-     * <p>Taking care about special attributes</p>
-     *  
+     * Construct a SyncDeltaBuilder the sync builder <p>Taking care about special attributes</p>
+     *
      * @param columnValues from the resultSet
      * @return SyncDeltaBuilder the sync builder
      */
@@ -1419,6 +1402,7 @@ public class DatabaseTableConnector implements
 
     /**
      * Get the default Attributes to get
+     *
      * @return the Set of default attribute names
      */
     private Set<String> getDefaultAttributesToGet() {
@@ -1431,6 +1415,7 @@ public class DatabaseTableConnector implements
 
     /**
      * Get the default Attributes to get
+     *
      * @return the Set of default attribute names
      */
     private Set<String> getStringColumnReguired() {
@@ -1443,6 +1428,7 @@ public class DatabaseTableConnector implements
 
     /**
      * Return true if and only if status is not equals to 'disabledStatusValued'.
+     *
      * @param status.
      * @return 'true' if enabled; 'false' otherwise.
      */
@@ -1456,6 +1442,7 @@ public class DatabaseTableConnector implements
 
     /**
      * Return entry status based on given parameter.
+     *
      * @param enabled should be the value of __ENABLED__
      * @return status column value.
      */
@@ -1544,9 +1531,7 @@ public class DatabaseTableConnector implements
         String cipherAlgorithm;
 
         try {
-            cipherAlgorithm =
-                    SupportedAlgorithm.valueOf(config.getCipherAlgorithm()).
-                    getAlgorithm();
+            cipherAlgorithm = SupportedAlgorithm.valueOf(config.getCipherAlgorithm()).getAlgorithm();
         } catch (Exception e) {
             cipherAlgorithm = config.getCipherAlgorithm();
         }
@@ -1558,8 +1543,7 @@ public class DatabaseTableConnector implements
 
             try {
 
-                algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).
-                        newInstance();
+                algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).newInstance();
 
                 if (StringUtil.isNotBlank(cipherKey)) {
                     algorithm.setKey(cipherKey);
@@ -1580,8 +1564,14 @@ public class DatabaseTableConnector implements
                 }
             });
 
-            encoded = new GuardedString(
-                    algorithm.encode(password[0]).toCharArray());
+            final String encodedPwd = algorithm.encode(password[0]);
+            if (StringUtil.isNotBlank(encodedPwd)) {
+                encoded = new GuardedString(
+                        (config.isPwdEncodeToUpperCase() ? encodedPwd.toUpperCase()
+                        : config.isPwdEncodeToLowerCase() ? encodedPwd.toLowerCase() : encodedPwd).toCharArray());
+            } else {
+                encoded = guarded;
+            }
         } else {
             encoded = guarded;
         }
@@ -1597,9 +1587,7 @@ public class DatabaseTableConnector implements
         String cipherAlgorithm;
 
         try {
-            cipherAlgorithm =
-                    SupportedAlgorithm.valueOf(config.getCipherAlgorithm()).
-                    getAlgorithm();
+            cipherAlgorithm = SupportedAlgorithm.valueOf(config.getCipherAlgorithm()).getAlgorithm();
         } catch (Exception e) {
             cipherAlgorithm = config.getCipherAlgorithm();
         }
@@ -1611,8 +1599,7 @@ public class DatabaseTableConnector implements
 
             try {
 
-                algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).
-                        newInstance();
+                algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).newInstance();
 
                 if (StringUtil.isNotBlank(cipherKey)) {
                     algorithm.setKey(cipherKey);
