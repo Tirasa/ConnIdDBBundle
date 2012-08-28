@@ -3,13 +3,14 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
  * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.     
+ * Copyright 2012 Tirasa. All rights reserved.
  * 
  * The contents of this file are subject to the terms of the Common Development 
  * and Distribution License("CDDL") (the "License").  You may not use this file 
  * except in compliance with the License.
  * 
  * You can obtain a copy of the License at 
- * http://IdentityConnectors.dev.java.net/legal/license.txt
+ * https://connid.googlecode.com/svn/base/trunk/legal/license.txt
  * See the License for the specific language governing permissions and limitations 
  * under the License. 
  * 
@@ -29,6 +30,8 @@ import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
 import org.connid.bundles.db.table.util.DatabaseTableSQLUtil;
 import org.connid.bundles.db.common.JNDIUtil;
+import org.connid.bundles.db.table.security.SupportedAlgorithm;
+import org.identityconnectors.framework.common.serializer.SerializerUtil;
 import org.identityconnectors.framework.spi.AbstractConfiguration;
 import org.identityconnectors.framework.spi.Configuration;
 import org.identityconnectors.framework.spi.ConfigurationProperty;
@@ -43,7 +46,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * Setup logging for the {@link DatabaseTableConfiguration}.
      */
-    static Log log = Log.getLog(DatabaseTableConfiguration.class);
+    private final static Log LOG = Log.getLog(DatabaseTableConfiguration.class);
 
     // =======================================================================
     // DatabaseTableConfiguration
@@ -629,14 +632,14 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     displayMessageKey = "JNDI_PROPERTIES_DISPLAY",
     helpMessageKey = "JNDI_PROPERTIES_HELP")
     public String[] getJndiProperties() {
-        return jndiProperties;
+        return (String[]) SerializerUtil.cloneObject(jndiProperties);
     }
 
     /**
      * @param value
      */
     public void setJndiProperties(String[] value) {
-        this.jndiProperties = value;
+        this.jndiProperties = (String[]) SerializerUtil.cloneObject(value);
     }
 
     private String cipherAlgorithm;
@@ -645,7 +648,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     displayMessageKey = "CIPHER_ALGORITHM_DISPLAY",
     helpMessageKey = "CIPHER_ALGORITHM_HELP")
     public String getCipherAlgorithm() {
-        return cipherAlgorithm;
+        return StringUtil.isBlank(cipherAlgorithm) ? SupportedAlgorithm.CLEARTEXT.name() : cipherAlgorithm;
     }
 
     public void setCipherAlgorithm(String cipherAlgorithm) {
@@ -677,7 +680,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     public void setPwdEncodeToUpperCase(boolean pwdEncodeToUpperCase) {
         this.pwdEncodeToUpperCase = pwdEncodeToUpperCase;
     }
-    
+
     private boolean pwdEncodeToLowerCase;
 
     @ConfigurationProperty(order = 26, required = false,
@@ -712,41 +715,38 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     @Override
     public void validate() {
-        log.info("Validate DatabaseTableConfiguration");
+        LOG.info("Validate DatabaseTableConfiguration");
+
         // check that there is a table to query..
         if (StringUtil.isBlank(getTable())) {
             throw new IllegalArgumentException(getMessage(MSG_TABLE_BLANK));
         }
         // check the url is configured
         if (StringUtil.isBlank(getJdbcUrlTemplate())) {
-            throw new IllegalArgumentException(getMessage(
-                    MSG_JDBC_TEMPLATE_BLANK));
+            throw new IllegalArgumentException(getMessage(MSG_JDBC_TEMPLATE_BLANK));
         }
         // determine if you can get a key column
         if (StringUtil.isBlank(getKeyColumn())) {
             throw new IllegalArgumentException(getMessage(MSG_KEY_COLUMN_BLANK));
         } else {
             if (getKeyColumn().equalsIgnoreCase(getChangeLogColumn())) {
-                throw new IllegalArgumentException(getMessage(
-                        MSG_KEY_COLUMN_EQ_CHANGE_LOG_COLUMN));
+                throw new IllegalArgumentException(getMessage(MSG_KEY_COLUMN_EQ_CHANGE_LOG_COLUMN));
             }
         }
         // key column, password column
         if (StringUtil.isNotBlank(getPasswordColumn())) {
             if (getPasswordColumn().equalsIgnoreCase(getKeyColumn())) {
-                throw new IllegalArgumentException(getMessage(
-                        MSG_PASSWD_COLUMN_EQ_KEY_COLUMN));
+                throw new IllegalArgumentException(getMessage(MSG_PASSWD_COLUMN_EQ_KEY_COLUMN));
             }
 
             if (getPasswordColumn().equalsIgnoreCase(getChangeLogColumn())) {
-                throw new IllegalArgumentException(getMessage(
-                        MSG_PASSWD_COLUMN_EQ_CHANGE_LOG_COLUMN));
+                throw new IllegalArgumentException(getMessage(MSG_PASSWD_COLUMN_EQ_CHANGE_LOG_COLUMN));
             }
         }
 
         // check that there is not a datasource
         if (StringUtil.isBlank(getDatasource())) {
-            log.info("Validate driver configuration.");
+            LOG.info("Validate driver configuration.");
 
             // determine if you can get a connection to the database..
             if (getUser() == null) {
@@ -754,58 +754,44 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             }
             // check that there is a pwd to query..
             if (getPassword() == null) {
-                throw new IllegalArgumentException(
-                        getMessage(MSG_PASSWORD_BLANK));
+                throw new IllegalArgumentException(getMessage(MSG_PASSWORD_BLANK));
             }
 
             // host required
-            if (getJdbcUrlTemplate().contains("%h")) {
-                if (StringUtil.isBlank(getHost())) {
-                    throw new IllegalArgumentException(
-                            getMessage(MSG_HOST_BLANK));
-                }
+            if (getJdbcUrlTemplate().contains("%h") && StringUtil.isBlank(getHost())) {
+                throw new IllegalArgumentException(getMessage(MSG_HOST_BLANK));
             }
             // port required
-            if (getJdbcUrlTemplate().contains("%p")) {
-                if (StringUtil.isBlank(getPort())) {
-                    throw new IllegalArgumentException(
-                            getMessage(MSG_PORT_BLANK));
-                }
+            if (getJdbcUrlTemplate().contains("%p") && StringUtil.isBlank(getPort())) {
+                throw new IllegalArgumentException(getMessage(MSG_PORT_BLANK));
             }
             // database required            
-            if (getJdbcUrlTemplate().contains("%d")) {
-                if (StringUtil.isBlank(getDatabase())) {
-                    throw new IllegalArgumentException(getMessage(
-                            MSG_DATABASE_BLANK));
-                }
+            if (getJdbcUrlTemplate().contains("%d") && StringUtil.isBlank(getDatabase())) {
+                throw new IllegalArgumentException(getMessage(MSG_DATABASE_BLANK));
             }
             // make sure the jdbcDriver is in the class path..
             if (StringUtil.isBlank(getJdbcDriver())) {
-                throw new IllegalArgumentException(getMessage(
-                        MSG_JDBC_DRIVER_BLANK));
+                throw new IllegalArgumentException(getMessage(MSG_JDBC_DRIVER_BLANK));
             }
             try {
                 Class.forName(getJdbcDriver());
             } catch (ClassNotFoundException e) {
-                throw new IllegalArgumentException(getMessage(
-                        MSG_JDBC_DRIVER_NOT_FOUND));
+                throw new IllegalArgumentException(getMessage(MSG_JDBC_DRIVER_NOT_FOUND));
             }
-            log.ok("driver configuration is ok");
+            LOG.ok("Driver configuration is ok");
         } else {
-            log.info("Validate datasource configuration");
+            LOG.info("Validate datasource configuration");
             //Validate the JNDI properties
-            JNDIUtil.arrayToHashtable(getJndiProperties(),
-                    getConnectorMessages());
-            log.ok("datasource configuration is ok");
+            JNDIUtil.arrayToHashtable(getJndiProperties(), getConnectorMessages());
+            LOG.ok("Datasource configuration is ok");
         }
 
         try {
             DatabaseTableSQLUtil.quoteName(getQuoting(), "test");
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(getMessage(MSG_INVALID_QUOTING,
-                    getQuoting()));
+            throw new IllegalArgumentException(getMessage(MSG_INVALID_QUOTING, getQuoting()));
         }
-        log.ok("Configuration is valid");
+        LOG.ok("Configuration is valid");
     }
 
     /**
@@ -814,7 +800,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * @return the database url
      */
     public String formatUrlTemplate() {
-        log.info("format UrlTemplate");
+        LOG.info("format UrlTemplate");
         final StringBuffer b = new StringBuffer();
         final String url = getJdbcUrlTemplate();
         final int len = url.length();
@@ -837,7 +823,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             }
         }
         String formattedURL = b.toString();
-        log.ok("UrlTemplate is formated to {0}", formattedURL);
+        LOG.ok("UrlTemplate is formated to {0}", formattedURL);
         return formattedURL;
     }
 
@@ -849,7 +835,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     public String getMessage(String key) {
         final String fmt = getConnectorMessages().format(key, key);
-        log.ok("Get for a key {0} connector message {1}", key, fmt);
+        LOG.ok("Get for a key {0} connector message {1}", key, fmt);
         return fmt;
     }
 
@@ -862,7 +848,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      */
     public String getMessage(String key, Object... objects) {
         final String fmt = getConnectorMessages().format(key, key, objects);
-        log.ok("Get for a key {0} connector message {1}", key, fmt);
+        LOG.ok("Get for a key {0} connector message {1}", key, fmt);
         return fmt;
     }
 }

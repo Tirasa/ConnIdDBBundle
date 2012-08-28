@@ -22,21 +22,28 @@
  */
 package org.connid.bundles.db.table.security;
 
-public enum SupportedAlgorithm {
+import java.io.UnsupportedEncodingException;
 
-    CLEARTEXT(ClearText.class.getName()),
-    MD5(MD5.class.getName()),
-    SHA1(SHA_1.class.getName()),
-    SHA256(SHA_256.class.getName()),
-    AES(AES.class.getName());
+public class ClearText extends EncodeAlgorithm {
 
-    final private String algorithm;
+    private final static String NAME = "CLEARTEXT";
 
-    SupportedAlgorithm(String algorithm) {
-        this.algorithm = algorithm;
+    @Override
+    public String encode(String clearPwd) throws PasswordEncodingException {
+        return clearPwd;
     }
 
-    public final String getAlgorithm() {
-        return algorithm;
+    @Override
+    public String decode(String encodedPwd) throws PasswordDecodingException {
+        return encodedPwd;
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public void setKey(String key) throws UnsupportedEncodingException {
     }
 }

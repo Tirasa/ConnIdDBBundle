@@ -10,7 +10,7 @@
  * except in compliance with the License.
  * 
  * You can obtain a copy of the License at 
- * http://IdentityConnectors.dev.java.net/legal/license.txt
+ * https://connid.googlecode.com/svn/base/trunk/legal/license.txt
  * See the License for the specific language governing permissions and limitations 
  * under the License. 
  * 
@@ -99,11 +99,11 @@ import org.identityconnectors.framework.spi.operations.TestOp;
 import org.identityconnectors.framework.spi.operations.UpdateOp;
 
 /**
- * The database table {@link DatabaseTableConnector} is a basic, but easy to use
- * {@link DatabaseTableConnector} for accounts in a relational database. <p> It supports create, update, search, and
- * delete operations. It can also be used for pass-thru authentication, although it assumes the password is in clear
- * text in the database. <p> This connector assumes that all account data is stored in a single database table. The
- * delete action is implemented to simply remove the row from the table. <p>
+ * The database table {@link DatabaseTableConnector} is a basic, but easy to use {@link DatabaseTableConnector} for
+ * accounts in a relational database. <p> It supports create, update, search, and delete operations. It can also be used
+ * for pass-thru authentication, although it assumes the password is in clear text in the database. <p> This connector
+ * assumes that all account data is stored in a single database table. The delete action is implemented to simply remove
+ * the row from the table. <p>
  *
  * @author Will Droste
  * @author Keith Yarbrough
@@ -1530,7 +1530,6 @@ public class DatabaseTableConnector implements
         final GuardedString encoded;
 
         String cipherAlgorithm;
-
         try {
             cipherAlgorithm = SupportedAlgorithm.valueOf(config.getCipherAlgorithm()).getAlgorithm();
         } catch (Exception e) {
@@ -1539,40 +1538,32 @@ public class DatabaseTableConnector implements
 
         final String cipherKey = config.getCipherKey();
 
-        if (StringUtil.isNotBlank(cipherAlgorithm)) {
-            final EncodeAlgorithm algorithm;
-
-            try {
-
-                algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).newInstance();
-
-                if (StringUtil.isNotBlank(cipherKey)) {
-                    algorithm.setKey(cipherKey);
-                }
-
-            } catch (Exception e) {
-                LOG.error(e, "Error retrieving algorithm {0}", cipherAlgorithm);
-                throw new PasswordEncodingException(e.getMessage());
+        final EncodeAlgorithm algorithm;
+        try {
+            algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).newInstance();
+            if (StringUtil.isNotBlank(cipherKey)) {
+                algorithm.setKey(cipherKey);
             }
+        } catch (Exception e) {
+            LOG.error(e, "Error retrieving algorithm {0}", cipherAlgorithm);
+            throw new PasswordEncodingException(e.getMessage());
+        }
 
-            final String[] password = {null};
+        final String[] password = {null};
 
-            guarded.access(new GuardedString.Accessor() {
+        guarded.access(new GuardedString.Accessor() {
 
-                @Override
-                public void access(char[] clearChars) {
-                    password[0] = new String(clearChars);
-                }
-            });
-
-            final String encodedPwd = algorithm.encode(password[0]);
-            if (StringUtil.isNotBlank(encodedPwd)) {
-                encoded = new GuardedString(
-                        (config.isPwdEncodeToUpperCase() ? encodedPwd.toUpperCase()
-                        : config.isPwdEncodeToLowerCase() ? encodedPwd.toLowerCase() : encodedPwd).toCharArray());
-            } else {
-                encoded = guarded;
+            @Override
+            public void access(char[] clearChars) {
+                password[0] = new String(clearChars);
             }
+        });
+
+        final String encodedPwd = algorithm.encode(password[0]);
+        if (StringUtil.isNotBlank(encodedPwd)) {
+            encoded = new GuardedString(
+                    (config.isPwdEncodeToUpperCase() ? encodedPwd.toUpperCase()
+                    : config.isPwdEncodeToLowerCase() ? encodedPwd.toLowerCase() : encodedPwd).toCharArray());
         } else {
             encoded = guarded;
         }
@@ -1586,7 +1577,6 @@ public class DatabaseTableConnector implements
         final String decoded;
 
         String cipherAlgorithm;
-
         try {
             cipherAlgorithm = SupportedAlgorithm.valueOf(config.getCipherAlgorithm()).getAlgorithm();
         } catch (Exception e) {
@@ -1595,26 +1585,18 @@ public class DatabaseTableConnector implements
 
         final String cipherKey = config.getCipherKey();
 
-        if (StringUtil.isNotBlank(cipherAlgorithm)) {
-            final EncodeAlgorithm algorithm;
-
-            try {
-
-                algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).newInstance();
-
-                if (StringUtil.isNotBlank(cipherKey)) {
-                    algorithm.setKey(cipherKey);
-                }
-
-            } catch (Exception e) {
-                LOG.error(e, "Error retrieving algorithm {0}", cipherAlgorithm);
-                throw new PasswordDecodingException(e.getMessage());
+        final EncodeAlgorithm algorithm;
+        try {
+            algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).newInstance();
+            if (StringUtil.isNotBlank(cipherKey)) {
+                algorithm.setKey(cipherKey);
             }
-
-            decoded = algorithm.decode(password);
-        } else {
-            decoded = password;
+        } catch (Exception e) {
+            LOG.error(e, "Error retrieving algorithm {0}", cipherAlgorithm);
+            throw new PasswordDecodingException(e.getMessage());
         }
+
+        decoded = algorithm.decode(password);
 
         return decoded;
     }

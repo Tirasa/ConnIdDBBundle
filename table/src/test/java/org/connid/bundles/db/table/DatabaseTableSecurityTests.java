@@ -2,14 +2,14 @@
  * ====================
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.     
+ * Copyright 2012 Tirasa. All rights reserved.
  * 
  * The contents of this file are subject to the terms of the Common Development 
  * and Distribution License("CDDL") (the "License").  You may not use this file 
  * except in compliance with the License.
  * 
  * You can obtain a copy of the License at 
- * http://IdentityConnectors.dev.java.net/legal/license.txt
+ * https://connid.googlecode.com/svn/base/trunk/legal/license.txt
  * See the License for the specific language governing permissions and limitations 
  * under the License. 
  * 
@@ -31,9 +31,6 @@ import org.connid.bundles.db.table.security.SHA_1;
 import org.connid.bundles.db.table.security.SHA_256;
 import org.junit.Test;
 
-/**
- * Attempts to test the Connector with the framework.
- */
 public class DatabaseTableSecurityTests {
 
     @Test
@@ -42,8 +39,7 @@ public class DatabaseTableSecurityTests {
 
         final String clazz = AES.class.getName();
 
-        final EncodeAlgorithm algorithm =
-                (EncodeAlgorithm) Class.forName(clazz).newInstance();
+        final EncodeAlgorithm algorithm = (EncodeAlgorithm) Class.forName(clazz).newInstance();
 
         assertEquals("AES", algorithm.getName());
 
@@ -56,7 +52,6 @@ public class DatabaseTableSecurityTests {
         String decoded = algorithm.decode(encoded);
         assertNotNull(decoded);
         assertEquals("password", decoded);
-
     }
 
     @Test
@@ -65,8 +60,7 @@ public class DatabaseTableSecurityTests {
 
         final String clazz = MD5.class.getName();
 
-        final EncodeAlgorithm algorithm =
-                (EncodeAlgorithm) Class.forName(clazz).newInstance();
+        final EncodeAlgorithm algorithm = (EncodeAlgorithm) Class.forName(clazz).newInstance();
 
         assertEquals("MD5", algorithm.getName());
 
@@ -81,8 +75,7 @@ public class DatabaseTableSecurityTests {
 
         final String clazz = SHA_1.class.getName();
 
-        final EncodeAlgorithm algorithm =
-                (EncodeAlgorithm) Class.forName(clazz).newInstance();
+        final EncodeAlgorithm algorithm = (EncodeAlgorithm) Class.forName(clazz).newInstance();
 
         assertEquals("SHA-1", algorithm.getName());
 
@@ -97,8 +90,7 @@ public class DatabaseTableSecurityTests {
 
         final String clazz = SHA_256.class.getName();
 
-        final EncodeAlgorithm algorithm =
-                (EncodeAlgorithm) Class.forName(clazz).newInstance();
+        final EncodeAlgorithm algorithm = (EncodeAlgorithm) Class.forName(clazz).newInstance();
 
         assertEquals("SHA-256", algorithm.getName());
 

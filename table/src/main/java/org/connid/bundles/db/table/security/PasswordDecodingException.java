@@ -2,14 +2,14 @@
  * ====================
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.     
+ * Copyright 2012 Tirasa. All rights reserved.     
  * 
  * The contents of this file are subject to the terms of the Common Development 
  * and Distribution License("CDDL") (the "License").  You may not use this file 
  * except in compliance with the License.
  * 
  * You can obtain a copy of the License at 
- * http://IdentityConnectors.dev.java.net/legal/license.txt
+ * https://connid.googlecode.com/svn/base/trunk/legal/license.txt
  * See the License for the specific language governing permissions and limitations 
  * under the License. 
  * 
@@ -27,13 +27,17 @@ public class PasswordDecodingException extends Exception {
     private static final long serialVersionUID = -3481810710404195283L;
 
     /**
-     * Creates a new instance of <code>PasswordEncodingException</code> without detail message.
+     * Creates a new instance of
+     * <code>PasswordEncodingException</code> without detail message.
      */
     public PasswordDecodingException() {
+        super();
     }
 
     /**
-     * Constructs an instance of <code>PasswordEncodingException</code> with the specified detail message.
+     * Constructs an instance of
+     * <code>PasswordEncodingException</code> with the specified detail message.
+     *
      * @param msg the detail message.
      */
     public PasswordDecodingException(String msg) {

@@ -3,13 +3,14 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
  * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.     
+ * Copyright 2012 Tirasa. All rights reserved.
  * 
  * The contents of this file are subject to the terms of the Common Development 
  * and Distribution License("CDDL") (the "License").  You may not use this file 
  * except in compliance with the License.
  * 
  * You can obtain a copy of the License at 
- * http://IdentityConnectors.dev.java.net/legal/license.txt
+ * https://connid.googlecode.com/svn/base/trunk/legal/license.txt
  * See the License for the specific language governing permissions and limitations 
  * under the License. 
  * 
@@ -22,12 +23,11 @@
  */
 package org.connid.bundles.db.table;
 
-import org.connid.bundles.db.table.DatabaseTableConfiguration;
-import static org.junit.Assert.assertEquals;
 import junit.framework.Assert;
-
+import org.connid.bundles.db.table.security.SupportedAlgorithm;
 import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.test.common.TestHelpers;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
@@ -65,6 +65,7 @@ public class DatabaseTableConfigurationTests {
 
     /**
      * The configuration
+     *
      * @return see {@link DatabaseTableConfiguration}
      */
     protected DatabaseTableConfiguration getConfiguration() {
@@ -270,5 +271,14 @@ public class DatabaseTableConfigurationTests {
         final String[] tstpr = {"a=A", "b"};
         config.setJndiProperties(tstpr);
         config.validate();
+    }
+
+    @Test
+    public void testConfigurationEmptyCipherAlgorithm() {
+        // attempt to test driver info..
+        DatabaseTableConfiguration config = getConfiguration();
+        // check defaults..
+        config.validate();
+        assertEquals(SupportedAlgorithm.CLEARTEXT.name(), config.getCipherAlgorithm());
     }
 }
