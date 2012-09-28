@@ -644,7 +644,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     private String cipherAlgorithm;
 
-    @ConfigurationProperty(order = 24, required = true,
+    @ConfigurationProperty(order = 24,
     displayMessageKey = "CIPHER_ALGORITHM_DISPLAY",
     helpMessageKey = "CIPHER_ALGORITHM_HELP")
     public String getCipherAlgorithm() {
