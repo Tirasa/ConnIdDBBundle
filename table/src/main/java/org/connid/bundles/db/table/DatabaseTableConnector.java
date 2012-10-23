@@ -1130,7 +1130,7 @@ public class DatabaseTableConnector implements
         }
 
         schema = schemaBld.build();
-        LOG.ok("schema builded");
+        LOG.ok("schema built");
     }
 
     /**
@@ -1334,7 +1334,7 @@ public class DatabaseTableConnector implements
         bld.setUid(new Uid(uidValue));
         // only deals w/ accounts..
         bld.setObjectClass(ObjectClass.ACCOUNT);
-        LOG.ok("ConnectorObject is builded");
+        LOG.ok("ConnectorObject is built");
         return bld;
     }
 
