@@ -35,23 +35,24 @@ public class AES extends EncodeAlgorithm {
     private SecretKeySpec keySpec = null;
 
     @Override
-    public String encode(String clearPwd)
+    public String encode(String clearPwd, String charsetName)
             throws PasswordEncodingException {
 
         if (keySpec == null) {
-            throw new PasswordEncodingException("Invalid secret key");
+            throw new PasswordEncodingException("Invalid secret key.");
+        }
+
+        if (charsetName == null) {
+            throw new PasswordEncodingException("Invalid password charset.");
         }
 
         try {
-
-            final byte[] cleartext = clearPwd.getBytes("UTF8");
+            final byte[] cleartext = clearPwd.getBytes(charsetName);
 
             final Cipher cipher = Cipher.getInstance(getName());
-
             cipher.init(Cipher.ENCRYPT_MODE, keySpec);
 
             return Base64.encode(cipher.doFinal(cleartext));
-
         } catch (Exception e) {
             LOG.error(e, "Error encoding password");
             throw new PasswordEncodingException(e.getMessage());
@@ -60,23 +61,24 @@ public class AES extends EncodeAlgorithm {
     }
 
     @Override
-    public String decode(String ecodedPwd)
+    public String decode(String encodedPwd, String charsetName)
             throws PasswordDecodingException {
 
         if (keySpec == null) {
             throw new PasswordDecodingException("Invalid secret key");
         }
 
-        try {
+        if (charsetName == null) {
+            throw new PasswordDecodingException("Invalid password charset.");
+        }
 
-            byte[] encoded = Base64.decode(ecodedPwd);
+        try {
+            byte[] encoded = Base64.decode(encodedPwd);
 
             final Cipher cipher = Cipher.getInstance(getName());
-
             cipher.init(Cipher.DECRYPT_MODE, keySpec);
 
-            return new String(cipher.doFinal(encoded), "UTF-8");
-
+            return new String(cipher.doFinal(encoded), charsetName);
         } catch (Exception e) {
             LOG.error(e, "Error decoding password");
             throw new PasswordDecodingException(e.getMessage());
@@ -94,6 +96,5 @@ public class AES extends EncodeAlgorithm {
 
         keySpec = new SecretKeySpec(
                 Arrays.copyOfRange(key.getBytes("UTF8"), 0, 16), getName());
-
     }
 }

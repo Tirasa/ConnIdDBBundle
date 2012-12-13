@@ -159,6 +159,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         config.setChangeLogColumn(CHANGELOG);
         config.setKeyColumn(KEYCOLUMN);
         config.setPasswordColumn(PASSWORDCOLUMN);
+        config.setPasswordCharset(PASSWORD_CHARSET);
         config.setConnectorMessages(TestHelpers.createDummyMessages());
         config.setDatabase(DB);
         config.setJdbcUrlTemplate(URL);
@@ -267,6 +268,8 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         assertEquals(KEYCOLUMN, config.getUser());
         config.setPassword(new GuardedString("".toCharArray()));
         assertEquals(KEYCOLUMN, config.getUser());
+        config.setPasswordCharset(PASSWORD_CHARSET);
+        assertEquals(PASSWORD_CHARSET, config.getPasswordCharset());
         config.validate();
     }
 

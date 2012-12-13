@@ -28,14 +28,18 @@ import java.security.MessageDigest;
 public abstract class MessageDigestAlgorithm extends EncodeAlgorithm {
 
     @Override
-    public String encode(String clearPwd)
-            throws PasswordEncodingException {
+    public String encode(String clearPwd, String charsetName)
+            throws PasswordEncodingException, UnsupportedPasswordCharsetException {
+
+        if (charsetName == null) {
+            throw new UnsupportedPasswordCharsetException("Invalid password charset.");
+        }
 
         try {
             final MessageDigest msgd = MessageDigest.getInstance(getName());
 
             msgd.reset();
-            msgd.update(clearPwd.getBytes());
+            msgd.update(clearPwd.getBytes(charsetName));
 
             final byte[] message = msgd.digest();
 
@@ -52,7 +56,9 @@ public abstract class MessageDigestAlgorithm extends EncodeAlgorithm {
             }
 
             return hexString.toString();
-
+        } catch (UnsupportedEncodingException uee) {
+            LOG.error(uee, "Error encoding password charset");
+            throw new UnsupportedPasswordCharsetException(uee.getMessage());
         } catch (Exception e) {
             LOG.error(e, "Error encoding password");
             throw new PasswordEncodingException(e.getMessage());
@@ -60,8 +66,13 @@ public abstract class MessageDigestAlgorithm extends EncodeAlgorithm {
     }
 
     @Override
-    public String decode(String encodedPwd)
+    public String decode(String encodedPwd, String charsetName)
             throws PasswordDecodingException {
+
+        if (charsetName == null) {
+            throw new PasswordDecodingException("Invalid password charset.");
+        }
+
         return encodedPwd;
     }
 

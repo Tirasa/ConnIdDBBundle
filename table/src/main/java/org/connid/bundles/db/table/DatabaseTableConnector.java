@@ -24,6 +24,7 @@
 package org.connid.bundles.db.table;
 
 import static org.connid.bundles.db.table.util.DatabaseTableConstants.*;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -40,7 +41,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.identityconnectors.common.Assertions;
 import org.identityconnectors.common.CollectionUtil;
 import org.identityconnectors.common.StringUtil;
@@ -50,6 +50,7 @@ import org.connid.bundles.db.table.security.EncodeAlgorithm;
 import org.connid.bundles.db.table.security.PasswordDecodingException;
 import org.connid.bundles.db.table.security.PasswordEncodingException;
 import org.connid.bundles.db.table.security.SupportedAlgorithm;
+import org.connid.bundles.db.table.security.UnsupportedPasswordCharsetException;
 import org.connid.bundles.db.table.util.DatabaseTableConstants;
 import org.connid.bundles.db.table.util.DatabaseTableSQLUtil;
 import org.connid.bundles.db.common.DatabaseQueryBuilder;
@@ -1508,7 +1509,7 @@ public class DatabaseTableConnector implements
                             getStatusColumnValue(value.toString()),
                             sqlType));
                 } else if (cname.equalsIgnoreCase(config.getPasswordColumn())) {
-                    // password encryption
+                    // password encryption                	
                     builder.addBind(new SQLParam(
                             quoteName(cname),
                             encodePassword((GuardedString) value),
@@ -1559,7 +1560,14 @@ public class DatabaseTableConnector implements
             }
         });
 
-        final String encodedPwd = algorithm.encode(password[0]);
+        String encodedPwd;
+        try {
+            encodedPwd = algorithm.encode(password[0], config.getPasswordCharset());
+        } catch (UnsupportedPasswordCharsetException e) {
+            LOG.error(e, "Error encoding password charset not supported");
+            throw new PasswordEncodingException(e.getMessage());
+        }
+
         if (StringUtil.isNotBlank(encodedPwd)) {
             encoded = new GuardedString(
                     (config.isPwdEncodeToUpperCase() ? encodedPwd.toUpperCase()
@@ -1596,7 +1604,7 @@ public class DatabaseTableConnector implements
             throw new PasswordDecodingException(e.getMessage());
         }
 
-        decoded = algorithm.decode(password);
+        decoded = algorithm.decode(password, config.getPasswordCharset());
 
         return decoded;
     }

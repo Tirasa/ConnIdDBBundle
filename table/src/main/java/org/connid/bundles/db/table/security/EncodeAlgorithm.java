@@ -32,10 +32,10 @@ public abstract class EncodeAlgorithm {
      */
     protected static Log LOG = Log.getLog(EncodeAlgorithm.class);
 
-    public abstract String encode(final String clearPwd)
-            throws PasswordEncodingException;
+    public abstract String encode(final String clearPwd, String charsetName)
+            throws PasswordEncodingException, UnsupportedPasswordCharsetException;
 
-    public abstract String decode(final String encodedPwd)
+    public abstract String decode(final String encodedPwd, String charsetName)
             throws PasswordDecodingException;
 
     public abstract String getName();

@@ -29,13 +29,25 @@ public class ClearText extends EncodeAlgorithm {
     private final static String NAME = "CLEARTEXT";
 
     @Override
-    public String encode(String clearPwd) throws PasswordEncodingException {
-        return clearPwd;
+    public String encode(String clearPwd, String charsetName)
+            throws PasswordEncodingException, UnsupportedPasswordCharsetException {
+
+        try {
+            return new String(clearPwd.getBytes(charsetName), charsetName);
+        } catch (UnsupportedEncodingException e) {
+            throw new UnsupportedPasswordCharsetException("Unsupported password charset.", e);
+        }
     }
 
     @Override
-    public String decode(String encodedPwd) throws PasswordDecodingException {
-        return encodedPwd;
+    public String decode(String encodedPwd, String charsetName)
+            throws PasswordDecodingException {
+
+        try {
+            return new String(encodedPwd.getBytes(charsetName), charsetName);
+        } catch (UnsupportedEncodingException e) {
+            throw new PasswordDecodingException("Unsupported password charset.");
+        }
     }
 
     @Override

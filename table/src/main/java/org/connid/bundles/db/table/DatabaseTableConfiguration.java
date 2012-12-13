@@ -25,6 +25,7 @@ package org.connid.bundles.db.table;
 
 import static org.connid.bundles.db.table.util.DatabaseTableConstants.*;
 
+import java.nio.charset.Charset;
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
@@ -707,6 +708,28 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         this.retrievePassword = retrievePassword;
     }
 
+    /**
+     * clear password character set used by resource
+     */
+    private String passwordCharset = DEFAULT_PASSWORD_CHARSET;
+
+    /**
+     * Return password character set used by resource to encode clear password specified as required by java.nio.Charset
+     * http://docs.oracle.com/javase/6/docs/api/java/nio/charset/Charset.html
+     *
+     * @return
+     */
+    @ConfigurationProperty(order = 28, required = false,
+    displayMessageKey = "PASSWORD_CHARSET_DISPLAY",
+    helpMessageKey = "PASSWORD_CHARSET_HELP")
+    public String getPasswordCharset() {
+        return passwordCharset;
+    }
+
+    public void setPasswordCharset(String passwordCharset) {
+        this.passwordCharset = passwordCharset;
+    }
+
     // =======================================================================
     // Configuration Interface
     // =======================================================================
@@ -791,6 +814,14 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(getMessage(MSG_INVALID_QUOTING, getQuoting()));
         }
+
+        // check there if specified password encoding is supported         
+        if (StringUtil.isNotBlank(getPasswordCharset())) {
+        	if (!Charset.availableCharsets().keySet().contains(getPasswordCharset())) {
+                throw new IllegalArgumentException(getMessage(MSG_PWD_ENCODING_UNSUPPORTED));
+            }            
+        }
+
         LOG.ok("Configuration is valid");
     }
 

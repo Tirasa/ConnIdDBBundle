@@ -57,6 +57,8 @@ public class DatabaseTableConfigurationTests {
 
     static final String PASSDCOLUMN = "tstPasswordColumn";
 
+    final static String PASSWORD_CHARSETNAME = "UTF-8";
+
     static final String CHANGELOG = "tstChangelogColumn";
 
     static final String URL = "jdbc:derby:@tstHost:8000:tstDatabase";
@@ -73,6 +75,7 @@ public class DatabaseTableConfigurationTests {
         config.setJdbcDriver(DRIVER);
         config.setUser(USER);
         config.setPassword(PASSWORD);
+        config.setPasswordCharset(PASSWORD_CHARSETNAME);
         config.setTable(DBTABLE);
         config.setHost(HOST);
         config.setPort(PORT);
@@ -280,5 +283,41 @@ public class DatabaseTableConfigurationTests {
         // check defaults..
         config.validate();
         assertEquals(SupportedAlgorithm.CLEARTEXT.name(), config.getCipherAlgorithm());
+    }
+
+    /**
+     * test method password default charset
+     */
+    @Test
+    public void testConfigurationEmptyPasswordCharset() {
+        // attempt to test driver info..
+        DatabaseTableConfiguration config = getConfiguration();
+        // check defaults..
+        config.validate();
+        assertEquals("UTF-8", config.getPasswordCharset());
+    }
+    
+    /**
+     * test allowed password charset
+     */
+    @Test
+    public void testConfigurationSupportedCharset() {
+        // attempt to test password Charset
+        DatabaseTableConfiguration config = getConfiguration();
+        // check defaults..
+        config.setPasswordCharset("ISO-8859-15");
+        config.validate();
+    }
+
+    /**
+     * test method unsupported charset
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testConfigurationUnsupportedCharset() {
+        // attempt to test password Charset
+        DatabaseTableConfiguration config = getConfiguration();
+        // check defaults..
+        config.setPasswordCharset("UTF-9");
+        config.validate();
     }
 }

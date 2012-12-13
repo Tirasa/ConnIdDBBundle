@@ -47,6 +47,7 @@ import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
 import org.connid.bundles.db.table.security.MD5;
 import org.connid.bundles.db.table.security.PasswordEncodingException;
+import org.connid.bundles.db.table.security.UnsupportedPasswordCharsetException;
 import org.connid.bundles.db.common.SQLParam;
 import org.connid.bundles.db.common.SQLUtil;
 import org.identityconnectors.framework.api.operations.AuthenticationApiOp;
@@ -87,7 +88,9 @@ public abstract class DatabaseTableTestBase {
     static final String KEYCOLUMN = "accountId";
 
     static final String PASSWORDCOLUMN = "password";
-
+    
+    final static String PASSWORD_CHARSETNAME = "UTF-8";
+    
     static final String MANAGER = "manager";
 
     static final String MIDDLENAME = "middlename";
@@ -157,6 +160,9 @@ public abstract class DatabaseTableTestBase {
     static final String PASSWD = props.getProperty("password", "");
 
     static final String DRIVER = props.getProperty("driver");
+    
+    static final String PASSWORD_CHARSET = props.getProperty("password_charset", "UTF-8");
+    
 
     static final Boolean IS_EMPTY_STRING_SUPPORT = Boolean.parseBoolean(
             props.getProperty("isEmptyStringSupported", "false"));
@@ -1289,11 +1295,13 @@ public abstract class DatabaseTableTestBase {
 
                     try {
 
-                        md5str = new MD5().encode("password");
+                        md5str = new MD5().encode("password", PASSWORD_CHARSETNAME);
                         assertFalse("password".equalsIgnoreCase(md5str));
 
                     } catch (PasswordEncodingException ex) {
                         assertFalse(true);
+                    } catch (UnsupportedPasswordCharsetException upce) {
+                    	assertFalse(true);
                     }
 
                     assertNotNull(md5str);
@@ -1320,11 +1328,13 @@ public abstract class DatabaseTableTestBase {
 
                             try {
 
-                                md5str = new MD5().encode("123pwd");
+                                md5str = new MD5().encode("123pwd", PASSWORD_CHARSETNAME);
                                 assertFalse("123pwd".equalsIgnoreCase(md5str));
 
                             } catch (PasswordEncodingException ex) {
                                 assertFalse(true);
+                            } catch (UnsupportedPasswordCharsetException upce) {
+                            	assertFalse(true);
                             }
 
                             assertNotNull(md5str);
@@ -1390,11 +1400,13 @@ public abstract class DatabaseTableTestBase {
 
                     try {
 
-                        md5str = new MD5().encode("password");
+                        md5str = new MD5().encode("password", PASSWORD_CHARSETNAME);
                         assertFalse("password".equalsIgnoreCase(md5str));
 
                     } catch (PasswordEncodingException ex) {
                         assertFalse(true);
+                    } catch (UnsupportedPasswordCharsetException upce) {
+                    	assertFalse(true);
                     }
 
                     assertNotNull(md5str);

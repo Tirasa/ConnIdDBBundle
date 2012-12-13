@@ -33,6 +33,10 @@ import org.junit.Test;
 
 public class DatabaseTableSecurityTests {
 
+    final static String UTF8_CHARSETNAME = "UTF-8";
+
+    final static String LATIN1_CHARSETNAME = "ISO-8859-1";
+
     @Test
     public void aes()
             throws Exception {
@@ -45,11 +49,11 @@ public class DatabaseTableSecurityTests {
 
         algorithm.setKey("1abcdefghilmnopqrstuvz2!");
 
-        String encoded = algorithm.encode("password");
+        String encoded = algorithm.encode("password", UTF8_CHARSETNAME);
         assertNotNull(encoded);
         assertFalse("password".equalsIgnoreCase(encoded));
 
-        String decoded = algorithm.decode(encoded);
+        String decoded = algorithm.decode(encoded, UTF8_CHARSETNAME);
         assertNotNull(decoded);
         assertEquals("password", decoded);
     }
@@ -64,9 +68,20 @@ public class DatabaseTableSecurityTests {
 
         assertEquals("MD5", algorithm.getName());
 
-        String encoded = algorithm.encode("password");
+        String encoded = algorithm.encode("password", UTF8_CHARSETNAME);
         assertNotNull(encoded);
         assertFalse("password".equalsIgnoreCase(encoded));
+        assertEquals("MD5", algorithm.getName());
+        assertEquals(encoded, "5f4dcc3b5aa765d61d8327deb882cf99");
+
+        encoded = algorithm.encode("password", LATIN1_CHARSETNAME);
+        assertEquals(encoded, "5f4dcc3b5aa765d61d8327deb882cf99");
+
+        encoded = algorithm.encode("passwordè", UTF8_CHARSETNAME);
+        assertEquals(encoded, "1ea7e38c6126a0765dc619a1e2aa99fc");
+
+        encoded = algorithm.encode("passwordè", LATIN1_CHARSETNAME);
+        assertEquals(encoded, "079fea8ebf50752a85c2cd90a32270db");
     }
 
     @Test
@@ -79,9 +94,19 @@ public class DatabaseTableSecurityTests {
 
         assertEquals("SHA-1", algorithm.getName());
 
-        String encoded = algorithm.encode("password");
+        String encoded = algorithm.encode("password", UTF8_CHARSETNAME);
         assertNotNull(encoded);
         assertFalse("password".equalsIgnoreCase(encoded));
+        assertEquals(encoded, "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8");
+
+        encoded = algorithm.encode("password", LATIN1_CHARSETNAME);
+        assertEquals(encoded, "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8");
+
+        encoded = algorithm.encode("passwordè", UTF8_CHARSETNAME);
+        assertEquals(encoded, "a5c28b16a7d49e6aadd711b7b61c0568f1e2b6fe");
+
+        encoded = algorithm.encode("passwordè", LATIN1_CHARSETNAME);
+        assertEquals(encoded, "d2231ee6665bed00c1677fdcd0605d12ea48f1a2");
     }
 
     @Test
@@ -94,7 +119,7 @@ public class DatabaseTableSecurityTests {
 
         assertEquals("SHA-256", algorithm.getName());
 
-        String encoded = algorithm.encode("password");
+        String encoded = algorithm.encode("password", UTF8_CHARSETNAME);
         assertNotNull(encoded);
         assertFalse("password".equalsIgnoreCase(encoded));
     }

@@ -65,6 +65,7 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
         config.setChangeLogColumn(CHANGELOG);
         config.setKeyColumn(KEYCOLUMN);
         config.setPasswordColumn(PASSWORDCOLUMN);
+        config.setPasswordCharset(PASSWORD_CHARSETNAME);
         config.setConnectorMessages(TestHelpers.createDummyMessages());
 
         // status fields configuration

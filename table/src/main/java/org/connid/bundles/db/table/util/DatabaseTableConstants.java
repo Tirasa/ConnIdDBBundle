@@ -34,6 +34,8 @@ public class DatabaseTableConstants {
     public static final String DEFAULT_TEMPLATE = "jdbc:oracle:thin:@%h:%p:%d";    
     /** The null column default value */
     public static final String EMPTY_STR = "";    
+    /** The default password encoding charset to use */
+    public static final String DEFAULT_PASSWORD_CHARSET = "UTF-8";
 
     public static final String MSG_ACCOUNT_OBJECT_CLASS_REQUIRED = "acount.object.class.required";    
     public static final String MSG_AUTH_FAILED="auth.op.failed";
@@ -60,6 +62,8 @@ public class DatabaseTableConstants {
     public static final String MSG_PASSWORD_BLANK = "admin.password.blank";
     public static final String MSG_PORT_BLANK = "port.blank";
     public static final String MSG_PWD_BLANK = "pwd.blank";
+    public static final String MSG_PWD_ENCODING_BLANK = "pwd.encoding.blank";
+    public static final String MSG_PWD_ENCODING_UNSUPPORTED = "pwd.encoding.unsupported";
     public static final String MSG_PWD_COLUMN_BLANK="pwd.column.blank";   
     public static final String MSG_QUERY_INVALID = "query.invalid"; 
     public static final String MSG_RESULT_HANDLER_NULL="result.handler.null";
