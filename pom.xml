@@ -42,9 +42,9 @@
   <packaging>pom</packaging>
 
   <scm>
-    <connection>scm:svn:http://connid.googlecode.com/svn/bundles/db/trunk/</connection>
-    <developerConnection>scm:svn:https://connid.googlecode.com/svn/bundles/db/trunk/</developerConnection>
-    <url>http://connid.googlecode.com/svn/bundles/db/trunk/</url>
+    <connection>scm:git:git@github.com:Tirasa/ConnIdDBBundle.git</connection>
+    <url>scm:git:git@github.com:Tirasa/ConnIdDBBundle.git</url>
+    <developerConnection>scm:git:git@github.com:Tirasa/ConnIdDBBundle.git</developerConnection>
   </scm>
 
   <properties>
