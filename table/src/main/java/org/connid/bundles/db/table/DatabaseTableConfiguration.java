@@ -110,7 +110,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     private String port = EMPTY_STR;
 
     /**
-     * NameQoute getter
+     * NameQuote getter
      *
      * @return quoting value
      */
@@ -282,7 +282,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * Status column. If not empty it indicates table column used to describe entry status. Disabled status value are
      * given by property 'disabledStatusValue'. Enabled status value are given by property 'enabledStatusValue'. Default
-     * value will be 'defaultSatusValue'.
+     * value will be 'defaultStatusValue'.
      */
     private String statusColumn = EMPTY_STR;
 
@@ -541,7 +541,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     /**
      * The new connection validation query. The query can be empty. Then the auto commit true/false command is applied
-     * by default. This can be unsufficient on some database drivers because of caching Then the validation query is
+     * by default. This can be insufficient on some database drivers because of caching Then the validation query is
      * required.
      */
     private String validConnectionQuery;
@@ -643,7 +643,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         this.jndiProperties = (String[]) SerializerUtil.cloneObject(value);
     }
 
-    private String cipherAlgorithm;
+    private String cipherAlgorithm = SupportedAlgorithm.CLEARTEXT.name();
 
     @ConfigurationProperty(order = 24,
     displayMessageKey = "CIPHER_ALGORITHM_DISPLAY",
@@ -697,7 +697,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
     private boolean retrievePassword;
 
-    @ConfigurationProperty(order = 27, required = true,
+    @ConfigurationProperty(order = 27,
     displayMessageKey = "RETRIEVE_PASSWORD_DISPLAY",
     helpMessageKey = "RETRIEVE_PASSWORD_HELP")
     public boolean isRetrievePassword() {
