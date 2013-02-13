@@ -386,10 +386,10 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * The Driver class. The jdbcDriver is located by connector framework to connect to database. Required configuration
-     * property, and should be validated
+     * The Driver class. The jdbcDriver is located by connector framework to connect to database. 
+     * Required configuration property (when not using a Datasource), and should be validated
      */
-    private String jdbcDriver = DEFAULT_DRIVER;
+    private String jdbcDriver = EMPTY_STR;
 
     /**
      * @return jdbcDriver value
@@ -409,10 +409,10 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * Database connection URL. The url is used to connect to database. Required configuration property, and should be
-     * validated
+     * Database connection URL. The url is used to connect to database. Required configuration 
+     * property (when not using a Datasource), and should be validated
      */
-    private String jdbcUrlTemplate = DEFAULT_TEMPLATE;
+    private String jdbcUrlTemplate = EMPTY_STR;
 
     /**
      * Return the jdbcUrlTemplate
@@ -744,10 +744,6 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         if (StringUtil.isBlank(getTable())) {
             throw new IllegalArgumentException(getMessage(MSG_TABLE_BLANK));
         }
-        // check the url is configured
-        if (StringUtil.isBlank(getJdbcUrlTemplate())) {
-            throw new IllegalArgumentException(getMessage(MSG_JDBC_TEMPLATE_BLANK));
-        }
         // determine if you can get a key column
         if (StringUtil.isBlank(getKeyColumn())) {
             throw new IllegalArgumentException(getMessage(MSG_KEY_COLUMN_BLANK));
@@ -778,6 +774,10 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             // check that there is a pwd to query..
             if (getPassword() == null) {
                 throw new IllegalArgumentException(getMessage(MSG_PASSWORD_BLANK));
+            }
+            // check the url is configured
+            if (StringUtil.isBlank(getJdbcUrlTemplate())) {
+                throw new IllegalArgumentException(getMessage(MSG_JDBC_TEMPLATE_BLANK));
             }
 
             // host required
