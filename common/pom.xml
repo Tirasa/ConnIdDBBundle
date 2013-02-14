@@ -28,8 +28,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>db</artifactId>
     <groupId>org.connid.bundles.db</groupId>
+    <artifactId>db</artifactId>
     <version>2.1.5-SNAPSHOT</version>
   </parent>
 
@@ -47,14 +47,12 @@
   <dependencies>
     <dependency>
       <groupId>org.connid</groupId>
-      <artifactId>framework</artifactId>
-      <scope>compile</scope>
+      <artifactId>connid-framework</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.connid</groupId>
-      <artifactId>framework-internal</artifactId>
-      <scope>runtime</scope>
+      <artifactId>connid-framework-internal</artifactId>
     </dependency>
 
     <dependency>

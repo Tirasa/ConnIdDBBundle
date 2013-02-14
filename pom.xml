@@ -89,28 +89,28 @@
             
       <dependency>
         <groupId>org.connid</groupId>
-        <artifactId>framework</artifactId>
+        <artifactId>connid-framework</artifactId>
         <version>${base.version}</version>
         <scope>compile</scope>
       </dependency>
 
       <dependency>
         <groupId>org.connid</groupId>
-        <artifactId>framework-internal</artifactId>
+        <artifactId>connid-framework-internal</artifactId>
         <version>${base.version}</version>
         <scope>runtime</scope>
       </dependency>
 
       <dependency>
         <groupId>org.connid</groupId>
-        <artifactId>test-common</artifactId>
+        <artifactId>connid-test-common</artifactId>
         <version>${base.version}</version>
         <scope>test</scope>
       </dependency>
 
       <dependency>
         <groupId>org.connid</groupId>
-        <artifactId>test-contract</artifactId>
+        <artifactId>connid-test-contract</artifactId>
         <version>${base.version}</version>
         <scope>test</scope>
       </dependency>
@@ -118,7 +118,7 @@
       <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derby</artifactId>
-        <version>10.8.2.2</version>
+        <version>10.9.1.0</version>
         <scope>test</scope>
       </dependency>
 
@@ -131,12 +131,16 @@
   </modules>
 
   <repositories>
-     <repository>
-        <id>sonatype</id>
-        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        <releases><enabled>false</enabled></releases>
-        <snapshots><enabled>true</enabled></snapshots>
-     </repository>
+    <repository>
+      <id>sonatype</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
   </repositories>
 
 </project>
