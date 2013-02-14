@@ -23,11 +23,12 @@
  */
 package org.connid.bundles.db.table;
 
-import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.connid.bundles.db.table.security.SupportedAlgorithm;
 import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.test.common.TestHelpers;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
@@ -42,8 +43,7 @@ public class DatabaseTableConfigurationTests {
 
     static final String USER = "tstUser";
 
-    static final GuardedString PASSWORD = new GuardedString("tstPAssword".
-            toCharArray());
+    static final GuardedString PASSWORD = new GuardedString("tstPAssword".toCharArray());
 
     static final String DBTABLE = "tstTable";
 
@@ -187,7 +187,7 @@ public class DatabaseTableConfigurationTests {
         config.setDatabase("");
         // check defaults..
         config.validate();
-        Assert.fail("empty database");
+        fail("empty database");
     }
 
     /**
@@ -200,7 +200,7 @@ public class DatabaseTableConfigurationTests {
         config.setPasswordColumn("a");
         // check defaults..
         config.validate();
-        Assert.fail("testConfigurationKeyEQPassword");
+        fail("testConfigurationKeyEQPassword");
     }
 
     /**
@@ -213,7 +213,7 @@ public class DatabaseTableConfigurationTests {
         config.setChangeLogColumn("a");
         // check defaults..
         config.validate();
-        Assert.fail("testConfigurationKeyEQChange");
+        fail("testConfigurationKeyEQChange");
     }
 
     /**
@@ -226,7 +226,7 @@ public class DatabaseTableConfigurationTests {
         config.setChangeLogColumn("a");
         // check defaults..
         config.validate();
-        Assert.fail("testConfigurationPasswdEQChange");
+        fail("testConfigurationPasswdEQChange");
     }
 
     /**
@@ -296,7 +296,7 @@ public class DatabaseTableConfigurationTests {
         config.validate();
         assertEquals("UTF-8", config.getPasswordCharset());
     }
-    
+
     /**
      * test allowed password charset
      */

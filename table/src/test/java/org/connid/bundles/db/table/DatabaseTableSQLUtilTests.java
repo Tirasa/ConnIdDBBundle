@@ -22,8 +22,8 @@
  */
 package org.connid.bundles.db.table;
 
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.CallableStatement;
@@ -36,21 +36,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import junit.framework.Assert;
-
-import org.identityconnectors.common.Pair;
-import org.identityconnectors.common.security.GuardedString;
+import org.connid.bundles.db.common.ExpectProxy;
+import org.connid.bundles.db.common.SQLParam;
 import org.connid.bundles.db.table.mapping.DefaultStrategy;
 import org.connid.bundles.db.table.mapping.MappingStrategy;
 import org.connid.bundles.db.table.util.DatabaseTableSQLUtil;
-import org.connid.bundles.db.common.ExpectProxy;
-import org.connid.bundles.db.common.SQLParam;
+import org.identityconnectors.common.Pair;
+import org.identityconnectors.common.security.GuardedString;
 import org.junit.Test;
-
 
 /**
  * The SQL util tests
+ *
  * @version $Revision 1.0$
  * @since 1.0
  */
@@ -58,7 +55,8 @@ public class DatabaseTableSQLUtilTests {
 
     /**
      * GetAttributeSet test method
-     * @throws SQLException 
+     *
+     * @throws SQLException
      */
     @Test
     public void testGetColumnValues() throws SQLException {
@@ -70,35 +68,36 @@ public class DatabaseTableSQLUtilTests {
         //Resultset
         final ExpectProxy<ResultSet> trs = new ExpectProxy<ResultSet>();
         ResultSet resultSetProxy = trs.getProxy(ResultSet.class);
-        
+
         //Metadata
         final ExpectProxy<ResultSetMetaData> trsmd = new ExpectProxy<ResultSetMetaData>();
         ResultSetMetaData metaDataProxy = trsmd.getProxy(ResultSetMetaData.class);
 
-        trs.expectAndReturn("getMetaData",metaDataProxy);
+        trs.expectAndReturn("getMetaData", metaDataProxy);
         trsmd.expectAndReturn("getColumnCount", 2);
         trsmd.expectAndReturn("getColumnName", TEST1);
         trsmd.expectAndReturn("getColumnType", Types.VARCHAR);
         trs.expectAndReturn("getString", TEST_VAL1);
-        trsmd.expectAndReturn("getColumnName", TEST2);        
+        trsmd.expectAndReturn("getColumnName", TEST2);
         trsmd.expectAndReturn("getColumnType", Types.VARCHAR);
         trs.expectAndReturn("getString", TEST_VAL2);
-        
+
         final DefaultStrategy derbyDbStrategy = new DefaultStrategy();
         final Map<String, SQLParam> actual = DatabaseTableSQLUtil.getColumnValues(derbyDbStrategy, resultSetProxy);
         assertTrue("getString not called", trs.isDone());
         assertTrue("getColumnType not called", trsmd.isDone());
         assertEquals(2, actual.size());
-        final SQLParam tv1 =  actual.get(TEST1);
-        Assert.assertNotNull(tv1);
-        assertEquals(TEST_VAL1, tv1.getValue()); 
-        final SQLParam tv2 =  actual.get(TEST2);
-        Assert.assertNotNull(tv2);
-        assertEquals(TEST_VAL2, tv2.getValue()); 
-     }   
-    
+        final SQLParam tv1 = actual.get(TEST1);
+        assertNotNull(tv1);
+        assertEquals(TEST_VAL1, tv1.getValue());
+        final SQLParam tv2 = actual.get(TEST2);
+        assertNotNull(tv2);
+        assertEquals(TEST_VAL2, tv2.getValue());
+    }
+
     /**
      * Test quoting method
+     *
      * @throws Exception
      */
     @Test
@@ -114,36 +113,37 @@ public class DatabaseTableSQLUtilTests {
             assertEquals(entry.getValue().second, actual);
         }
     }
-    
+
     /**
      * Test quoting method
+     *
      * @throws Exception
      */
     @Test
     public void testSetParams() throws Exception {
         final ExpectProxy<MappingStrategy> mse = new ExpectProxy<MappingStrategy>();
         MappingStrategy ms = mse.getProxy(MappingStrategy.class);
-        
+
         final ExpectProxy<PreparedStatement> pse = new ExpectProxy<PreparedStatement>();
-        PreparedStatement ps = pse.getProxy(PreparedStatement.class);        
-        
+        PreparedStatement ps = pse.getProxy(PreparedStatement.class);
+
         final ExpectProxy<CallableStatement> cse = new ExpectProxy<CallableStatement>();
-        CallableStatement cs = cse.getProxy(CallableStatement.class);        
-        
+        CallableStatement cs = cse.getProxy(CallableStatement.class);
+
         List<SQLParam> params = new ArrayList<SQLParam>();
         params.add(new SQLParam("test", "test", Types.VARCHAR));
         params.add(new SQLParam("password", new GuardedString("tst".toCharArray()), Types.VARCHAR));
         mse.expect("setSQLParam");
         mse.expect("setSQLParam");
-        
-        DatabaseTableSQLUtil.setParams(ms, ps, params );
+
+        DatabaseTableSQLUtil.setParams(ms, ps, params);
         assertTrue("setSQLParam not called", mse.isDone());
         assertTrue("setSQLParam not called", pse.isDone());
 
-        mse.expect("setSQLParam");       
+        mse.expect("setSQLParam");
         mse.expect("setSQLParam");
         DatabaseTableSQLUtil.setParams(ms, cs, params);
         assertTrue("setSQLParam not called", mse.isDone());
         assertTrue("setSQLParam not called", cse.isDone());
-    }        
+    }
 }
