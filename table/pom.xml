@@ -30,7 +30,7 @@
   <parent>
     <groupId>org.connid.bundles.db</groupId>
     <artifactId>db</artifactId>
-    <version>2.1.4.1-SNAPSHOT</version>
+    <version>2.1.6-SNAPSHOT</version>
   </parent>
 
   <groupId>org.connid.bundles.db</groupId>
@@ -47,12 +47,12 @@
   <dependencies>
     <dependency>
       <groupId>org.connid</groupId>
-      <artifactId>framework</artifactId>
+      <artifactId>connid-framework</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.connid</groupId>
-      <artifactId>framework-internal</artifactId>
+      <artifactId>connid-framework-internal</artifactId>
     </dependency>
 
     <dependency>
@@ -69,13 +69,13 @@
 
     <dependency>
       <groupId>org.connid</groupId>
-      <artifactId>test-common</artifactId>
+      <artifactId>connid-test-common</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.connid</groupId>
-      <artifactId>test-contract</artifactId>
+      <artifactId>connid-test-contract</artifactId>
       <scope>test</scope>
     </dependency>
 
