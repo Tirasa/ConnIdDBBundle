@@ -125,9 +125,28 @@
     </dependencies>
   </dependencyManagement>
 
+  <build>
+    <plugins>                  
+      <!-- Disable license header check globally since the Scripted SQL bundle is forked from OpenICF and 
+      a different license header is required; it will be re-enabled for other modules. -->
+      <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+        <version>1.9.0</version>
+        <executions>
+          <execution>
+            <id>check-headers</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <modules>
     <module>common</module>
     <module>table</module>
+    <module>scriptedsql</module>
   </modules>
 
   <repositories>

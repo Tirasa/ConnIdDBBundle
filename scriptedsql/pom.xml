@@ -3,7 +3,7 @@
 /*
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright 2011 Tirasa. All rights reserved.
+* Copyright 2013 Tirasa. All rights reserved.
 *
 * The contents of this file are subject to the terms of either the GNU
 * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,9 +34,9 @@
   </parent>
 
   <groupId>org.connid.bundles.db</groupId>
-  <artifactId>common</artifactId>
+  <artifactId>org.connid.bundles.db.scriptedsql</artifactId>
 
-  <name>Bundles: DB: Common</name>
+  <name>Bundles: DB: ScriptedSQL</name>
 
   <packaging>jar</packaging>
 
@@ -56,27 +56,94 @@
     </dependency>
 
     <dependency>
+      <groupId>org.connid.bundles.db</groupId>
+      <artifactId>common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.connid</groupId>
+      <artifactId>connid-test-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.connid</groupId>
+      <artifactId>connid-test-contract</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
+        
     <plugins>
-      <!-- Re-enable license header check for this module -->
+      
       <plugin>
-        <groupId>com.mycila.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
-        <version>1.9.0</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <inherited>true</inherited>
+        <configuration>
+          <includes>
+            <include>**/*Tests.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+
+          <appendAssemblyId>false</appendAssemblyId>
+
+          <descriptors>
+            <descriptor>src/assemble/connector.xml</descriptor>
+          </descriptors>
+
+          <archive>
+            <index>true</index>
+            <manifestEntries>
+
+              <ConnectorBundle-FrameworkVersion>
+                ${base.version}
+              </ConnectorBundle-FrameworkVersion>
+
+              <ConnectorBundle-Name>
+                ${project.artifactId}
+              </ConnectorBundle-Name>
+
+              <ConnectorBundle-Version>
+                ${project.version}
+              </ConnectorBundle-Version>
+
+            </manifestEntries>
+          </archive>
+                    
+        </configuration>
+                
         <executions>
           <execution>
-            <id>check-headers</id>
-            <phase>verify</phase>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
+        
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
   </build>
-
 </project>
