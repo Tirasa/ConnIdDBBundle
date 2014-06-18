@@ -26,8 +26,6 @@ public class SHA_1 extends MessageDigestAlgorithm {
 
     private final static String NAME = "SHA-1";
 
-    private final static String KEY = null;
-
     @Override
     public String getName() {
         return NAME;

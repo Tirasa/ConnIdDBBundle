@@ -23,6 +23,7 @@
 package org.connid.bundles.db.table;
 
 import org.connid.bundles.db.table.DatabaseTableConfiguration;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -87,9 +88,8 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
      */
     public static class MockContextFactory implements InitialContextFactory {
 
-        @SuppressWarnings("UseOfObsoleteCollectionType")
         @Override
-        public Context getInitialContext(java.util.Hashtable environment)
+        public Context getInitialContext(@SuppressWarnings("rawtypes") java.util.Hashtable environment)
                 throws NamingException {
             final Context context = (Context) Proxy.newProxyInstance(
                     getClass().getClassLoader(),

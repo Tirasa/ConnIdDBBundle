@@ -26,8 +26,6 @@ public class SHA_256 extends MessageDigestAlgorithm {
 
     private final static String NAME = "SHA-256";
 
-    private final static String KEY = null;
-
     @Override
     public String getName() {
         return NAME;

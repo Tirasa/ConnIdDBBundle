@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.script.ScriptExecutor;
 import org.identityconnectors.common.script.ScriptExecutorFactory;
@@ -358,7 +359,7 @@ public class ScriptedSQLConnector implements PoolableConnector, AuthenticateOp, 
      * {@inheritDoc}
      */
     @Override
-    public void executeQuery(ObjectClass objClass, Map query, ResultsHandler handler, OperationOptions options) {
+    public void executeQuery(ObjectClass objClass, @SuppressWarnings("rawtypes") Map query, ResultsHandler handler, OperationOptions options) {
         if (config.isReloadScriptOnExecution()) {
             searchExecutor = getScriptExecutor(config.getSearchScript(), config.getSearchScriptFileName());
             LOG.ok("Search script loaded");
@@ -559,7 +560,7 @@ public class ScriptedSQLConnector implements PoolableConnector, AuthenticateOp, 
                     // is there a chance we fetch password from search?
                 } else {
                     if (attrValue instanceof Collection) {
-                        cobld.addAttribute(AttributeBuilder.build(attrName, (Collection) attrValue));
+                        cobld.addAttribute(AttributeBuilder.build(attrName, (Collection<?>) attrValue));
                     } else if (attrValue != null) {
                         cobld.addAttribute(AttributeBuilder.build(attrName, attrValue));
                     } else {
@@ -629,7 +630,7 @@ public class ScriptedSQLConnector implements PoolableConnector, AuthenticateOp, 
                         final String attrName = attr.getKey();
                         final Object attrValue = attr.getValue();
                         if (attrValue instanceof Collection) {
-                            cobld.addAttribute(AttributeBuilder.build(attrName, (Collection) attrValue));
+                            cobld.addAttribute(AttributeBuilder.build(attrName, (Collection<?>) attrValue));
                         } else if (attrValue != null) {
                             cobld.addAttribute(AttributeBuilder.build(attrName, attrValue));
                         } else {
