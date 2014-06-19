@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.identityconnectors.common.Assertions;
 import org.identityconnectors.common.CollectionUtil;
 import org.identityconnectors.common.StringUtil;
@@ -121,6 +122,14 @@ public class DatabaseTableConnector implements
      * Setup logging for the {@link DatabaseTableConnector}.
      */
     private static Log LOG = Log.getLog(DatabaseTableConnector.class);
+    
+    /**
+     * A "hashed password" attribute. If this attribute is "true" then the value supplied for
+     * the password attribute is assumed to be hashed according to the defined password digest
+     * algorithm, and hence is not hashed (again).
+     */
+    private static final String HASHED_PASSWORD_ATTRIBUTE = 
+        AttributeUtil.createSpecialName("HASHED_PASSWORD");
 
     /**
      * Place holder for the {@link Connection} passed into the callback
@@ -275,7 +284,7 @@ public class DatabaseTableConnector implements
 
         Set<Attribute> attrToBeProcessed = new HashSet<Attribute>(attrs);
 
-        // If status column is specified attibute __ENABLED__ must be specified.
+        // If status column is specified attribute __ENABLED__ must be specified.
         // If attribute __ENABLED__ is not specified a default value must be
         // provided.
         if (StringUtil.isNotBlank(config.getStatusColumn())) {
@@ -287,6 +296,18 @@ public class DatabaseTableConnector implements
                         isEnabled(config.getDefaultStatusValue())));
             }
         }
+        
+        // Find out whether the supplied password should be hashed or not
+        boolean hashedPassword = false;
+        final Attribute hashedPasswordAttribute = 
+            AttributeUtil.find(HASHED_PASSWORD_ATTRIBUTE, attrToBeProcessed);
+
+        if (hashedPasswordAttribute != null && hashedPasswordAttribute.getValue() != null
+            && !hashedPasswordAttribute.getValue().isEmpty()
+            && hashedPasswordAttribute.getValue().get(0) instanceof Boolean) {
+            hashedPassword = (Boolean)hashedPasswordAttribute.getValue().get(0);
+            attrToBeProcessed.remove(hashedPasswordAttribute);
+        }
 
         //All attribute names should be in create columns statement 
         for (Attribute attr : attrToBeProcessed) {
@@ -295,7 +316,7 @@ public class DatabaseTableConnector implements
 
             if (StringUtil.isNotBlank(columnName)) {
 
-                handleAttribute(bld, attr, columnName);
+                handleAttribute(bld, attr, hashedPassword, columnName);
 
                 missingRequiredColumns.remove(columnName);
 
@@ -451,6 +472,18 @@ public class DatabaseTableConnector implements
         final String accountUid = uid.getUidValue();
         Assertions.nullCheck(accountUid, "accountUid");
         LOG.ok("Account uid {0} is present", accountUid);
+        
+        // Find out whether the supplied password should be hashed or not
+        boolean hashedPassword = false;
+        final Attribute hashedPasswordAttribute = 
+            AttributeUtil.find(HASHED_PASSWORD_ATTRIBUTE, attrs);
+
+        if (hashedPasswordAttribute != null && hashedPasswordAttribute.getValue() != null
+            && !hashedPasswordAttribute.getValue().isEmpty()
+            && hashedPasswordAttribute.getValue().get(0) instanceof Boolean) {
+            hashedPassword = (Boolean)hashedPasswordAttribute.getValue().get(0);
+            attrs.remove(hashedPasswordAttribute);
+        }
 
         Uid ret = uid;
         // The update is changing name. The oldUid is a key and the name will become new uid.
@@ -473,7 +506,7 @@ public class DatabaseTableConnector implements
                 final String columnName = getColumnName(attributeName);
 
                 if (StringUtil.isNotBlank(columnName)) {
-                    handleAttribute(updateSet, attr, columnName);
+                    handleAttribute(updateSet, attr, hashedPassword, columnName);
 
                     LOG.ok("Attribute {0} was added to update", attr.getName());
                 } else {
@@ -1394,6 +1427,7 @@ public class DatabaseTableConnector implements
     private <T extends OperationBuilder> void handleAttribute(
             final T builder,
             final Attribute attribute,
+            boolean hashedPassword,
             final String cname) {
 
         Object value = AttributeUtil.getSingleValue(attribute);
@@ -1437,11 +1471,29 @@ public class DatabaseTableConnector implements
                             getStatusColumnValue(value.toString()),
                             sqlType));
                 } else if (cname.equalsIgnoreCase(config.getPasswordColumn())) {
-                    // password encryption                	
-                    builder.addBind(new SQLParam(
-                            quoteName(cname),
-                            encodePassword((GuardedString) value),
-                            sqlType));
+                    if (hashedPassword) {
+                        final String[] password = {null};
+
+                        ((GuardedString)value).access(new GuardedString.Accessor() {
+
+                            @Override
+                            public void access(char[] clearChars) {
+                                password[0] = new String(clearChars);
+                            }
+                        });
+                        String encodedPassword = changeCaseOfEncodedPassword(password[0]);
+                        // password encryption                  
+                        builder.addBind(new SQLParam(
+                                quoteName(cname),
+                                new GuardedString(encodedPassword.toCharArray()),
+                                sqlType));
+                    } else {
+                        // password encryption                  
+                        builder.addBind(new SQLParam(
+                                quoteName(cname),
+                                encodePassword((GuardedString) value),
+                                sqlType));
+                    }
                 } else {
                     builder.addBind(new SQLParam(
                             quoteName(cname), value, sqlType));
@@ -1497,14 +1549,21 @@ public class DatabaseTableConnector implements
         }
 
         if (StringUtil.isNotBlank(encodedPwd)) {
-            encoded = new GuardedString(
-                    (config.isPwdEncodeToUpperCase() ? encodedPwd.toUpperCase()
-                    : config.isPwdEncodeToLowerCase() ? encodedPwd.toLowerCase() : encodedPwd).toCharArray());
+            encoded = new GuardedString(changeCaseOfEncodedPassword(encodedPwd).toCharArray());
         } else {
             encoded = guarded;
         }
 
         return encoded;
+    }
+    
+    private String changeCaseOfEncodedPassword(String encodedPwd) {
+        if (StringUtil.isNotBlank(encodedPwd)) {
+            return config.isPwdEncodeToUpperCase() ? encodedPwd.toUpperCase()
+                    : config.isPwdEncodeToLowerCase() ? encodedPwd.toLowerCase() : encodedPwd;
+        }
+        
+        return null;
     }
 
     private String decodePassword(final String password)
