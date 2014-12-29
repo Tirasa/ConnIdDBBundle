@@ -203,7 +203,9 @@ public class ScriptedSQLConnector implements PoolableConnector, AuthenticateOp, 
             arguments.put("objectClass", objClass.getObjectClassValue());
             arguments.put("options", options.getOptions());
             // We give the id (name) as an argument, more friendly than dealing with __NAME__
-            arguments.put("id", AttributeUtil.getNameFromAttributes(attrs).getNameValue());
+            arguments.put("id", AttributeUtil.getNameFromAttributes(attrs).getNameValue() == null 
+                    ? AttributeUtil.getUidAttribute(attrs).getUidValue() 
+                    : AttributeUtil.getNameFromAttributes(attrs).getNameValue());
 
             Map<String, List<Object>> attrMap = new HashMap<String, List<Object>>();
             for (Attribute attr : attrs) {

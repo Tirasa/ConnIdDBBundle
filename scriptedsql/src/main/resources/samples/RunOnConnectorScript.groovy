@@ -47,7 +47,8 @@ def mySQLCreateUsers = "CREATE TABLE Users ("+
 "firstname varchar(32) NOT NULL default '',"+
 "lastname varchar(32) NOT NULL default '',"+
 "fullname varchar(32),"+
-"email varchar(32),"+
+"email varchar(32),"+\
+"organization varchar(32),"+
 "timestamp TIMESTAMP(8))";
 
 def mySQLCreateGroups = "CREATE TABLE Groups ("+
