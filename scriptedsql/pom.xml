@@ -53,7 +53,7 @@
 
     <dependency>
       <groupId>net.tirasa.connid.bundles.db</groupId>
-      <artifactId>common</artifactId>
+      <artifactId>net.tirasa.connid.bundles.db.common</artifactId>
       <version>${project.version}</version>
     </dependency>
 

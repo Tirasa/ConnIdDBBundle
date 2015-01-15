@@ -34,7 +34,7 @@
   </parent>
 
   <groupId>net.tirasa.connid.bundles.db</groupId>
-  <artifactId>common</artifactId>
+  <artifactId>net.tirasa.connid.bundles.db.common</artifactId>
 
   <name>Bundles: DB: Common</name>
 
