@@ -55,32 +55,52 @@ log.info("Entering "+action+" Script");
 def sql = new Sql(connection);
 
 if (action.equalsIgnoreCase("GET_LATEST_SYNC_TOKEN")) {
-    row = sql.firstRow("select timestamp from Users order by timestamp desc")
-    log.ok("Get Latest Sync Token script: last token is: "+row["timestamp"])
-    // We don't wanna return the java.sql.Timestamp, it is not a supported data type
-    // Get the 'long' version
-    return row["timestamp"].getTime();
+  switch ( objectClass ) {
+  case "__ACCOUNT__":
+    row = sql.firstRow("select timestamp from Users order by timestamp desc");
+    break;
+  case "__GROUP__":
+    row = sql.firstRow("select timestamp from Groups order by timestamp desc");
+    break;
+  }
+  
+  log.ok("Get Latest Sync Token script: last token is: "+row["timestamp"])
+  // We don't wanna return the java.sql.Timestamp, it is not a supported data type
+  // Get the 'long' version
+  return row["timestamp"].getTime();
 }
 
 else if (action.equalsIgnoreCase("SYNC")) {
-    def result = []
-    def tstamp = null
-    if (token != null){
-        tstamp = new java.sql.Timestamp(token)
-    }
-    else{
-        def today= new Date()
-        tstamp = new java.sql.Timestamp(today.time)
-    }
+  def result = [];
+  def tstamp = null;
+  if (token != null){
+    tstamp = new java.sql.Timestamp(token);
+  }
+  else{
+    def today= new Date();
+    tstamp = new java.sql.Timestamp(today.time);
+  }
 
+  switch ( objectClass ) {
+  case "__ACCOUNT__":
     sql.eachRow("select * from Users where timestamp > ${tstamp}",
-        {result.add([operation:"CREATE_OR_UPDATE", uid:it.uid, token:it.timestamp.getTime(), 
-              attributes:[firstname:it.firstname, lastname:it.lastname, email:it.email, organization:it.organization]])}
+      {result.add([operation:"CREATE_OR_UPDATE", uid:it.uid, token:it.timestamp.getTime(), 
+            attributes:[firstname:it.firstname,fullname:it.fullname, lastname:it.lastname, email:it.email, organization:it.organization]])}
     )
-    log.ok("Sync script: found "+result.size()+" events to sync")
-    return result;
-    }
-else { // action not implemented
-    log.error("Sync script: action '"+action+"' is not implemented in this script")
-    return null;
+    break;
+    
+  case "__GROUP__":
+    sql.eachRow("select * from Groups where timestamp > ${tstamp}",
+      {result.add([operation:"CREATE_OR_UPDATE", uid:it.gid,token:it.timestamp.getTime(), 
+            attributes:[gid:it.gid,name:it.name,description:it.description]])}
+    );
+    break;
+  }
+    
+  log.ok("Sync script: found "+result.size()+" events to sync");
+  return result;
+}
+else {
+  log.error("Sync script: action '"+action+"' is not implemented in this script");
+  return null;
 }
