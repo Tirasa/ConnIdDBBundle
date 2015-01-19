@@ -35,7 +35,7 @@
 
   <groupId>net.tirasa.connid.bundles.db</groupId>
   <artifactId>db</artifactId>
-  <version>2.2.1</version>
+  <version>2.2.2-SNAPSHOT</version>
 
   <name>ConnId Bundles: DB</name>
 
