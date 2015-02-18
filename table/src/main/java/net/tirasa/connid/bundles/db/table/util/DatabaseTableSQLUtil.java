@@ -24,10 +24,13 @@
 package net.tirasa.connid.bundles.db.table.util;
 
 import java.sql.CallableStatement;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.List;
 import java.util.Map;
@@ -217,5 +220,25 @@ public final class DatabaseTableSQLUtil {
             throw new IllegalArgumentException();
         }
         return bld.toString();
+    }
+
+    /**
+     * Timestamp string as long.
+     *
+     * @param ts timestamp as string.
+     * @return timestamp as long.
+     */
+    public static long tsAsLong(final String ts) {
+        final long time;
+
+        if (ts.matches("\\d\\d:\\d\\d:\\d\\d")) {
+            time = Time.valueOf(ts).getTime();
+        } else if (ts.matches("\\d\\d\\d\\d-\\d\\d-\\d\\d")) {
+            time = Date.valueOf(ts).getTime();
+        } else {
+            time = Timestamp.valueOf(ts).getTime();
+        }
+
+        return time;
     }
 }
