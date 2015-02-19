@@ -893,7 +893,6 @@ public class DatabaseTableConnector implements
      * {@inheritDoc}
      */
     @Override
-
     public void sync(
             final ObjectClass oclass,
             final SyncToken token,
@@ -943,9 +942,16 @@ public class DatabaseTableConnector implements
         final FilterWhereBuilder where = new FilterWhereBuilder();
 
         if (token != null && token.getValue() != null) {
-            final Object tokenVal = token.getValue();
-            LOG.info("Sync token is {0}", tokenVal);
+            LOG.info("Sync token is {0}", token.getValue());
             final Integer sqlType = getColumnType(config.getChangeLogColumn());
+            
+            Object tokenVal;
+            try {
+                tokenVal = SQLUtil.attribute2jdbcValue(token.getValue(), sqlType);
+            } catch (Exception e) {
+                tokenVal = token.getValue();
+            }
+
             where.addBind(new SQLParam(changeLogColumnName, tokenVal, sqlType), ">");
         }
 
@@ -994,7 +1000,6 @@ public class DatabaseTableConnector implements
      * {@inheritDoc}
      */
     @Override
-
     public SyncToken getLatestSyncToken(ObjectClass oclass) {
         LOG.info("check the ObjectClass");
 

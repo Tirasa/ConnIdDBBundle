@@ -538,6 +538,7 @@ public final class SQLUtil {
         return ret;
     }
 
+    
     /**
      * Retrieve the SQL value from result set
      * @param resultSet the result set
@@ -856,6 +857,7 @@ public final class SQLUtil {
             throws SQLException {
         try {
             guard.access(new GuardedString.Accessor() {
+                @Override
                 public void access(char[] clearChars) {
                     try {
                         //Never use setString, the DB2 database will fail for secured columns
