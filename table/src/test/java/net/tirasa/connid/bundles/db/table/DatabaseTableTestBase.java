@@ -220,77 +220,47 @@ public abstract class DatabaseTableTestBase {
             throws Exception;
 
     /**
-     *
      * Create the test modify attribute set
      *
-     *
-     *
      * @param cfg the configuration
-     *
      * @return the initialized attribute set
-     *
      * @throws Exception anything wrong
-     *
      */
     protected abstract Set<Attribute> getModifyAttributeSet(DatabaseTableConfiguration cfg)
             throws Exception;
 
     /**
-     *
      * The class load method
      *
-     *
-     *
      * @param conn
-     *
      * @throws Exception
-     *
      */
     protected void deleteAllFromAccounts(DatabaseTableConnection conn)
             throws Exception {
 
         // update the last change
         final String SQL_TEMPLATE = "DELETE FROM ACCOUNTS";
-
         log.ok(SQL_TEMPLATE);
-
         PreparedStatement ps = null;
-
         try {
-
             ps = conn.getConnection().prepareStatement(SQL_TEMPLATE);
-
             ps.execute();
-
         } finally {
-
             SQLUtil.closeQuietly(ps);
-
         }
-
         conn.commit();
-
     }
 
     /**
-     *
      * The close connector after test method
-     *
      */
     @After
-
     public void disposeConnector() {
-
         log.ok("disposeConnector");
-
         if (con != null) {
-
             con.dispose();
-
             con = null;
-
         }
-
     }
 
     /**
@@ -1250,7 +1220,7 @@ public abstract class DatabaseTableTestBase {
 
         final List<ConnectorObject> results = TestHelpers.searchToList(
                 con,
-                ObjectClass.ACCOUNT, 
+                ObjectClass.ACCOUNT,
                 FilterBuilder.equalTo(uid),
                 opOption.build());
 
@@ -1478,9 +1448,20 @@ public abstract class DatabaseTableTestBase {
         DatabaseTableConnection conn = DatabaseTableConnection.createDBTableConnection(cfg);
 
         try {
-            List<SQLParam> values = new ArrayList<SQLParam>();
-            values.add(new SQLParam("changelog", changelog, Types.INTEGER));
+            final List<SQLParam> values = new ArrayList<SQLParam>();
+
+            final int sqlType = con.getColumnType("changelog");
+            Object tokenVal;
+            try {
+                tokenVal = SQLUtil.attribute2jdbcValue(changelog.toString(), sqlType);
+            } catch (Exception e) {
+                tokenVal = new Timestamp(tsAsLong(changelog.toString()));
+            }
+
+            values.add(new SQLParam("changelog", tokenVal, sqlType));
+
             values.add(new SQLParam("accountId", uid.getUidValue(), Types.VARCHAR));
+
             ps = conn.prepareStatement(SQL_TEMPLATE, values);
             ps.execute();
             conn.commit();
@@ -1601,50 +1582,32 @@ public abstract class DatabaseTableTestBase {
      *
      */
     @Test
-
-    public void testSyncUsingLongColumn()
-            throws Exception {
-
+    public void testSyncUsingLongColumn() throws Exception {
         final String ERR1 = "Could not find new object.";
-
         final String SQL_TEMPLATE = "UPDATE Accounts SET accessed = ? WHERE accountId = ?";
 
         final DatabaseTableConfiguration cfg = getConfiguration();
-
         cfg.setChangeLogColumn(ACCESSED);
-
         con = getConnector(cfg);
 
         final Set<Attribute> expected = getCreateAttributeSet(cfg);
-
         final Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
 
         // update the last change
         PreparedStatement ps = null;
+        final DatabaseTableConnection conn = DatabaseTableConnection.createDBTableConnection(cfg);
 
-        DatabaseTableConnection conn = DatabaseTableConnection.createDBTableConnection(cfg);
-
-        Integer changed = new Long(System.currentTimeMillis()).intValue();
+        final Integer changed = new Long(System.currentTimeMillis()).intValue();
 
         try {
-
-            List<SQLParam> values = new ArrayList<SQLParam>();
-
+            final List<SQLParam> values = new ArrayList<SQLParam>();
             values.add(new SQLParam("accessed", changed, Types.INTEGER));
-
-            values.add(new SQLParam("accountId", uid.getUidValue(),
-                    Types.VARCHAR));
-
+            values.add(new SQLParam("accountId", uid.getUidValue(), Types.VARCHAR));
             ps = conn.prepareStatement(SQL_TEMPLATE, values);
-
             ps.execute();
-
             conn.commit();
-
         } finally {
-
             SQLUtil.closeQuietly(ps);
-
         }
 
         System.out.println("Uid: " + uid);
@@ -1653,23 +1616,19 @@ public abstract class DatabaseTableTestBase {
 
         // attempt to find the newly created object..
         con.sync(ObjectClass.ACCOUNT, new SyncToken(changed - 1000), ok, null);
-
         assertTrue(ERR1, ok.found);
 
         // Test the created attributes are equal the searched
         assertNotNull(ok.attributes);
 
         attributeSetsEquals(con.schema(), expected, ok.attributes, ACCESSED);
-
         System.out.println("Uid: " + uid);
 
         FindUidSyncHandler empt = new FindUidSyncHandler(uid);
 
         // attempt to find the newly created object..
         con.sync(ObjectClass.ACCOUNT, ok.token, empt, null);
-
         assertFalse(ERR1, empt.found);
-
     }
 
     @Test
@@ -1712,7 +1671,6 @@ public abstract class DatabaseTableTestBase {
                     con, ObjectClass.ACCOUNT, new EqualsFilter(uid), op.build());
 
             assertNotNull(rs);
-
             assertTrue("Could not find new object", rs.size() == 1);
 
             //Test the created attributes are equal the searched
@@ -2061,51 +2019,34 @@ public abstract class DatabaseTableTestBase {
         final Set<String> ignoreSet = new HashSet<String>(Arrays.asList(ignore));
 
         if (schema != null) {
-
             final ObjectClassInfo oci = schema.findObjectClassInfo(ObjectClass.ACCOUNT_NAME);
-
             final Set<AttributeInfo> ais = oci.getAttributeInfo();
-
             for (AttributeInfo ai : ais) {
-
                 //ignore not returned by default
                 if (!ai.isReturnedByDefault()) {
-
                     ignoreSet.add(ai.getName());
-
                 }
 
                 //ignore not readable attributes
                 if (!ai.isReadable()) {
-
                     ignoreSet.add(ai.getName());
-
                 }
-
             }
-
         }
 
         final Set<String> names = CollectionUtil.newCaseInsensitiveSet();
-
         names.addAll(expMap.keySet());
-
         names.addAll(actMap.keySet());
-
         names.removeAll(ignoreSet);
-
         names.remove(Uid.NAME);
 
         int missing = 0;
 
         final List<String> mis = new ArrayList<String>();
-
         final List<String> extra = new ArrayList<String>();
 
         for (String attrName : names) {
-
             final Attribute expAttr = expMap.get(attrName);
-
             final Attribute actAttr = actMap.get(attrName);
 
             if (expAttr != null && actAttr != null) {
@@ -2114,56 +2055,34 @@ public abstract class DatabaseTableTestBase {
                 // equality between timestamp field actual and expected values.
                 // For instance, MySql and PostgreSQL handle timestamp fields
                 // with a little difference about milliseconds.
-                if (CHANGED.equalsIgnoreCase(attrName)) {
-
+                if (CHANGED.equalsIgnoreCase(attrName) || CHANGELOG.equalsIgnoreCase(attrName)) {
                     assertEquals(
                             attrName,
-                            Timestamp.valueOf(
-                                    AttributeUtil.getStringValue(expAttr)),
-                            Timestamp.valueOf(
-                                    AttributeUtil.getStringValue(actAttr)));
-
-                } else if (OPENTIME.equalsIgnoreCase(attrName)
-                        || ACTIVATE.equalsIgnoreCase(attrName)) {
-
+                            SQLUtil.string2Timestamp(AttributeUtil.getSingleValue(expAttr).toString()),
+                            SQLUtil.string2Timestamp(AttributeUtil.getSingleValue(actAttr).toString()));
+                } else if (OPENTIME.equalsIgnoreCase(attrName) || ACTIVATE.equalsIgnoreCase(attrName)) {
                     assertEquals(attrName,
                             tsAsLong(AttributeUtil.getStringValue(expAttr)),
                             tsAsLong(AttributeUtil.getStringValue(actAttr)));
-
                 } else {
-
                     assertEquals(attrName,
                             AttributeUtil.getSingleValue(expAttr).toString(),
                             AttributeUtil.getSingleValue(actAttr).toString());
-
                 }
 
             } else {
-
                 missing = missing + 1;
-
                 if (expAttr != null) {
-
                     mis.add(expAttr.getName());
-
                 }
-
                 if (actAttr != null) {
-
                     extra.add(actAttr.getName());
-
                 }
-
             }
-
         }
 
-        assertEquals(
-                "missing attributes extra " + extra + " , missing " + mis,
-                0, missing);
-
+        assertEquals("missing attributes extra " + extra + " , missing " + mis, 0, missing);
         log.ok("attributeSets are equal!");
-
     }
 
     protected static class FindUidSyncHandler implements SyncResultsHandler {
@@ -2214,12 +2133,12 @@ public abstract class DatabaseTableTestBase {
             return true;
         }
     }
-    
+
     @Test
     public void schema() throws Exception {
         final DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
-        
+
         final Schema schema = con.schema();
         assertNotNull(schema);
 

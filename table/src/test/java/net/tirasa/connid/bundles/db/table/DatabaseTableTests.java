@@ -23,7 +23,6 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
-
 import java.io.File;
 
 import java.math.BigDecimal;
@@ -287,7 +286,6 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
      * @see org.identityconnectors.databasetable.DatabaseTableTestBase#getCreateAttributeSet()
      */
     @Override
-
     protected Set<Attribute> getCreateAttributeSet(DatabaseTableConfiguration cfg) throws Exception {
         final Set<Attribute> ret = new HashSet<Attribute>();
         // set __ENABLED__ attribute
@@ -321,12 +319,9 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
 
         ret.add(AttributeBuilder.build(SALARY, new BigDecimal("360536.75")));
         ret.add(AttributeBuilder.build(JPEGPHOTO, randomBytes(r, 2000)));
-        ret.add(AttributeBuilder.build(OPENTIME, new java.sql.Time(
-                System.currentTimeMillis()).toString()));
-        ret.add(AttributeBuilder.build(ACTIVATE, new java.sql.Date(
-                System.currentTimeMillis()).toString()));
-        ret.add(AttributeBuilder.build(CHANGED, new Timestamp(
-                System.currentTimeMillis() / 1000 * 1000).toString()));
+        ret.add(AttributeBuilder.build(OPENTIME, new java.sql.Time(System.currentTimeMillis()).toString()));
+        ret.add(AttributeBuilder.build(ACTIVATE, new java.sql.Date(System.currentTimeMillis()).toString()));
+        ret.add(AttributeBuilder.build(CHANGED, new Timestamp(System.currentTimeMillis() / 1000 * 1000).toString()));
 
         if (!cfg.getChangeLogColumn().equalsIgnoreCase(CHANGELOG)) {
             ret.add(AttributeBuilder.build(CHANGELOG, new Timestamp(System.currentTimeMillis()).getTime()));
@@ -666,27 +661,26 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
 
         // update the last change
         PreparedStatement ps = null;
-
         DatabaseTableConnection conn = null;
 
         try {
+            conn = DatabaseTableConnection.createDBTableConnection(getConfiguration());
+            final List<SQLParam> values = new ArrayList<SQLParam>();
 
-            conn = DatabaseTableConnection.createDBTableConnection(
-                    getConfiguration());
+            final Integer sqlType = con.getColumnType("changelog");
 
-            List<SQLParam> values = new ArrayList<SQLParam>();
+            Object tokenVal;
+            try {
+                tokenVal = SQLUtil.attribute2jdbcValue(changelog.toString(), sqlType);
+            } catch (Exception e) {
+                tokenVal = changelog;
+            }
 
-            values.add(new SQLParam("changelog", changelog, Types.INTEGER));
-
-            values.add(new SQLParam("accountId", uid.getUidValue(),
-                    Types.VARCHAR));
-
+            values.add(new SQLParam("changelog", tokenVal, sqlType));
+            values.add(new SQLParam("accountId", uid.getUidValue(), Types.VARCHAR));
             ps = conn.prepareStatement(SQL_TEMPLATE, values);
-
             ps.execute();
-
             conn.commit();
-
         } finally {
 
             SQLUtil.closeQuietly(ps);

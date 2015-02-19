@@ -28,13 +28,11 @@ import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.*;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableSQLUtil.tsAsLong;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.MessageFormat;
@@ -210,11 +208,8 @@ public class DatabaseTableConnector implements
      *
      */
     @Override
-
     public Configuration getConfiguration() {
-
         return this.config;
-
     }
 
     /**
@@ -339,21 +334,16 @@ public class DatabaseTableConnector implements
     @Override
 
     public Uid create(ObjectClass oclass, Set<Attribute> attrs, OperationOptions options) {
-
         LOG.info("create account, check the ObjectClass");
 
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
-
             throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
-
         }
 
         LOG.ok("Object class ok");
 
         if (attrs == null || attrs.isEmpty()) {
-
             throw new IllegalArgumentException(config.getMessage(MSG_INVALID_ATTRIBUTE_SET));
-
         }
 
         LOG.ok("Attribute set is not empty");
@@ -362,9 +352,7 @@ public class DatabaseTableConnector implements
         final Name name = AttributeUtil.getNameFromAttributes(attrs);
 
         if (name == null) {
-
             throw new IllegalArgumentException(config.getMessage(MSG_NAME_BLANK));
-
         }
 
         final String accountName = name.getNameValue();
@@ -381,34 +369,25 @@ public class DatabaseTableConnector implements
         final Set<String> missingRequiredColumns = CollectionUtil.newCaseInsensitiveSet();
 
         if (config.isEnableEmptyString()) {
-
             final Set<String> mrc = getStringColumnReguired();
-
             LOG.info("Add missing required columns {0}", mrc);
-
             missingRequiredColumns.addAll(mrc);
-
         }
 
         LOG.info("process and check the Attribute Set");
 
-        Set<Attribute> attrToBeProcessed = new HashSet<Attribute>(attrs);
+        final Set<Attribute> attrToBeProcessed = new HashSet<Attribute>(attrs);
 
         // If status column is specified attribute __ENABLED__ must be specified.
         // If attribute __ENABLED__ is not specified a default value must be
         // provided.
         if (StringUtil.isNotBlank(config.getStatusColumn())) {
-
             final Attribute enabled = AttributeUtil.find(OperationalAttributes.ENABLE_NAME, attrToBeProcessed);
-
             if (enabled == null) {
-
                 attrToBeProcessed.add(AttributeBuilder.build(
                         OperationalAttributes.ENABLE_NAME,
                         isEnabled(config.getDefaultStatusValue())));
-
             }
-
         }
 
         // Find out whether the supplied password should be hashed or not
@@ -419,49 +398,31 @@ public class DatabaseTableConnector implements
         if (hashedPasswordAttribute != null && hashedPasswordAttribute.getValue() != null
                 && !hashedPasswordAttribute.getValue().isEmpty()
                 && hashedPasswordAttribute.getValue().get(0) instanceof Boolean) {
-
             hashedPassword = (Boolean) hashedPasswordAttribute.getValue().get(0);
-
             attrToBeProcessed.remove(hashedPasswordAttribute);
-
         }
 
         //All attribute names should be in create columns statement 
         for (Attribute attr : attrToBeProcessed) {
-
             // quoted column name
             final String columnName = getColumnName(attr.getName());
 
             if (StringUtil.isNotBlank(columnName)) {
-
                 handleAttribute(bld, attr, hashedPassword, columnName);
-
                 missingRequiredColumns.remove(columnName);
-
                 LOG.ok("Attribute {0} was added to insert", attr.getName());
-
             } else {
-
                 LOG.ok("Attribute {0} ignored. Missing internal mapping", attr.getName());
-
             }
-
         }
 
         // Bind empty string for not-null columns which are not in attribute set list
         if (config.isEnableEmptyString()) {
-
             LOG.info("Some columns should be empty");
-
             for (String mCol : missingRequiredColumns) {
-
-                bld.addBind(new SQLParam(quoteName(mCol),
-                        DatabaseTableConstants.EMPTY_STR, getColumnType(mCol)));
-
+                bld.addBind(new SQLParam(quoteName(mCol), DatabaseTableConstants.EMPTY_STR, getColumnType(mCol)));
                 LOG.ok("Required empty value to column {0} added", mCol);
-
             }
-
         }
 
         final String SQL_INSERT = "INSERT INTO {0} ( {1} ) VALUES ( {2} )";
@@ -472,44 +433,28 @@ public class DatabaseTableConnector implements
         PreparedStatement pstmt = null;
 
         try {
-
             openConnection();
-
             pstmt = getConn().prepareStatement(sql, bld.getParams());
-
             // execute the SQL statement
             pstmt.execute();
-
             LOG.info("Create account {0} commit", accountName);
-
             commit();
-
         } catch (SQLException e) {
-
             LOG.error(e, "Create account ''{0}'' error", accountName);
-
             if (throwIt(e.getErrorCode())) {
-
                 SQLUtil.rollbackQuietly(getConn());
-
                 throw new ConnectorException(config.getMessage(MSG_CAN_NOT_CREATE, accountName), e);
-
             }
-
         } finally {
-
             // clean up...
             SQLUtil.closeQuietly(pstmt);
-
             closeConnection();
-
         }
 
         LOG.ok("Account {0} created", accountName);
 
         // create and return the uid..
         return new Uid(accountName);
-
     }
 
     /**
@@ -944,10 +889,10 @@ public class DatabaseTableConnector implements
         if (token != null && token.getValue() != null) {
             LOG.info("Sync token is {0}", token.getValue());
             final Integer sqlType = getColumnType(config.getChangeLogColumn());
-            
+
             Object tokenVal;
             try {
-                tokenVal = SQLUtil.attribute2jdbcValue(token.getValue(), sqlType);
+                tokenVal = SQLUtil.attribute2jdbcValue(token.getValue().toString(), sqlType);
             } catch (Exception e) {
                 tokenVal = token.getValue();
             }
@@ -1809,22 +1754,13 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     *
      * Return entry status based on given parameter.
      *
-     *
-     *
      * @param enabled should be the value of __ENABLED__
-     *
      * @return status column value.
-     *
      */
     private String getStatusColumnValue(final String enabled) {
-
-        return "TRUE".equalsIgnoreCase(enabled)
-                ? config.getEnabledStatusValue()
-                : config.getDisabledStatusValue();
-
+        return "TRUE".equalsIgnoreCase(enabled) ? config.getEnabledStatusValue() : config.getDisabledStatusValue();
     }
 
     private <T extends OperationBuilder> void handleAttribute(
@@ -1837,11 +1773,8 @@ public class DatabaseTableConnector implements
 
         //Empty String
         if (isToBeEmpty(cname, value)) {
-
             LOG.info("Attribute {0} should be empty", cname);
-
             value = DatabaseTableConstants.EMPTY_STR;
-
         }
 
         final int sqlType = getColumnType(cname);
@@ -1849,76 +1782,51 @@ public class DatabaseTableConnector implements
         LOG.info("attribute {0} fit column {1} and sql type {2}", attribute.getName(), cname, sqlType);
 
         try {
-
-            final boolean isDate = sqlType == 91 || sqlType == 93 || sqlType == 92;
-
-            if (isDate) {
-
-                final Long time = tsAsLong(value.toString());
-
-                builder.addBind(new SQLParam(quoteName(cname), sqlType == 91
-                        ? new Date(time) : (sqlType == 92 ? new Time(time) : new Timestamp(time)), sqlType));
-
+            if (sqlType == 91 || sqlType == 93 || sqlType == 92) {
+                Object tokenVal;
+                try {
+                    tokenVal = SQLUtil.attribute2jdbcValue(value.toString(), sqlType);
+                } catch (Exception e) {
+                    tokenVal = new Timestamp(tsAsLong(value.toString()));
+                }
+                builder.addBind(new SQLParam(quoteName(cname), tokenVal, sqlType));
             } else {
-
                 if (cname.equalsIgnoreCase(config.getStatusColumn())) {
-
                     builder.addBind(new SQLParam(
                             quoteName(cname),
                             getStatusColumnValue(value.toString()),
                             sqlType));
-
                 } else if (cname.equalsIgnoreCase(config.getPasswordColumn())) {
 
                     if (hashedPassword) {
-
                         final String[] password = { null };
-
                         ((GuardedString) value).access(new GuardedString.Accessor() {
 
                             @Override
-
                             public void access(char[] clearChars) {
-
                                 password[0] = new String(clearChars);
-
                             }
-
                         });
-
                         String encodedPassword = changeCaseOfEncodedPassword(password[0]);
-
                         // password encryption                  
                         builder.addBind(new SQLParam(
                                 quoteName(cname),
                                 new GuardedString(encodedPassword.toCharArray()),
                                 sqlType));
-
                     } else {
-
                         // password encryption                  
                         builder.addBind(new SQLParam(
                                 quoteName(cname),
                                 encodePassword((GuardedString) value),
                                 sqlType));
-
                     }
-
                 } else {
-
-                    builder.addBind(new SQLParam(
-                            quoteName(cname), value, sqlType));
-
+                    builder.addBind(new SQLParam(quoteName(cname), value, sqlType));
                 }
-
             }
-
         } catch (Throwable t) {
-
             LOG.error(t, "Error parsing value '{0}' of attribute {1}:{2}", value, cname, sqlType);
-
         }
-
     }
 
     private GuardedString encodePassword(final GuardedString guarded)
