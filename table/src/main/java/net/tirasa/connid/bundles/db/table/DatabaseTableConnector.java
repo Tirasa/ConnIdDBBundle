@@ -405,14 +405,16 @@ public class DatabaseTableConnector implements
         //All attribute names should be in create columns statement 
         for (Attribute attr : attrToBeProcessed) {
             // quoted column name
-            final String columnName = getColumnName(attr.getName());
+            if (!attr.getName().equals(config.getKeyColumn())) {
+                final String columnName = getColumnName(attr.getName());
 
-            if (StringUtil.isNotBlank(columnName)) {
-                handleAttribute(bld, attr, hashedPassword, columnName);
-                missingRequiredColumns.remove(columnName);
-                LOG.ok("Attribute {0} was added to insert", attr.getName());
-            } else {
-                LOG.ok("Attribute {0} ignored. Missing internal mapping", attr.getName());
+                if (StringUtil.isNotBlank(columnName)) {
+                    handleAttribute(bld, attr, hashedPassword, columnName);
+                    missingRequiredColumns.remove(columnName);
+                    LOG.ok("Attribute {0} was added to insert", attr.getName());
+                } else {
+                    LOG.ok("Attribute {0} ignored. Missing internal mapping", attr.getName());
+                }
             }
         }
 
@@ -674,7 +676,7 @@ public class DatabaseTableConnector implements
         for (Attribute attr : attrs) {
 
             // All attributes needs to be updated except the UID
-            if (!attr.is(Uid.NAME)) {
+            if (!attr.is(Uid.NAME) && !attr.getName().equals(config.getKeyColumn())) {
 
                 final String attributeName = attr.getName();
 
@@ -1498,14 +1500,7 @@ public class DatabaseTableConnector implements
 
             columnSQLTypes.put(name, columnType);
 
-            if (name.equalsIgnoreCase(config.getKeyColumn())) {
-                // name attribute
-                attrBld.setName(Name.NAME);
-                //The generate UID make the Name attribute is nor required
-                attrBld.setRequired(true);
-                attrInfo.add(attrBld.build());
-                LOG.ok("key column in name attribute in the schema");
-            } else if (name.equalsIgnoreCase(config.getPasswordColumn())) {
+            if (name.equalsIgnoreCase(config.getPasswordColumn())) {
                 // Password attribute
                 attrInfo.add(OperationalAttributeInfos.PASSWORD);
                 LOG.ok("password column in password attribute in the schema");
@@ -1540,8 +1535,19 @@ public class DatabaseTableConnector implements
                 attrBld.setReturnedByDefault(isReturnedByDefault(dataType));
                 attrInfo.add(attrBld.build());
                 LOG.ok("the column name {0} has data type {1}", name, dataType);
+                
+                if (name.equalsIgnoreCase(config.getKeyColumn())) {
+                    // name attribute
+                    final AttributeInfoBuilder attrBldName = new AttributeInfoBuilder();
+                    attrBldName.setName(Name.NAME);
+                    //The generate UID make the Name attribute is nor required
+                    attrBldName.setRequired(true);
+                    attrInfo.add(attrBldName.build());
+                    LOG.ok("key column in name attribute in the schema");
+                }
             }
         }
+
         LOG.ok("the Attribute InfoSet is done");
         return attrInfo;
     }
@@ -1586,6 +1592,7 @@ public class DatabaseTableConnector implements
                 }
                 uidValue = param.getValue().toString();
                 bld.setName(uidValue);
+                bld.addAttribute(AttributeBuilder.build(columnName, param.getValue()));
             } else if (columnName.equalsIgnoreCase(config.getPasswordColumn())) {
                 if (config.isRetrievePassword()) {
                     final String pwd = (String) param.getValue();

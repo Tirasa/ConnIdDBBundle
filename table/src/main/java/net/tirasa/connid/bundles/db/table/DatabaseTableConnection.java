@@ -82,9 +82,7 @@ public class DatabaseTableConnection extends DatabaseConnection {
      *
      */
     static DatabaseTableConnection createDBTableConnection(DatabaseTableConfiguration config) {
-
         Connection connection = getNativeConnection(config);
-
         return new DatabaseTableConnection(connection, config);
 
     }
@@ -99,11 +97,8 @@ public class DatabaseTableConnection extends DatabaseConnection {
     private static java.sql.Connection getNativeConnection(DatabaseTableConfiguration config) {
 
         java.sql.Connection connection;
-
         final String login = config.getUser();
-
         final GuardedString password = config.getPassword();
-
         final String datasource = config.getDatasource();
 
         if (StringUtil.isNotBlank(datasource)) {
@@ -111,106 +106,63 @@ public class DatabaseTableConnection extends DatabaseConnection {
             LOG.info("Get a new connection using datasource {0}", datasource);
 
             final String[] jndiProperties = config.getJndiProperties();
-
-            final ConnectorMessages connectorMessages = config.
-                    getConnectorMessages();
-
-            final Hashtable<String, String> prop = JNDIUtil.arrayToHashtable(
-                    jndiProperties, connectorMessages);
+            final ConnectorMessages connectorMessages = config.getConnectorMessages();
+            final Hashtable<String, String> prop = JNDIUtil.arrayToHashtable(jndiProperties, connectorMessages);
 
             if (StringUtil.isNotBlank(login) && password != null) {
-
-                connection = SQLUtil.getDatasourceConnection(datasource, login,
-                        password, prop);
-
+                connection = SQLUtil.getDatasourceConnection(datasource, login, password, prop);
             } else {
-
                 connection = SQLUtil.getDatasourceConnection(datasource, prop);
-
             }
 
             LOG.ok("The new connection using datasource {0} created", datasource);
 
         } else {
-
             final String driver = config.getJdbcDriver();
-
             final String connectionUrl = config.formatUrlTemplate();
 
             LOG.info(
-                    "Get a new connection using connection url {0} and user {1}",
-                    connectionUrl, login);
-
-            connection = SQLUtil.getDriverMangerConnection(driver, connectionUrl,
-                    login, password);
-
-            LOG.ok("The new connection using connection url {0} and user {1} created",
-                    connectionUrl, login);
-
+                    "Get a new connection using connection url {0} and user {1}", connectionUrl, login);
+            connection = SQLUtil.getDriverMangerConnection(driver, connectionUrl, login, password);
+            LOG.ok("The new connection using connection url {0} and user {1} created", connectionUrl, login);
         }
 
         /* On Oracle enable the synonyms */
         try {
-
             Class<?> clazz = Class.forName("oracle.jdbc.OracleConnection");
-
             if (clazz != null && clazz.isAssignableFrom(connection.getClass())) {
-
                 try {
-
-                    final Method getIncludeSynonyms = clazz.getMethod(
-                            "getIncludeSynonyms");
-
-                    final Object includeSynonyms = getIncludeSynonyms.invoke(
-                            connection);
+                    final Method getIncludeSynonyms = clazz.getMethod("getIncludeSynonyms");
+                    final Object includeSynonyms = getIncludeSynonyms.invoke(connection);
 
                     LOG.info("getIncludeSynonyms on ORACLE : {0}",
                             includeSynonyms);
 
                     if (Boolean.FALSE.equals(includeSynonyms)) {
-
-                        final Method setIncludeSynonyms = clazz.getMethod(
-                                "setIncludeSynonyms", boolean.class);
-
+                        final Method setIncludeSynonyms = clazz.getMethod("setIncludeSynonyms", boolean.class);
                         setIncludeSynonyms.invoke(connection, Boolean.TRUE);
-
                         LOG.ok("setIncludeSynonyms to true success");
-
                     }
-
                 } catch (Exception e) {
-
                     LOG.error(e, "setIncludeSynonyms on ORACLE exception");
-
                 }
-
             }
 
         } catch (ClassNotFoundException e) {
-
             //expected
         }
 
         //Disable auto-commit mode
         try {
-
             if (connection.getAutoCommit()) {
-
                 LOG.info("setAutoCommit(false)");
-
                 connection.setAutoCommit(false);
-
             }
-
         } catch (SQLException expected) {
-
             //expected
             LOG.error(expected, "setAutoCommit(false) exception");
-
         }
-
         return connection;
-
     }
 
     /**
@@ -251,13 +203,9 @@ public class DatabaseTableConnection extends DatabaseConnection {
      *
      */
     private DatabaseTableConnection(Connection conn, DatabaseTableConfiguration config) {
-
         super(conn);
-
         this.config = config;
-
         this.sms = createMappingStrategy(conn, config);
-
         LOG.ok("New DatabaseTableConnection for : {0}", config.getUser());
 
     }
@@ -278,28 +226,19 @@ public class DatabaseTableConnection extends DatabaseConnection {
     public MappingStrategy createMappingStrategy(Connection conn, DatabaseTableConfiguration config) {
 
         LOG.info("Create: DefaultStrategy");
-
         LOG.info("Append: JdbcConvertor");
-
         // tail is always convert to jdbc and do the default statement
         MappingStrategy tail = new JdbcConvertor(new DefaultStrategy());
 
         if (!config.isAllNative()) {
-
             LOG.info("Append: StringStrategy");
-
             // Backward compatibility is to read and write as string all attributes which make sance to read 
             tail = new StringStrategy(tail);
-
             // Native timestamps will read as timestamp and convert to String
             if (config.isNativeTimestamps()) {
-
                 LOG.info("Append: NativeTimestampsStrategy");
-
                 tail = new NativeTimestampsStrategy(tail);
-
             }
-
         }
 
         // head is convert all attributes to acceptable type, if they are not already
@@ -322,9 +261,7 @@ public class DatabaseTableConnection extends DatabaseConnection {
      * @throws SQLException
      *
      */
-    public Map<String, SQLParam> getColumnValues(final ResultSet result)
-            throws SQLException {
-
+    public Map<String, SQLParam> getColumnValues(final ResultSet result) throws SQLException {
         return DatabaseTableSQLUtil.getColumnValues(sms, result);
 
     }
@@ -339,7 +276,6 @@ public class DatabaseTableConnection extends DatabaseConnection {
      *
      */
     public MappingStrategy getSms() {
-
         return sms;
 
     }
@@ -367,19 +303,13 @@ public class DatabaseTableConnection extends DatabaseConnection {
      */
     @Override
 
-    public CallableStatement prepareCall(final String sql, final List<SQLParam> params)
-            throws SQLException {
+    public CallableStatement prepareCall(final String sql, final List<SQLParam> params) throws SQLException {
 
         LOG.info("Prepare SQL Call : {0}", sql);
-
         final CallableStatement prepareCall = getConnection().prepareCall(sql);
-
         DatabaseTableSQLUtil.setParams(sms, prepareCall, params);
-
         LOG.ok("SQL Call statement ok");
-
         return prepareCall;
-
     }
 
     /**
@@ -404,21 +334,14 @@ public class DatabaseTableConnection extends DatabaseConnection {
      *
      */
     @Override
-
-    public PreparedStatement prepareStatement(final String sql, final List<SQLParam> params)
-            throws SQLException {
+    public PreparedStatement prepareStatement(final String sql, final List<SQLParam> params) throws SQLException {
 
         LOG.info("Prepare SQL Statement : {0}", sql);
-
         final PreparedStatement prepareStatement = getConnection().
                 prepareStatement(sql);
-
         DatabaseTableSQLUtil.setParams(sms, prepareStatement, params);
-
         LOG.ok("SQL Statement ok");
-
         return prepareStatement;
-
     }
 
     /**
@@ -435,57 +358,35 @@ public class DatabaseTableConnection extends DatabaseConnection {
      *
      */
     @Override
-
     public void test() {
-
         String sql = config.getValidConnectionQuery();
-
         // attempt through auto commit..
         if (StringUtil.isBlank(sql)) {
-
-            LOG.info(
-                    "valid connection query is empty, test connection using default");
-
+            LOG.info("valid connection query is empty, test connection using default");
             super.test();
-
         } else {
-
             Statement stmt = null;
-
             try {
 
                 stmt = getConnection().createStatement();
-
                 LOG.info("test connection using {0}", sql);
-
                 // valid queries will return a result set...
                 if (!stmt.execute(sql)) {
-
                     // should have thrown if server was down don't get the
                     // ResultSet, we don't want it if we got to this point and
                     // the SQL was not a query, give a hint why we failed
-                    throw new ConnectorException(config.getMessage(
-                            MSG_QUERY_INVALID, sql));
-
+                    throw new ConnectorException(config.getMessage(MSG_QUERY_INVALID, sql));
                 }
-
                 LOG.ok("connection is valid");
-
             } catch (Exception ex) {
 
                 // anything, not just SQLException
                 // nothing to do, just invalidate the connection
-                throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ,
-                        sql), ex);
-
+                throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ,sql), ex);
             } finally {
-
                 SQLUtil.closeQuietly(stmt);
-
             }
-
         }
-
     }
 
     /**
@@ -500,9 +401,7 @@ public class DatabaseTableConnection extends DatabaseConnection {
      *
      */
     void setSms(MappingStrategy sms) {
-
         this.sms = sms;
-
     }
 
     /**
@@ -515,13 +414,9 @@ public class DatabaseTableConnection extends DatabaseConnection {
         if (getConnection() != null && StringUtil.isNotBlank(config.
                 getDatasource()) /* &&
                  * this.conn.getConnection() instanceof PooledConnection */) {
-
             LOG.info("Close the pooled connection");
-
             dispose();
-
         }
-
     }
 
     /**
@@ -535,13 +430,8 @@ public class DatabaseTableConnection extends DatabaseConnection {
             throws SQLException {
 
         if (getConnection() == null || getConnection().isClosed()) {
-
             LOG.info("Get new connection, it is closed");
-
             setConnection(getNativeConnection(config));
-
         }
-
     }
-
 }

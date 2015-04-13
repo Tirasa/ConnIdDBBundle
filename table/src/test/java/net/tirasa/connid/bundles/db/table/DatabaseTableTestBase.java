@@ -698,8 +698,6 @@ public abstract class DatabaseTableTestBase {
 
         try {
 
-            System.out.println("Uid: " + uid);
-
             // attempt to find the newly created object..
             List<ConnectorObject> list = TestHelpers.searchToList(con,
                     ObjectClass.ACCOUNT, new EqualsFilter(uid));
@@ -710,11 +708,9 @@ public abstract class DatabaseTableTestBase {
             final ConnectorObject co = list.get(0);
 
             assertNotNull(co);
-
+            
             final Set<Attribute> actual = co.getAttributes();
-
             assertNotNull(actual);
-
             attributeSetsEquals(con.schema(), expected, actual);
 
         } finally {
@@ -741,9 +737,7 @@ public abstract class DatabaseTableTestBase {
 
                 // should get here..
             }
-
         }
-
     }
 
     /**
@@ -774,8 +768,6 @@ public abstract class DatabaseTableTestBase {
 
         try {
 
-            System.out.println("Uid: " + uid);
-
             // attempt to find the newly created object..
             List<ConnectorObject> list = TestHelpers.searchToList(con,
                     ObjectClass.ACCOUNT, new EqualsFilter(uid));
@@ -786,7 +778,6 @@ public abstract class DatabaseTableTestBase {
 
             // attempt to delete the object..
             ObjectClass objc = new ObjectClass("UNSUPPORTED");
-
             con.delete(objc, uid, null);
 
         }
@@ -1358,7 +1349,6 @@ public abstract class DatabaseTableTestBase {
         assertNotNull(uid);
 
         try {
-            System.out.println("Uid: " + uid);
             FindUidSyncHandler handler = new FindUidSyncHandler(uid);
 
             // attempt to find the newly created object..
@@ -1469,7 +1459,6 @@ public abstract class DatabaseTableTestBase {
             SQLUtil.closeQuietly(ps);
         }
 
-        System.out.println("Uid: " + uid);
         FindUidSyncHandler ok = new FindUidSyncHandler(uid);
 
         // attempt to find the newly created object..
@@ -1545,8 +1534,6 @@ public abstract class DatabaseTableTestBase {
             SQLUtil.closeQuietly(ps);
         }
 
-        System.out.println("Uid: " + uid);
-
         FindUidSyncHandler ok = new FindUidSyncHandler(uid);
 
         // attempt to find the newly created object..
@@ -1558,8 +1545,6 @@ public abstract class DatabaseTableTestBase {
         assertNotNull(ok.attributes);
 
         attributeSetsEquals(con.schema(), expected, ok.attributes, AGE);
-
-        System.out.println("Uid: " + uid);
 
         FindUidSyncHandler empt = new FindUidSyncHandler(uid);
 
@@ -1610,8 +1595,6 @@ public abstract class DatabaseTableTestBase {
             SQLUtil.closeQuietly(ps);
         }
 
-        System.out.println("Uid: " + uid);
-
         FindUidSyncHandler ok = new FindUidSyncHandler(uid);
 
         // attempt to find the newly created object..
@@ -1622,7 +1605,6 @@ public abstract class DatabaseTableTestBase {
         assertNotNull(ok.attributes);
 
         attributeSetsEquals(con.schema(), expected, ok.attributes, ACCESSED);
-        System.out.println("Uid: " + uid);
 
         FindUidSyncHandler empt = new FindUidSyncHandler(uid);
 
@@ -2017,7 +1999,7 @@ public abstract class DatabaseTableTestBase {
         log.ok("attributeSetsEquals");
 
         final Set<String> ignoreSet = new HashSet<String>(Arrays.asList(ignore));
-
+        
         if (schema != null) {
             final ObjectClassInfo oci = schema.findObjectClassInfo(ObjectClass.ACCOUNT_NAME);
             final Set<AttributeInfo> ais = oci.getAttributeInfo();
@@ -2033,12 +2015,13 @@ public abstract class DatabaseTableTestBase {
                 }
             }
         }
-
+        
         final Set<String> names = CollectionUtil.newCaseInsensitiveSet();
         names.addAll(expMap.keySet());
         names.addAll(actMap.keySet());
         names.removeAll(ignoreSet);
         names.remove(Uid.NAME);
+        //names.remove(KEYCOLUMN);
 
         int missing = 0;
 
@@ -2122,7 +2105,6 @@ public abstract class DatabaseTableTestBase {
          */
         @Override
         public boolean handle(SyncDelta delta) {
-            System.out.println("SyncDeltat: " + delta);
             if (delta.getUid().equals(uid)) {
                 found = true;
                 this.attributes = delta.getObject().getAttributes();
