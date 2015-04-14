@@ -23,25 +23,12 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
-
-
-import net.tirasa.connid.bundles.db.table.DatabaseTableConfiguration;
-
-
-
 import static org.junit.Assert.assertEquals;
-
 import static org.junit.Assert.fail;
-
 import net.tirasa.connid.bundles.db.table.security.SupportedAlgorithm;
-
 import org.identityconnectors.common.security.GuardedString;
-
 import org.identityconnectors.test.common.TestHelpers;
-
 import org.junit.Test;
-
-
 
 /**
 

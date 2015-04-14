@@ -24,9 +24,7 @@
 package net.tirasa.connid.bundles.db.table;
 
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.*;
-
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableSQLUtil.tsAsLong;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -220,19 +218,12 @@ public class DatabaseTableConnector implements
     @Override
 
     public void init(Configuration cfg) {
-
         LOG.info("init DatabaseTable connector");
-
         this.config = (DatabaseTableConfiguration) cfg;
-
         this.schema = null;
-
         this.defaultAttributesToGet = null;
-
         this.columnSQLTypes = null;
-
         LOG.ok("init DatabaseTable connector ok, connection is valid");
-
     }
 
     /**
@@ -243,34 +234,22 @@ public class DatabaseTableConnector implements
     @Override
 
     public void checkAlive() {
-
         LOG.info("checkAlive DatabaseTable connector");
-
         try {
-
             if (StringUtil.isNotBlank(config.getDatasource())) {
-
                 openConnection();
-
             } else {
-
                 getConn().test();
-
                 commit();
-
             }
 
         } catch (SQLException e) {
-
             LOG.error(e, "error in checkAlive");
-
             throw ConnectorException.wrap(e);
-
         }
 
         //Check alive will not close the connection, the next API call is expected
         LOG.ok("checkAlive DatabaseTable connector ok");
-
     }
 
     /**
@@ -283,20 +262,14 @@ public class DatabaseTableConnector implements
      *
      */
     DatabaseTableConnection getConn() {
-
         //Lazy initialize the connection
         if (conn == null) {
-
             this.config.validate();
-
             //Validate first to minimize wrong resource access
             this.conn = DatabaseTableConnection.createDBTableConnection(
                     this.config);
-
         }
-
         return conn;
-
     }
 
     /**
@@ -305,25 +278,15 @@ public class DatabaseTableConnector implements
      *
      */
     @Override
-
     public void dispose() {
-
         LOG.info("dispose DatabaseTable connector");
-
         if (conn != null) {
-
             conn.dispose();
-
             conn = null;
-
         }
-
         this.defaultAttributesToGet = null;
-
         this.schema = null;
-
         this.columnSQLTypes = null;
-
     }
 
     /**
@@ -332,7 +295,6 @@ public class DatabaseTableConnector implements
      *
      */
     @Override
-
     public Uid create(ObjectClass oclass, Set<Attribute> attrs, OperationOptions options) {
         LOG.info("create account, check the ObjectClass");
 
@@ -471,9 +433,7 @@ public class DatabaseTableConnector implements
      *
      */
     private boolean throwIt(int errorCode) {
-
         return config.isRethrowAllSQLExceptions() || errorCode != 0;
-
     }
 
     /**
@@ -490,9 +450,7 @@ public class DatabaseTableConnector implements
      *
      */
     private boolean isToBeEmpty(final String columnName, Object value) {
-
         return config.isEnableEmptyString() && getStringColumnReguired().contains(columnName) && value == null;
-
     }
 
     /**
@@ -501,46 +459,30 @@ public class DatabaseTableConnector implements
      *
      */
     @Override
-
     public void delete(final ObjectClass oclass, final Uid uid, final OperationOptions options) {
 
         LOG.info("delete account, check the ObjectClass");
 
         final String SQL_DELETE = "DELETE FROM {0} WHERE {1} = ?";
-
         PreparedStatement stmt = null;
-
         // create the SQL string..
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
-
             throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
-
         }
 
         LOG.ok("The ObjectClass is ok");
-
         if (uid == null || (uid.getUidValue() == null)) {
-
             throw new IllegalArgumentException(config.getMessage(MSG_UID_BLANK));
-
         }
 
         final String accountUid = uid.getUidValue();
-
         LOG.ok("The Uid is present");
-
         final String tblname = config.getTable();
-
         final String keycol = quoteName(config.getKeyColumn());
-
         final String sql = MessageFormat.format(SQL_DELETE, tblname, keycol);
-
         try {
-
             LOG.info("delete account SQL {0}", sql);
-
             openConnection();
-
             // create a prepared call..
             stmt = getConn().getConnection().prepareStatement(sql);
 
@@ -549,52 +491,33 @@ public class DatabaseTableConnector implements
 
             // uid to delete..
             LOG.info("Deleting account Uid: {0}", accountUid);
-
             final int dr = stmt.executeUpdate();
 
             if (dr < 1) {
-
                 LOG.error("No account Uid: {0} found", accountUid);
-
                 SQLUtil.rollbackQuietly(getConn());
-
                 throw new UnknownUidException();
-
             }
 
             if (dr > 1) {
-
                 LOG.error("More then one account Uid: {0} found", accountUid);
-
                 SQLUtil.rollbackQuietly(getConn());
-
                 throw new IllegalArgumentException(config.getMessage(MSG_MORE_USERS_DELETED, accountUid));
-
             }
 
             LOG.info("Delete account {0} commit", accountUid);
-
             commit();
-
         } catch (SQLException e) {
-
             LOG.error(e, "Delete account ''{0}'' SQL error", accountUid);
-
             SQLUtil.rollbackQuietly(getConn());
-
             throw new ConnectorException(config.getMessage(MSG_CAN_NOT_DELETE, accountUid), e);
-
         } finally {
-
             // clean up..
             SQLUtil.closeQuietly(stmt);
-
             closeConnection();
-
         }
 
         LOG.ok("Account Uid {0} deleted", accountUid);
-
     }
 
     /**
@@ -603,34 +526,25 @@ public class DatabaseTableConnector implements
      *
      */
     @Override
-
     public Uid update(ObjectClass oclass, Uid uid, Set<Attribute> attrs, OperationOptions options) {
-
         LOG.info("update account, check the ObjectClass");
-
         final String SQL_TEMPLATE = "UPDATE {0} SET {1} WHERE {2} = ?";
 
         // create the sql statement..
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
-
             throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
-
         }
 
         LOG.ok("The ObjectClass is ok");
 
         if (attrs == null || attrs.isEmpty()) {
-
             throw new IllegalArgumentException(config.getMessage(MSG_INVALID_ATTRIBUTE_SET));
-
         }
 
         LOG.ok("Attribute set is not empty");
 
         final String accountUid = uid.getUidValue();
-
         Assertions.nullCheck(accountUid, "accountUid");
-
         LOG.ok("Account uid {0} is present", accountUid);
 
         // Find out whether the supplied password should be hashed or not
@@ -641,115 +555,70 @@ public class DatabaseTableConnector implements
         if (hashedPasswordAttribute != null && hashedPasswordAttribute.getValue() != null
                 && !hashedPasswordAttribute.getValue().isEmpty()
                 && hashedPasswordAttribute.getValue().get(0) instanceof Boolean) {
-
             hashedPassword = (Boolean) hashedPasswordAttribute.getValue().get(0);
-
             attrs.remove(hashedPasswordAttribute);
-
         }
 
         Uid ret = uid;
 
         // The update is changing name. The oldUid is a key and the name will become new uid.
         final Name name = AttributeUtil.getNameFromAttributes(attrs);
-
         String accountName = accountUid;
 
         if (name != null && !accountUid.equals(name.getNameValue())) {
-
             accountName = name.getNameValue();
-
             Assertions.nullCheck(accountName, "accountName");
-
             LOG.info("Account name {0} is present and is not the same as uid", accountName);
-
             ret = new Uid(accountName);
-
             LOG.ok("Renaming account uid {0} to name {1}", accountUid, accountName);
-
         }
 
         LOG.info("process and check the Attribute Set");
 
         UpdateSetBuilder updateSet = new UpdateSetBuilder();
-
         for (Attribute attr : attrs) {
 
             // All attributes needs to be updated except the UID
             if (!attr.is(Uid.NAME) && !attr.getName().equals(config.getKeyColumn())) {
-
                 final String attributeName = attr.getName();
-
                 final String columnName = getColumnName(attributeName);
-
                 if (StringUtil.isNotBlank(columnName)) {
-
                     handleAttribute(updateSet, attr, hashedPassword, columnName);
-
                     LOG.ok("Attribute {0} was added to update", attr.getName());
-
                 } else {
-
                     LOG.ok("Attribute {0} ignored. Missing internal mapping", attr.getName());
-
                 }
-
             }
-
         }
 
         LOG.info("Update account {1}", accountName);
-
         // Format the update query
         final String tblname = config.getTable();
-
         final String keycol = quoteName(config.getKeyColumn());
-
         updateSet.addValue(new SQLParam(keycol, accountUid, getColumnType(config.getKeyColumn())));
-
         final String sql = MessageFormat.format(SQL_TEMPLATE, tblname, updateSet.getSQL(), keycol);
-
         PreparedStatement stmt = null;
-
         try {
-
             openConnection();
-
             // create the prepared statement..
             stmt = getConn().prepareStatement(sql, updateSet.getParams());
-
             stmt.executeUpdate();
-
             // commit changes
             LOG.info("Update account {0} commit", accountName);
-
             commit();
-
         } catch (SQLException e) {
-
             LOG.error(e, "Update account {0} error", accountName);
-
             if (throwIt(e.getErrorCode())) {
-
                 SQLUtil.rollbackQuietly(getConn());
-
                 throw new ConnectorException(config.getMessage(MSG_CAN_NOT_UPDATE, accountName), e);
-
             }
-
         } finally {
-
             // clean up..
             SQLUtil.closeQuietly(stmt);
-
             closeConnection();
-
         }
-
         LOG.ok("Account {0} updated", accountName);
-
         return ret;
-
     }
 
     /**
@@ -966,11 +835,8 @@ public class DatabaseTableConnector implements
 
         // Format the update query
         final String SQL_SELECT = "SELECT MAX( {0} ) FROM {1}";
-
         final String tblname = config.getTable();
-
         final String chlogName = quoteName(config.getChangeLogColumn());
-
         final String sql = MessageFormat.format(SQL_SELECT, chlogName, tblname);
 
         SyncToken ret = null;
@@ -978,7 +844,6 @@ public class DatabaseTableConnector implements
         LOG.info("getLatestSyncToken on {0}", oclass);
 
         PreparedStatement stmt = null;
-
         ResultSet rset = null;
 
         try {
@@ -1012,10 +877,8 @@ public class DatabaseTableConnector implements
                 }
 
                 LOG.ok("getLatestSyncToken", ret);
-
                 // commit changes
                 LOG.info("commit getLatestSyncToken");
-
                 commit();
             }
         } catch (SQLException e) {
@@ -1030,7 +893,6 @@ public class DatabaseTableConnector implements
         }
 
         LOG.ok("getLatestSyncToken commited");
-
         return ret;
     }
 
@@ -1041,7 +903,6 @@ public class DatabaseTableConnector implements
      * {@inheritDoc}
      */
     @Override
-
     public Schema schema() {
         try {
             openConnection();
@@ -1066,7 +927,6 @@ public class DatabaseTableConnector implements
      * Test the configuration and connection {@inheritDoc}
      */
     @Override
-
     public void test() {
         LOG.info("test");
 
@@ -1090,17 +950,14 @@ public class DatabaseTableConnector implements
     /**
      * @throws SQLException
      */
-    private void openConnection()
-            throws SQLException {
+    private void openConnection() throws SQLException {
         getConn().openConnection();
-
     }
 
     /**
      * @throws SQLException
      */
-    private void commit()
-            throws SQLException {
+    private void commit() throws SQLException {
         getConn().getConnection().commit();
     }
 
@@ -1153,21 +1010,15 @@ public class DatabaseTableConnector implements
         }
 
         final String keyColumnName = quoteName(config.getKeyColumn());
-
         final String passwordColumnName = quoteName(config.getPasswordColumn());
-
         final String sql = MessageFormat.format(SQL_AUTH_QUERY, keyColumnName, config.getTable(), passwordColumnName);
-
         final List<SQLParam> values = new ArrayList<SQLParam>();
 
         values.add(new SQLParam(keyColumnName, username, getColumnType(config.getKeyColumn()))); // real username
-
         values.add(new SQLParam(passwordColumnName, encodedPwd)); // real password
 
         PreparedStatement stmt = null;
-
         ResultSet result = null;
-
         Uid uid = null;
 
         //No passwordExpired capability
@@ -1176,11 +1027,8 @@ public class DatabaseTableConnector implements
             LOG.info("authenticate Account: {0}", username);
 
             openConnection();
-
             stmt = getConn().prepareStatement(sql, values);
-
             result = stmt.executeQuery();
-
             LOG.ok("authenticate query for account {0} executed ", username);
 
             //No PasswordExpired capability
@@ -1193,7 +1041,6 @@ public class DatabaseTableConnector implements
 
             // commit changes
             LOG.info("commit authenticate");
-
             commit();
         } catch (SQLException e) {
             LOG.error(e, "Account: {0} authentication failed ", username);
@@ -1386,15 +1233,10 @@ public class DatabaseTableConnector implements
          * Use SchemaBuilder to build the schema. Currently, only ACCOUNT type is supported.
          */
         final SchemaBuilder schemaBld = new SchemaBuilder(getClass());
-
         final ObjectClassInfoBuilder ociB = new ObjectClassInfoBuilder();
-
         ociB.setType(ObjectClass.ACCOUNT_NAME);
-
         ociB.addAllAttributeInfo(attrInfoSet);
-
         final ObjectClassInfo oci = ociB.build();
-
         schemaBld.defineObjectClass(oci);
 
         /*
@@ -1433,12 +1275,10 @@ public class DatabaseTableConnector implements
         LOG.info("get schema from the table");
 
         final Set<AttributeInfo> attrInfo;
-
         final String sql = MessageFormat.format(SCHEMA_QUERY, config.getTable(), quoteName(config.getKeyColumn()));
 
         // check out the result etc..
         ResultSet rset = null;
-
         Statement stmt = null;
 
         try {
@@ -1483,7 +1323,6 @@ public class DatabaseTableConnector implements
         final Set<AttributeInfo> attrInfo = new HashSet<AttributeInfo>();
 
         columnSQLTypes = CollectionUtil.<Integer>newCaseInsensitiveMap();
-
         stringColumnRequired = CollectionUtil.newCaseInsensitiveSet();
 
         final ResultSetMetaData meta = rset.getMetaData();
@@ -1535,7 +1374,7 @@ public class DatabaseTableConnector implements
                 attrBld.setReturnedByDefault(isReturnedByDefault(dataType));
                 attrInfo.add(attrBld.build());
                 LOG.ok("the column name {0} has data type {1}", name, dataType);
-                
+
                 if (name.equalsIgnoreCase(config.getKeyColumn())) {
                     // name attribute
                     final AttributeInfoBuilder attrBldName = new AttributeInfoBuilder();
@@ -1574,9 +1413,7 @@ public class DatabaseTableConnector implements
             final Map<String, SQLParam> columnValues) {
 
         LOG.info("build ConnectorObject");
-
         String uidValue = null;
-
         ConnectorObjectBuilder bld = new ConnectorObjectBuilder();
 
         for (Map.Entry<String, SQLParam> colValue : columnValues.entrySet()) {
@@ -1654,7 +1491,6 @@ public class DatabaseTableConnector implements
         LOG.info("buildSyncDelta");
 
         SyncDeltaBuilder bld = new SyncDeltaBuilder();
-
         // Find a token
         SQLParam tokenParam = columnValues.get(config.getChangeLogColumn());
 
@@ -1681,7 +1517,6 @@ public class DatabaseTableConnector implements
         LOG.ok("SyncDeltaBuilder is ok");
 
         return bld;
-
     }
 
     /**
@@ -1757,7 +1592,6 @@ public class DatabaseTableConnector implements
         return StringUtil.isBlank(status)
                 ? StringUtil.isNotBlank(config.getDisabledStatusValue())
                 : !status.equalsIgnoreCase(config.getDisabledStatusValue());
-
     }
 
     /**
@@ -1836,43 +1670,29 @@ public class DatabaseTableConnector implements
         }
     }
 
-    private GuardedString encodePassword(final GuardedString guarded)
-            throws PasswordEncodingException {
+    private GuardedString encodePassword(final GuardedString guarded) throws PasswordEncodingException {
 
         final GuardedString encoded;
-
         String cipherAlgorithm;
 
         try {
-
             cipherAlgorithm = SupportedAlgorithm.valueOf(config.getCipherAlgorithm()).getAlgorithm();
-
         } catch (Exception e) {
-
             cipherAlgorithm = config.getCipherAlgorithm();
-
         }
 
         final String cipherKey = config.getCipherKey();
-
         final EncodeAlgorithm algorithm;
 
         try {
-
             algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).newInstance();
-
             if (StringUtil.isNotBlank(cipherKey)) {
-
                 algorithm.setKey(cipherKey);
-
             }
 
         } catch (Exception e) {
-
             LOG.error(e, "Error retrieving algorithm {0}", cipherAlgorithm);
-
             throw new PasswordEncodingException(e.getMessage());
-
         }
 
         final String[] password = { null };
@@ -1880,41 +1700,26 @@ public class DatabaseTableConnector implements
         guarded.access(new GuardedString.Accessor() {
 
             @Override
-
             public void access(char[] clearChars) {
-
                 password[0] = new String(clearChars);
-
             }
-
         });
 
         String encodedPwd;
 
         try {
-
             encodedPwd = algorithm.encode(password[0], config.getPasswordCharset());
-
         } catch (UnsupportedPasswordCharsetException e) {
-
             LOG.error(e, "Error encoding password charset not supported");
-
             throw new PasswordEncodingException(e.getMessage());
-
         }
 
         if (StringUtil.isNotBlank(encodedPwd)) {
-
             encoded = new GuardedString(changeCaseOfEncodedPassword(encodedPwd).toCharArray());
-
         } else {
-
             encoded = guarded;
-
         }
-
         return encoded;
-
     }
 
     private String changeCaseOfEncodedPassword(String encodedPwd) {
@@ -1948,7 +1753,6 @@ public class DatabaseTableConnector implements
         }
 
         decoded = algorithm.decode(password, config.getPasswordCharset());
-
         return decoded;
     }
 }

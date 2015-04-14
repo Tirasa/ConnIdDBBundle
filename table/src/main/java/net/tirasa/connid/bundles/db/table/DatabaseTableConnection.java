@@ -207,7 +207,6 @@ public class DatabaseTableConnection extends DatabaseConnection {
         this.config = config;
         this.sms = createMappingStrategy(conn, config);
         LOG.ok("New DatabaseTableConnection for : {0}", config.getUser());
-
     }
 
     /**
@@ -245,7 +244,6 @@ public class DatabaseTableConnection extends DatabaseConnection {
         LOG.info("Append: AttributeConvertor");
 
         return new AttributeConvertor(tail);
-
     }
 
     /**
@@ -263,7 +261,6 @@ public class DatabaseTableConnection extends DatabaseConnection {
      */
     public Map<String, SQLParam> getColumnValues(final ResultSet result) throws SQLException {
         return DatabaseTableSQLUtil.getColumnValues(sms, result);
-
     }
 
     /**

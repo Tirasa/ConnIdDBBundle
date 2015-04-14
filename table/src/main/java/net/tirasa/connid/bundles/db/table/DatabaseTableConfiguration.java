@@ -232,9 +232,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setTable(String table) {
-
         this.table = table;
-
     }
 
     /**
@@ -258,9 +256,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "KEY_COLUMN_HELP")
 
     public String getKeyColumn() {
-
         return this.keyColumn;
-
     }
 
     /**
@@ -273,7 +269,6 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setKeyColumn(String keyColumn) {
-
         this.keyColumn = keyColumn;
 
     }
@@ -301,9 +296,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "PASSWORD_COLUMN_HELP")
 
     public String getPasswordColumn() {
-
         return this.passwordColumn;
-
     }
 
     /**
@@ -316,9 +309,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setPasswordColumn(String value) {
-
         this.passwordColumn = value;
-
     }
 
     /**
@@ -346,9 +337,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "STATUS_COLUMN_HELP")
 
     public String getStatusColumn() {
-
         return statusColumn;
-
     }
 
     /**
@@ -361,9 +350,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setStatusColumn(final String statusColumn) {
-
         this.statusColumn = statusColumn;
-
     }
 
     /**
@@ -387,9 +374,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "DISABLED_STATUS_VALUE_HELP")
 
     public String getDisabledStatusValue() {
-
         return disabledStatusValue;
-
     }
 
     /**
@@ -402,9 +387,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setDisabledStatusValue(final String disabledStatusValue) {
-
         this.disabledStatusValue = disabledStatusValue;
-
     }
 
     /**
@@ -428,9 +411,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "ENABLED_STATUS_VALUE_HELP")
 
     public String getEnabledStatusValue() {
-
         return enabledStatusValue;
-
     }
 
     /**
@@ -443,9 +424,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setEnabledStatusValue(final String enabledStatusValue) {
-
         this.enabledStatusValue = enabledStatusValue;
-
     }
 
     /**
@@ -469,9 +448,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "DEFAULT_STATUS_VALUE_HELP")
 
     public String getDefaultStatusValue() {
-
         return defaultStatusValue;
-
     }
 
     /**
@@ -484,9 +461,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setDefaultStatusValue(final String defaultStatusValue) {
-
         this.defaultStatusValue = defaultStatusValue;
-
     }
 
     /**
@@ -507,9 +482,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "JDBC_DRIVER_HELP")
 
     public String getJdbcDriver() {
-
         return this.jdbcDriver;
-
     }
 
     /**
@@ -518,9 +491,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setJdbcDriver(String value) {
-
         this.jdbcDriver = value;
-
     }
 
     /**
@@ -545,9 +516,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "URL_TEMPLATE_HELP")
 
     public String getJdbcUrlTemplate() {
-
         return jdbcUrlTemplate;
-
     }
 
     /**
@@ -556,9 +525,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setJdbcUrlTemplate(String value) {
-
         this.jdbcUrlTemplate = value;
-
     }
 
     /**
@@ -582,9 +549,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "ENABLE_EMPTY_STRING_HELP")
 
     public boolean isEnableEmptyString() {
-
         return enableEmptyString;
-
     }
 
     /**
@@ -597,9 +562,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setEnableEmptyString(boolean enableEmptyString) {
-
         this.enableEmptyString = enableEmptyString;
-
     }
 
     /**
@@ -625,9 +588,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "RETHROW_ALL_SQLEXCEPTIONS_HELP")
 
     public boolean isRethrowAllSQLExceptions() {
-
         return rethrowAllSQLExceptions;
-
     }
 
     /**
@@ -640,9 +601,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setRethrowAllSQLExceptions(boolean rethrowAllSQLExceptions) {
-
         this.rethrowAllSQLExceptions = rethrowAllSQLExceptions;
-
     }
 
     /**
@@ -668,9 +627,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "NATIVE_TIMESTAMPS_HELP")
 
     public boolean isNativeTimestamps() {
-
         return nativeTimestamps;
-
     }
 
     /**
@@ -683,9 +640,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setNativeTimestamps(boolean nativeTimestamps) {
-
         this.nativeTimestamps = nativeTimestamps;
-
     }
 
     /**
@@ -709,9 +664,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "ALL_NATIVE_HELP")
 
     public boolean isAllNative() {
-
         return allNative;
-
     }
 
     /**
@@ -724,9 +677,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setAllNative(boolean allNative) {
-
         this.allNative = allNative;
-
     }
 
     /**
@@ -754,9 +705,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "VALID_CONNECTION_QUERY_HELP")
 
     public String getValidConnectionQuery() {
-
         return this.validConnectionQuery;
-
     }
 
     /**
@@ -769,9 +718,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setValidConnectionQuery(String value) {
-
         this.validConnectionQuery = value;
-
     }
 
     /**
@@ -797,9 +744,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "CHANGE_LOG_COLUMN_HELP")
 
     public String getChangeLogColumn() {
-
         return this.changeLogColumn;
-
     }
 
     /**
@@ -808,9 +753,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setChangeLogColumn(String value) {
-
         this.changeLogColumn = value;
-
     }
 
     // =======================================================================
@@ -837,9 +780,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "DATASOURCE_HELP")
 
     public String getDatasource() {
-
         return datasource;
-
     }
 
     /**
@@ -848,9 +789,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setDatasource(String value) {
-
         this.datasource = value;
-
     }
 
     /**
@@ -874,9 +813,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "JNDI_PROPERTIES_HELP")
 
     public String[] getJndiProperties() {
-
         return (String[]) SerializerUtil.cloneObject(jndiProperties);
-
     }
 
     /**
@@ -885,9 +822,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      *
      */
     public void setJndiProperties(String[] value) {
-
         this.jndiProperties = (String[]) SerializerUtil.cloneObject(value);
-
     }
 
     private String cipherAlgorithm = SupportedAlgorithm.CLEARTEXT.name();
@@ -897,15 +832,11 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "CIPHER_ALGORITHM_HELP")
 
     public String getCipherAlgorithm() {
-
         return StringUtil.isBlank(cipherAlgorithm) ? SupportedAlgorithm.CLEARTEXT.name() : cipherAlgorithm;
-
     }
 
     public void setCipherAlgorithm(String cipherAlgorithm) {
-
         this.cipherAlgorithm = cipherAlgorithm;
-
     }
 
     private String cipherKey;
@@ -915,15 +846,11 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "CIPHER_KEY_HELP")
 
     public String getCipherKey() {
-
         return cipherKey;
-
     }
 
     public void setCipherKey(String cipherKey) {
-
         this.cipherKey = cipherKey;
-
     }
 
     private boolean pwdEncodeToUpperCase;
@@ -933,15 +860,11 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "PWD_ENCODE_UPPERCASE_HELP")
 
     public boolean isPwdEncodeToUpperCase() {
-
         return pwdEncodeToUpperCase;
-
     }
 
     public void setPwdEncodeToUpperCase(boolean pwdEncodeToUpperCase) {
-
         this.pwdEncodeToUpperCase = pwdEncodeToUpperCase;
-
     }
 
     private boolean pwdEncodeToLowerCase;
@@ -951,15 +874,11 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "PWD_ENCODE_LOWERCASE_HELP")
 
     public boolean isPwdEncodeToLowerCase() {
-
         return pwdEncodeToLowerCase;
-
     }
 
     public void setPwdEncodeToLowerCase(boolean pwdEncodeToLowerCase) {
-
         this.pwdEncodeToLowerCase = pwdEncodeToLowerCase;
-
     }
 
     private boolean retrievePassword;
@@ -969,15 +888,11 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "RETRIEVE_PASSWORD_HELP")
 
     public boolean isRetrievePassword() {
-
         return retrievePassword;
-
     }
 
     public void setRetrievePassword(boolean retrievePassword) {
-
         this.retrievePassword = retrievePassword;
-
     }
 
     /**
@@ -1003,15 +918,11 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             helpMessageKey = "PASSWORD_CHARSET_HELP")
 
     public String getPasswordCharset() {
-
         return passwordCharset;
-
     }
 
     public void setPasswordCharset(String passwordCharset) {
-
         this.passwordCharset = passwordCharset;
-
     }
 
     // =======================================================================
@@ -1132,9 +1043,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         LOG.info("format UrlTemplate");
 
         final StringBuilder b = new StringBuilder();
-
         final String url = getJdbcUrlTemplate();
-
         final int len = url.length();
 
         for (int i = 0; i < len; i++) {
@@ -1144,9 +1053,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
                 b.append(ch);
             } else if (i + 1 < len) {
                 i++;
-
                 ch = url.charAt(i);
-
                 if (ch == '%') {
                     b.append(ch);
                 } else if (ch == 'h') {

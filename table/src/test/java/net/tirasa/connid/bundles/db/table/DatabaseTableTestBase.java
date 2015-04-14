@@ -239,7 +239,7 @@ public abstract class DatabaseTableTestBase {
             throws Exception {
 
         // update the last change
-        final String SQL_TEMPLATE = "DELETE FROM ACCOUNTS";
+        final String SQL_TEMPLATE = "DELETE FROM Accounts";
         log.ok(SQL_TEMPLATE);
         PreparedStatement ps = null;
         try {
