@@ -54,6 +54,7 @@ import org.identityconnectors.common.CollectionUtil;
 import org.identityconnectors.common.IOUtil;
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.security.GuardedString;
+import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 
 
@@ -63,6 +64,7 @@ import org.identityconnectors.framework.common.exceptions.ConnectorException;
  * @since 1.0
  */
 public final class SQLUtil {
+	private static final Log LOG = Log.getLog(SQLUtil.class);
    
     /**
      * Never allow this to be instantiated.
@@ -188,7 +190,11 @@ public final class SQLUtil {
                 ret[0] = DriverManager.getConnection(url);
             }
             // turn off auto-commit
-            ret[0].setAutoCommit(false);
+            try {
+				ret[0].setAutoCommit(false);
+			} catch (SQLException expected) {
+				 LOG.error(expected, "setAutoCommit() exception");
+			}
         } catch (Exception e) {
             throw ConnectorException.wrap(e);
         }
