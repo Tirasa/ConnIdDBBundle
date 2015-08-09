@@ -882,7 +882,7 @@ public class ScriptedSQLConfiguration extends AbstractConfiguration {
         } else {
             LOG.info("Validate datasource configuration");
             //Validate the JNDI properties
-            JNDIUtil.arrayToHashtable(getJndiProperties(), getConnectorMessages());
+            JNDIUtil.arrayToProperties(getJndiProperties(), getConnectorMessages());
             LOG.ok("datasource configuration is ok");
         }
 

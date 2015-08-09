@@ -25,7 +25,7 @@ package net.tirasa.connid.bundles.db.scriptedsql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Hashtable;
+import java.util.Properties;
 import net.tirasa.connid.bundles.db.common.JNDIUtil;
 import net.tirasa.connid.bundles.db.common.SQLUtil;
 import org.identityconnectors.common.StringUtil;
@@ -66,7 +66,7 @@ public class ScriptedSQLConnection {
             LOG.info("Get a new connection using datasource {0}", datasource);
             final String[] jndiProperties = config.getJndiProperties();
             final ConnectorMessages connectorMessages = config.getConnectorMessages();
-            final Hashtable<String, String> prop = JNDIUtil.arrayToHashtable(jndiProperties, connectorMessages);
+            final Properties prop = JNDIUtil.arrayToProperties(jndiProperties, connectorMessages);
             if (StringUtil.isNotBlank(login) && password != null) {
                 connection = SQLUtil.getDatasourceConnection(datasource, login, password, prop);
             } else {

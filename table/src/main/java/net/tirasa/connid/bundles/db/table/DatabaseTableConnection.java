@@ -33,9 +33,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
@@ -107,7 +107,7 @@ public class DatabaseTableConnection extends DatabaseConnection {
 
             final String[] jndiProperties = config.getJndiProperties();
             final ConnectorMessages connectorMessages = config.getConnectorMessages();
-            final Hashtable<String, String> prop = JNDIUtil.arrayToHashtable(jndiProperties, connectorMessages);
+            final Properties prop = JNDIUtil.arrayToProperties(jndiProperties, connectorMessages);
 
             if (StringUtil.isNotBlank(login) && password != null) {
                 connection = SQLUtil.getDatasourceConnection(datasource, login, password, prop);
@@ -379,7 +379,7 @@ public class DatabaseTableConnection extends DatabaseConnection {
 
                 // anything, not just SQLException
                 // nothing to do, just invalidate the connection
-                throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ,sql), ex);
+                throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ, sql), ex);
             } finally {
                 SQLUtil.closeQuietly(stmt);
             }
