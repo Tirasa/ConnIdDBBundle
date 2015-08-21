@@ -962,19 +962,19 @@ public class ScriptedSQLConfiguration extends AbstractConfiguration {
         return fmt;
     }
 
-    private void checkFileIsReadable(String type, String fileName) {
+    private void checkFileIsReadable(final String type, final String fileName) {
         if (fileName == null) {
             LOG.info("{0} Script Filename is null", type);
         } else {
-            File f = new File(fileName);
+            File file = new File(ScriptedSQLConnector.resolveVariables(fileName));
             try {
-                if (f.canRead()) {
+                if (file.canRead()) {
                     LOG.ok("{0} is readable", fileName);
                 } else {
                     throw new IllegalArgumentException("Can't read " + fileName);
                 }
             } catch (SecurityException e) {
-                throw new IllegalArgumentException("Can't read " + fileName);
+                throw new IllegalArgumentException("Can't read " + fileName, e);
             }
         }
     }

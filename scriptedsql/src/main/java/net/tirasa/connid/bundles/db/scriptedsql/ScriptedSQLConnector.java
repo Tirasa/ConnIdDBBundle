@@ -23,17 +23,17 @@
  */
 package net.tirasa.connid.bundles.db.scriptedsql;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.identityconnectors.common.IOUtil;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.script.ScriptExecutor;
 import org.identityconnectors.common.script.ScriptExecutorFactory;
@@ -60,6 +60,33 @@ public class ScriptedSQLConnector implements PoolableConnector, AuthenticateOp, 
      * Setup logging for the {@link ScriptedSQLConnector}.
      */
     private static final Log LOG = Log.getLog(ScriptedSQLConnector.class);
+
+    private static final Pattern VARIABLE = Pattern.compile("\\$\\{[a-zA-Z]+\\w*\\}");
+
+    public static final String resolveVariables(final String input) {
+        Set<String> vars = new HashSet<String>();
+        Matcher matcher = VARIABLE.matcher(input);
+        while (matcher.find()) {
+            int n = 0;
+            for (int i = matcher.start() - 1; i >= 0 && input.charAt(i) == '\\'; i--) {
+                n++;
+            }
+            if (n % 2 != 0) {
+                continue;
+            }
+
+            vars.add(input.substring(matcher.start() + 2, matcher.end() - 1));
+        }
+
+        String resolved = input;
+        for (String var : vars) {
+            String replacement = System.getProperty(var);
+            if (replacement != null) {
+                resolved = resolved.replace("${" + var + "}", replacement);
+            }
+        }
+        return resolved;
+    }
 
     /**
      * Place holder for the Connection created in the init method
@@ -203,8 +230,8 @@ public class ScriptedSQLConnector implements PoolableConnector, AuthenticateOp, 
             arguments.put("objectClass", objClass.getObjectClassValue());
             arguments.put("options", options.getOptions());
             // We give the id (name) as an argument, more friendly than dealing with __NAME__
-            arguments.put("id", AttributeUtil.getNameFromAttributes(attrs).getNameValue() == null 
-                    ? AttributeUtil.getUidAttribute(attrs).getUidValue() 
+            arguments.put("id", AttributeUtil.getNameFromAttributes(attrs).getNameValue() == null
+                    ? AttributeUtil.getUidAttribute(attrs).getUidValue()
                     : AttributeUtil.getNameFromAttributes(attrs).getNameValue());
 
             Map<String, List<Object>> attrMap = new HashMap<String, List<Object>>();
@@ -718,40 +745,13 @@ public class ScriptedSQLConnector implements PoolableConnector, AuthenticateOp, 
         }
     }
 
-    private String readFile(String filename) {
-        File file = new File(filename);
-        StringBuilder contents = new StringBuilder();
-        BufferedReader reader = null;
-        String text;
-
-        try {
-            reader = new BufferedReader(new FileReader(file));
-            while ((text = reader.readLine()) != null) {
-                contents.append(text).append(System.getProperty("line.separator"));
-            }
-        } catch (FileNotFoundException e) {
-            throw new ConnectorException(filename + " not found", e);
-        } catch (IOException e) {
-            throw new ConnectorException(filename, e);
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException e) {
-                throw new ConnectorException(filename, e);
-            }
-        }
-        return contents.toString();
-    }
-
     private ScriptExecutor getScriptExecutor(String script, String scriptFileName) {
         String scriptCode = script;
         ScriptExecutor scriptExec = null;
 
         try {
             if (scriptFileName != null) {
-                scriptCode = readFile(scriptFileName);
+                scriptCode = IOUtil.readFileUTF8(new File(resolveVariables(scriptFileName)));
             }
             if (scriptCode.length() > 0) {
                 scriptExec = factory.newScriptExecutor(getClass().getClassLoader(), scriptCode, true);
