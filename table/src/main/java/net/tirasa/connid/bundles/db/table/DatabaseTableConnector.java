@@ -23,8 +23,23 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.*;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableSQLUtil.tsAsLong;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_AUTHENTICATE_OP_NOT_SUPPORTED;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_AUTH_FAILED;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_CREATE;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_DELETE;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_READ;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_UPDATE;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CHANGELOG_COLUMN_BLANK;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_INVALID_ATTRIBUTE_SET;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_INVALID_SYNC_TOKEN_VALUE;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_MORE_USERS_DELETED;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_NAME_BLANK;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_PASSWORD_BLANK;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_RESULT_HANDLER_NULL;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_UID_BLANK;
+import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_USER_BLANK;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -134,90 +149,59 @@ public class DatabaseTableConnector implements
         ResolveUsernameOp {
 
     /**
-     *
      * Setup logging for the {@link DatabaseTableConnector}.
-     *
      */
     private static Log LOG = Log.getLog(DatabaseTableConnector.class);
 
     /**
-     *
      * A "hashed password" attribute. If this attribute is "true" then the value supplied for
      *
      * the password attribute is assumed to be hashed according to the defined password digest
      *
      * algorithm, and hence is not hashed (again).
-     *
      */
     private static final String HASHED_PASSWORD_ATTRIBUTE = AttributeUtil.createSpecialName("HASHED_PASSWORD");
 
     /**
-     *
-     * Place holder for the {@link Connection} passed into the callback
-     *
-     * {@link ConnectionFactory#setConnection(Connection)}.
-     *
+     * Place holder for the {@link Connection} passed into the callback.
      */
     private DatabaseTableConnection conn;
 
     /**
-     *
-     * Place holder for the {@link Configuration} passed into the callback
-     *
-     * {@link DatabaseTableConnector#init(Configuration)}.
-     *
+     * Place holder for the {@link Configuration} passed into the callback.
      */
     private DatabaseTableConfiguration config;
 
     /**
-     *
      * Schema cache is used. The schema creation need a jdbc query.
-     *
      */
     private Schema schema;
 
     /**
-     *
-     * Default attributes to get, created and cached from the schema
-     *
+     * Default attributes to get, created and cached from the schema.
      */
     private Set<String> defaultAttributesToGet;
 
     /**
-     *
-     * Same of the data types must be converted
-     *
+     * Same of the data types must be converted.
      */
     private Map<String, Integer> columnSQLTypes;
 
     /**
-     *
-     * Cached value for required columns
-     *
+     * Cached value for required columns.
      */
     private Set<String> stringColumnRequired;
 
     // =======================================================================
     // Initialize/dispose methods..
     // =======================================================================
-    /**
-     *
-     * {@inheritDoc}
-     *
-     */
     @Override
     public Configuration getConfiguration() {
         return this.config;
     }
 
-    /**
-     *
-     * Init the connector {@inheritDoc}
-     *
-     */
     @Override
-
-    public void init(Configuration cfg) {
+    public void init(final Configuration cfg) {
         LOG.info("init DatabaseTable connector");
         this.config = (DatabaseTableConfiguration) cfg;
         this.schema = null;
@@ -226,13 +210,7 @@ public class DatabaseTableConnector implements
         LOG.ok("init DatabaseTable connector ok, connection is valid");
     }
 
-    /**
-     *
-     * {@inheritDoc}
-     *
-     */
     @Override
-
     public void checkAlive() {
         LOG.info("checkAlive DatabaseTable connector");
         try {
@@ -242,7 +220,6 @@ public class DatabaseTableConnector implements
                 getConn().test();
                 commit();
             }
-
         } catch (SQLException e) {
             LOG.error(e, "error in checkAlive");
             throw ConnectorException.wrap(e);
@@ -253,15 +230,11 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     *
-     * The connector connection access method
-     *
-     *
+     * The connector connection access method.
      *
      * @return connection
-     *
      */
-    DatabaseTableConnection getConn() {
+    private DatabaseTableConnection getConn() {
         //Lazy initialize the connection
         if (conn == null) {
             this.config.validate();
@@ -273,9 +246,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     *
-     * Disposes of the {@link DatabaseTableConnector}'s resources. {@inheritDoc}
-     *
+     * Disposes of the {@link DatabaseTableConnector}'s resources.
      */
     @Override
     public void dispose() {
@@ -290,12 +261,10 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     *
-     * Creates a row in the database representing an account. {@inheritDoc}
-     *
+     * Creates a row in the database representing an account.
      */
     @Override
-    public Uid create(ObjectClass oclass, Set<Attribute> attrs, OperationOptions options) {
+    public Uid create(final ObjectClass oclass, final Set<Attribute> attrs, final OperationOptions options) {
         LOG.info("create account, check the ObjectClass");
 
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
@@ -422,45 +391,31 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     *
-     * Test to throw the exception
-     *
-     *
+     * Test to throw the exception.
      *
      * @param e exception
-     *
-     * @return
-     *
+     * @return true/false
      */
     private boolean throwIt(int errorCode) {
         return config.isRethrowAllSQLExceptions() || errorCode != 0;
     }
 
     /**
-     *
      * Test is value is null and must be empty
      *
-     *
-     *
      * @param columnName the column name
-     *
      * @param value the value to tests
-     *
      * @return true/false
-     *
      */
     private boolean isToBeEmpty(final String columnName, Object value) {
         return config.isEnableEmptyString() && getStringColumnReguired().contains(columnName) && value == null;
     }
 
     /**
-     *
-     * Deletes a row from the table. {@inheritDoc}
-     *
+     * Deletes a row from the table.
      */
     @Override
     public void delete(final ObjectClass oclass, final Uid uid, final OperationOptions options) {
-
         LOG.info("delete account, check the ObjectClass");
 
         final String SQL_DELETE = "DELETE FROM {0} WHERE {1} = ?";
@@ -521,12 +476,12 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     *
-     * Update the database row with the data provided. {@inheritDoc}
-     *
+     * Update the database row with the data provided.
      */
     @Override
-    public Uid update(ObjectClass oclass, Uid uid, Set<Attribute> attrs, OperationOptions options) {
+    public Uid update(
+            final ObjectClass oclass, final Uid uid, final Set<Attribute> attrs, final OperationOptions options) {
+
         LOG.info("update account, check the ObjectClass");
         final String SQL_TEMPLATE = "UPDATE {0} SET {1} WHERE {2} = ?";
 
@@ -622,10 +577,12 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Creates a Database Table filter translator. {@inheritDoc}
+     * Creates a Database Table filter translator.
      */
     @Override
-    public FilterTranslator<FilterWhereBuilder> createFilterTranslator(ObjectClass oclass, OperationOptions options) {
+    public FilterTranslator<FilterWhereBuilder> createFilterTranslator(
+            final ObjectClass oclass, final OperationOptions options) {
+
         LOG.info("check the ObjectClass");
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
             throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
@@ -635,12 +592,12 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Search for rows {@inheritDoc}
+     * Search for rows.
      */
     @Override
+    public void executeQuery(final ObjectClass oclass, final FilterWhereBuilder where, final ResultsHandler handler,
+            final OperationOptions options) {
 
-    public void executeQuery(ObjectClass oclass, FilterWhereBuilder where, ResultsHandler handler,
-            OperationOptions options) {
         LOG.info("check the ObjectClass and result handler");
 
         // Contract tests
@@ -705,9 +662,6 @@ public class DatabaseTableConnector implements
         LOG.ok("Query Account commited");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void sync(
             final ObjectClass oclass,
@@ -812,11 +766,8 @@ public class DatabaseTableConnector implements
         LOG.ok("Sync Account commited");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public SyncToken getLatestSyncToken(ObjectClass oclass) {
+    public SyncToken getLatestSyncToken(final ObjectClass oclass) {
         LOG.info("check the ObjectClass");
 
         // Contract tests    
@@ -866,7 +817,7 @@ public class DatabaseTableConnector implements
                     final boolean isDate = sqlType == 91 || sqlType == 93 || sqlType == 92;
 
                     if (isDate) {
-                        ret = new SyncToken(SQLUtil.jdbc2AttributeValue(tsAsLong(value)));
+                        ret = new SyncToken(SQLUtil.jdbc2AttributeValue(DatabaseTableSQLUtil.tsAsLong(value)));
                     } else {
                         try {
                             ret = new SyncToken(SQLUtil.jdbc2AttributeValue(Long.parseLong(value)));
@@ -899,9 +850,6 @@ public class DatabaseTableConnector implements
     // =======================================================================
     // Schema..
     // =======================================================================
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Schema schema() {
         try {
@@ -924,7 +872,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Test the configuration and connection {@inheritDoc}
+     * Test the configuration and connection.
      */
     @Override
     public void test() {
@@ -962,7 +910,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Attempts to authenticate the given username combination {@inheritDoc}
+     * Attempts to authenticate the given username combination.
      */
     @Override
     public Uid authenticate(
@@ -1057,7 +1005,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Attempts to resolve the given username {@inheritDoc}
+     * Attempts to resolve the given username.
      */
     @Override
     public Uid resolveUsername(ObjectClass oclass, String username, OperationOptions options) {
@@ -1085,19 +1033,13 @@ public class DatabaseTableConnector implements
         LOG.ok("The username is ok");
 
         final String keyColumnName = quoteName(config.getKeyColumn());
-
         final String passwordColumnName = quoteName(config.getPasswordColumn());
-
         final String sql = MessageFormat.format(SQL_AUTH_QUERY, keyColumnName, config.getTable(), passwordColumnName);
-
         final List<SQLParam> values = new ArrayList<SQLParam>();
-
         values.add(new SQLParam(keyColumnName, username, getColumnType(config.getKeyColumn()))); // real username
 
         PreparedStatement stmt = null;
-
         ResultSet result = null;
-
         Uid uid = null;
 
         //No passwordExpired capability
@@ -1143,7 +1085,7 @@ public class DatabaseTableConnector implements
      * @param value Value to be quoted
      * @return the quoted column name
      */
-    public String quoteName(String value) {
+    public String quoteName(final String value) {
         return DatabaseTableSQLUtil.quoteName(config.getQuoting(), value);
     }
 
@@ -1153,7 +1095,7 @@ public class DatabaseTableConnector implements
      * @param columnName the column name
      * @return the cached column type
      */
-    public int getColumnType(String columnName) {
+    public int getColumnType(final String columnName) {
         if (columnSQLTypes == null) {
             cacheSchema();
         }
@@ -1177,7 +1119,7 @@ public class DatabaseTableConnector implements
      * @param attributeName
      * @return the Column Name value
      */
-    public String getColumnName(String attributeName) {
+    public String getColumnName(final String attributeName) {
         if (Name.NAME.equalsIgnoreCase(attributeName)) {
             LOG.ok("attribute name {0} map to key column", attributeName);
             return config.getKeyColumn();
@@ -1203,7 +1145,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Cache schema, defaultAtributesToGet, columnClassNamens
+     * Cache schema, defaultAtributesToGet, columnClassNames.
      */
     private void cacheSchema() {
         /*
@@ -1220,6 +1162,7 @@ public class DatabaseTableConnector implements
             final String name = info.getName();
             if (info.isReturnedByDefault()
                     || (name.equals(OperationalAttributes.PASSWORD_NAME) && config.isRetrievePassword())) {
+
                 defaultAttributesToGet.add(name);
             }
         }
@@ -1266,7 +1209,6 @@ public class DatabaseTableConnector implements
      * @return Schema based on a empty SELECT query.
      */
     private Set<AttributeInfo> buildSelectBasedAttributeInfos() {
-
         /**
          * Template for a empty query to get the columns of the table.
          */
@@ -1316,8 +1258,7 @@ public class DatabaseTableConnector implements
      * @return
      * @throws SQLException
      */
-    private Set<AttributeInfo> buildAttributeInfoSet(ResultSet rset)
-            throws SQLException {
+    private Set<AttributeInfo> buildAttributeInfoSet(final ResultSet rset) throws SQLException {
         LOG.info("build AttributeInfoSet");
 
         final Set<AttributeInfo> attrInfo = new HashSet<AttributeInfo>();
@@ -1392,7 +1333,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Decide if should be returned by default Generally all byte arrays are not returned by default
+     * Decide if should be returned by default Generally all byte arrays are not returned by default.
      *
      * @param dataType the type of the attribute type
      * @return
@@ -1409,8 +1350,7 @@ public class DatabaseTableConnector implements
      * @param columnValues from the result set
      * @return ConnectorObjectBuilder object
      */
-    private ConnectorObjectBuilder buildConnectorObject(
-            final Map<String, SQLParam> columnValues) {
+    private ConnectorObjectBuilder buildConnectorObject(final Map<String, SQLParam> columnValues) {
 
         LOG.info("build ConnectorObject");
         String uidValue = null;
@@ -1479,15 +1419,12 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Construct a SyncDeltaBuilder the sync builder
-     * <p>
-     * Taking care about special attributes</p>
+     * Construct a SyncDeltaBuilder the sync builder taking care about special attributes.
      *
      * @param columnValues from the resultSet
      * @return SyncDeltaBuilder the sync builder
      */
-    private SyncDeltaBuilder buildSyncDelta(Map<String, SQLParam> columnValues) {
-
+    private SyncDeltaBuilder buildSyncDelta(final Map<String, SQLParam> columnValues) {
         LOG.info("buildSyncDelta");
 
         SyncDeltaBuilder bld = new SyncDeltaBuilder();
@@ -1524,7 +1461,7 @@ public class DatabaseTableConnector implements
      *
      * @return
      */
-    private Set<String> resolveColumnNamesToGet(OperationOptions options) {
+    private Set<String> resolveColumnNamesToGet(final OperationOptions options) {
         Set<String> attributesToGet = getDefaultAttributesToGet();
 
         if (options != null && options.getAttributesToGet() != null) {
@@ -1551,7 +1488,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Get the default Attributes to get
+     * Get the default Attributes to get.
      *
      * @return the Set of default attribute names
      */
@@ -1564,7 +1501,7 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     * Get the default Attributes to get
+     * Get the default Attributes to get.
      *
      * @return the Set of default attribute names
      */
@@ -1577,18 +1514,12 @@ public class DatabaseTableConnector implements
     }
 
     /**
-     *
      * Return true if and only if status is not equals to 'disabledStatusValued'.
      *
-     *
-     *
      * @param status.
-     *
      * @return 'true' if enabled; 'false' otherwise.
-     *
      */
     private boolean isEnabled(final String status) {
-
         return StringUtil.isBlank(status)
                 ? StringUtil.isNotBlank(config.getDisabledStatusValue())
                 : !status.equalsIgnoreCase(config.getDisabledStatusValue());
@@ -1628,7 +1559,7 @@ public class DatabaseTableConnector implements
                 try {
                     tokenVal = SQLUtil.attribute2jdbcValue(value.toString(), sqlType);
                 } catch (Exception e) {
-                    tokenVal = new Timestamp(tsAsLong(value.toString()));
+                    tokenVal = new Timestamp(DatabaseTableSQLUtil.tsAsLong(value.toString()));
                 }
                 builder.addBind(new SQLParam(quoteName(cname), tokenVal, sqlType));
             } else {
@@ -1671,10 +1602,7 @@ public class DatabaseTableConnector implements
     }
 
     private GuardedString encodePassword(final GuardedString guarded) throws PasswordEncodingException {
-
-        final GuardedString encoded;
         String cipherAlgorithm;
-
         try {
             cipherAlgorithm = SupportedAlgorithm.valueOf(config.getCipherAlgorithm()).getAlgorithm();
         } catch (Exception e) {
@@ -1696,7 +1624,6 @@ public class DatabaseTableConnector implements
         }
 
         final String[] password = { null };
-
         guarded.access(new GuardedString.Accessor() {
 
             @Override
@@ -1706,7 +1633,6 @@ public class DatabaseTableConnector implements
         });
 
         String encodedPwd;
-
         try {
             encodedPwd = algorithm.encode(password[0], config.getPasswordCharset());
         } catch (UnsupportedPasswordCharsetException e) {
@@ -1714,6 +1640,7 @@ public class DatabaseTableConnector implements
             throw new PasswordEncodingException(e.getMessage());
         }
 
+        GuardedString encoded;
         if (StringUtil.isNotBlank(encodedPwd)) {
             encoded = new GuardedString(changeCaseOfEncodedPassword(encodedPwd).toCharArray());
         } else {
