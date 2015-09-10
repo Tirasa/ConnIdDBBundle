@@ -234,7 +234,7 @@ public class DatabaseTableConnector implements
      *
      * @return connection
      */
-    private DatabaseTableConnection getConn() {
+    protected DatabaseTableConnection getConn() {
         //Lazy initialize the connection
         if (conn == null) {
             this.config.validate();
