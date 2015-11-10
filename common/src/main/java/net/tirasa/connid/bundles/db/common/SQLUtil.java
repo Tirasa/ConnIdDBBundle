@@ -47,6 +47,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -81,7 +82,13 @@ public final class SQLUtil {
      */
     public static Connection getDatasourceConnection(final String datasourceName, final Properties env) {
         try {
+            LOG.ok("Datasource: {0}", datasourceName);
+            LOG.ok("Properties");
+            for (final String propertyName : env.stringPropertyNames()) {
+                LOG.ok(propertyName + ": {0}", env.getProperty(propertyName));
+            }
             final javax.naming.InitialContext ic = getInitialContext(env);
+            LOG.ok("Initial context: {0}", ic);
             final DataSource ds = (DataSource) ic.lookup(datasourceName);
             return ds.getConnection();
         } catch (Exception e) {
@@ -100,10 +107,18 @@ public final class SQLUtil {
      */
     public static Connection getDatasourceConnection(
             final String datasourceName, final String user, GuardedString password, final Properties env) {
-
         try {
+            LOG.ok("Datasource: {0}", datasourceName);
+            LOG.ok("User: {0}", user);
+            for (final String propertyName : env.stringPropertyNames()) {
+                LOG.ok("Properties");
+                LOG.ok(propertyName + ": {0}", env.getProperty(propertyName));
+            }
             javax.naming.InitialContext ic = getInitialContext(env);
-            final DataSource ds = (DataSource) ic.lookup(datasourceName);
+            Context webContext = (Context) ic.lookup("java:/comp/env");
+            LOG.ok("Initial context created");
+            final DataSource ds = (DataSource) webContext.lookup(datasourceName);
+            LOG.ok("Datasource context created");
             final Connection[] ret = new Connection[1];
             password.access(new GuardedString.Accessor() {
 
@@ -211,8 +226,7 @@ public final class SQLUtil {
     }
 
     /**
-     * Ignores any exception thrown by the {@link Connection} parameter when
-     * closed, it also checks for {@code null}.
+     * Ignores any exception thrown by the {@link Connection} parameter when closed, it also checks for {@code null}.
      *
      * @param conn JDBC connection to rollback.
      */
@@ -227,11 +241,10 @@ public final class SQLUtil {
     }
 
     /**
-     * Ignores any exception thrown by the {@link DatabaseConnection} parameter when
-     * closed, it also checks for {@code null}.
+     * Ignores any exception thrown by the {@link DatabaseConnection} parameter when closed, it also checks for
+     * {@code null}.
      *
-     * @param conn
-     * DatabaseConnection to rollback.
+     * @param conn DatabaseConnection to rollback.
      */
     public static void rollbackQuietly(final DatabaseConnection conn) {
         if (conn != null) {
@@ -240,8 +253,7 @@ public final class SQLUtil {
     }
 
     /**
-     * Ignores any exception thrown by the {@link Connection} parameter when
-     * closed, it also checks for {@code null}.
+     * Ignores any exception thrown by the {@link Connection} parameter when closed, it also checks for {@code null}.
      *
      * @param conn JDBC connection to close.
      */
@@ -256,11 +268,9 @@ public final class SQLUtil {
     }
 
     /**
-     * Ignores any exception thrown by the {@link Connection} parameter when closed,
-     * it also checks for {@code null}.
+     * Ignores any exception thrown by the {@link Connection} parameter when closed, it also checks for {@code null}.
      *
-     * @param conn
-     * DatabaseConnection to close.
+     * @param conn DatabaseConnection to close.
      */
     public static void closeQuietly(final DatabaseConnection conn) {
         if (conn != null) {
@@ -284,8 +294,8 @@ public final class SQLUtil {
     }
 
     /**
-     * Closes the {@link ResultSet} and ignores any {@link Exception} that may
-     * be thrown by the {@link ResultSet#close()} method.
+     * Closes the {@link ResultSet} and ignores any {@link Exception} that may be thrown by the
+     * {@link ResultSet#close()} method.
      *
      * @param rset {@link ResultSet} to close quitely.
      */
@@ -481,9 +491,8 @@ public final class SQLUtil {
     }
 
     /**
-     * Binds the "?" markers in SQL statement with the parameters given as <i>values</i>.
-     * It concentrates the replacement of all params.<code>GuardedString</code> are handled so the password is never
-     * visible.
+     * Binds the "?" markers in SQL statement with the parameters given as <i>values</i>. It concentrates the
+     * replacement of all params.<code>GuardedString</code> are handled so the password is never visible.
      *
      * @param statement
      * @param params a <code>List</code> of the object arguments
@@ -503,9 +512,8 @@ public final class SQLUtil {
     }
 
     /**
-     * Binds the "?" markers in SQL statement with the parameters given as <i>values</i>.
-     * It concentrates the replacement of all params. <code>GuardedString</code> are handled so the password is never
-     * visible.
+     * Binds the "?" markers in SQL statement with the parameters given as <i>values</i>. It concentrates the
+     * replacement of all params. <code>GuardedString</code> are handled so the password is never visible.
      *
      * @param statement
      * @param params a <code>List</code> of the object arguments
@@ -517,8 +525,7 @@ public final class SQLUtil {
     }
 
     /**
-     * Set the statement parameter.
-     * It is ready for overloading if necessary.
+     * Set the statement parameter. It is ready for overloading if necessary.
      *
      * @param stmt a <code>PreparedStatement</code> to set the params
      * @param idx an index of the parameter
@@ -619,8 +626,7 @@ public final class SQLUtil {
     }
 
     /**
-     * Convert database type to connector supported set of attribute types
-     * Can be redefined for different databases.
+     * Convert database type to connector supported set of attribute types Can be redefined for different databases.
      *
      * @param sqlType #{@link Types}
      * @return a connector supported class
@@ -666,8 +672,7 @@ public final class SQLUtil {
     }
 
     /**
-     * Set a parameter to statement.
-     * The conversion to required database type is expected to be done.
+     * Set a parameter to statement. The conversion to required database type is expected to be done.
      *
      * @param stmt the statement to set
      * @param idx index of the parameter
@@ -785,8 +790,8 @@ public final class SQLUtil {
     }
 
     /**
-     * Convert the attribute to expected jdbc type using java conversions
-     * Some database strategy sets all attributes as string, other convert them first and than set as native.
+     * Convert the attribute to expected jdbc type using java conversions Some database strategy sets all attributes as
+     * string, other convert them first and than set as native.
      *
      * @param value the value to be converted
      * @param sqlType the target sql type
@@ -907,9 +912,8 @@ public final class SQLUtil {
     }
 
     /**
-     * Selects single value (first column) from select.
-     * It fetches only first row, does not check whether more rows are returned by select.
-     * If no row is returned, returns null
+     * Selects single value (first column) from select. It fetches only first row, does not check whether more rows are
+     * returned by select. If no row is returned, returns null
      *
      * @param conn JDBC connection
      * @param sql Select statement with or without parameters
@@ -926,7 +930,7 @@ public final class SQLUtil {
             st = conn.prepareStatement(sql);
             setParams(st, Arrays.asList(params));
             rs = st.executeQuery();
-            Object value = null;
+            Object value;
             if (rs.next()) {
                 //If needed , switch to getSQLParam
                 value = rs.getObject(1);
@@ -940,9 +944,8 @@ public final class SQLUtil {
     }
 
     /**
-     * Selects all rows from select.
-     * It uses {@link ResultSet#getMetaData()} to find columns count and use {@link ResultSet#getObject(int)} to
-     * retrieve column value.
+     * Selects all rows from select. It uses {@link ResultSet#getMetaData()} to find columns count and use
+     * {@link ResultSet#getObject(int)} to retrieve column value.
      *
      * @param conn JDBC connection
      * @param sql SQL select with or without params
@@ -964,8 +967,8 @@ public final class SQLUtil {
             while (rs.next()) {
                 Object[] row = new Object[metaData.getColumnCount()];
                 for (int i = 0; i < row.length; i++) {
-                    final SQLParam param =
-                            getSQLParam(rs, i + 1, metaData.getColumnName(i + 1), metaData.getColumnType(i + 1));
+                    final SQLParam param = getSQLParam(rs, i + 1, metaData.getColumnName(i + 1), metaData.getColumnType(
+                            i + 1));
                     row[i] = jdbc2AttributeValue(param.getValue());
 
                 }
@@ -979,8 +982,8 @@ public final class SQLUtil {
     }
 
     /**
-     * Executes DML sql statement.
-     * This can be useful to execute insert/update/delete or some database specific statement in one call
+     * Executes DML sql statement. This can be useful to execute insert/update/delete or some database specific
+     * statement in one call
      *
      * @param conn
      * @param sql
@@ -988,9 +991,9 @@ public final class SQLUtil {
      * @return number of rows affected as defined by {@link PreparedStatement#executeUpdate()}
      * @throws SQLException
      */
-    public static int executeUpdateStatement(final Connection conn, final String sql, final SQLParam... params) 
+    public static int executeUpdateStatement(final Connection conn, final String sql, final SQLParam... params)
             throws SQLException {
-        
+
         PreparedStatement st = null;
         try {
             st = conn.prepareStatement(sql);
