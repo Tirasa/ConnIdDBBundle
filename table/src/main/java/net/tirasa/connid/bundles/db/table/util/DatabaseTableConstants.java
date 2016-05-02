@@ -1,18 +1,18 @@
-/* 
+/*
  * ====================
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
  * except in compliance with the License.
- * 
+ *
  * You can obtain a copy of the License at
  * http://opensource.org/licenses/cddl1.php
  * See the License for the specific language governing permissions and limitations
  * under the License.
- * 
+ *
  * When distributing the Covered Code, include this CDDL Header Notice in each file
  * and include the License file at http://opensource.org/licenses/cddl1.php.
  * If applicable, add the following below this CDDL Header, with the fields
@@ -54,10 +54,6 @@ public class DatabaseTableConstants {
 
     public static final String MSG_CAN_NOT_UPDATE = "can.not.update";
 
-    public static final String MSG_DATABASE_BLANK = "database.blank";
-
-    public static final String MSG_HOST_BLANK = "host.blank";
-
     public static final String MSG_CHANGELOG_COLUMN_BLANK = "changelog.column.blank";
 
     public static final String MSG_INVALID_ATTRIBUTE_SET = "invalid.attribute.set";
@@ -65,12 +61,6 @@ public class DatabaseTableConstants {
     public static final String MSG_INVALID_QUOTING = "invalid.quoting";
 
     public static final String MSG_INVALID_SYNC_TOKEN_VALUE = "invalid.sync.token.value";
-
-    public static final String MSG_JDBC_DRIVER_BLANK = "jdbc.driver.blank";
-
-    public static final String MSG_JDBC_DRIVER_NOT_FOUND = "jdbc.driver.not.found";
-
-    public static final String MSG_JDBC_TEMPLATE_BLANK = "jdbc.template.blank";
 
     public static final String MSG_KEY_COLUMN_BLANK = "key.column.blank";
 
@@ -83,10 +73,6 @@ public class DatabaseTableConstants {
     public static final String MSG_PASSWD_COLUMN_EQ_CHANGE_LOG_COLUMN = "passwd.column.eq.change.log.column";
 
     public static final String MSG_PASSWD_COLUMN_EQ_KEY_COLUMN = "passwd.column.eq.key.column";
-
-    public static final String MSG_PASSWORD_BLANK = "admin.password.blank";
-
-    public static final String MSG_PORT_BLANK = "port.blank";
 
     public static final String MSG_PWD_BLANK = "pwd.blank";
 
@@ -103,8 +89,6 @@ public class DatabaseTableConstants {
     public static final String MSG_TABLE_BLANK = "table.blank";
 
     public static final String MSG_UID_BLANK = "uid.blank";
-
-    public static final String MSG_USER_BLANK = "admin.user.blank";
 
     private DatabaseTableConstants() {
         throw new AssertionError();

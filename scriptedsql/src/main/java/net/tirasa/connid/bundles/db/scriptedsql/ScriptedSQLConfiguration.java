@@ -1,18 +1,18 @@
-/* 
+/*
  * ====================
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
  * except in compliance with the License.
- * 
+ *
  * You can obtain a copy of the License at
  * http://opensource.org/licenses/cddl1.php
  * See the License for the specific language governing permissions and limitations
  * under the License.
- * 
+ *
  * When distributing the Covered Code, include this CDDL Header Notice in each file
  * and include the License file at http://opensource.org/licenses/cddl1.php.
  * If applicable, add the following below this CDDL Header, with the fields
@@ -22,6 +22,15 @@
  * Portions Copyrighted 2011 ConnId.
  */
 package net.tirasa.connid.bundles.db.scriptedsql;
+
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_DATABASE_BLANK;
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_HOST_BLANK;
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_JDBC_DRIVER_BLANK;
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_JDBC_DRIVER_NOT_FOUND;
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_JDBC_TEMPLATE_BLANK;
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_PASSWORD_BLANK;
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_PORT_BLANK;
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_USER_BLANK;
 
 import java.io.File;
 import net.tirasa.connid.bundles.db.common.JNDIUtil;
@@ -837,7 +846,7 @@ public class ScriptedSQLConfiguration extends AbstractConfiguration {
         LOG.info("Validate ScriptedSQLConfiguration");
         // check the url is configured
         if (StringUtil.isBlank(getJdbcUrlTemplate())) {
-            throw new IllegalArgumentException(getMessage("MSG_JDBC_TEMPLATE_BLANK"));
+            throw new IllegalArgumentException(getMessage(MSG_JDBC_TEMPLATE_BLANK));
         }
         // check that there is not a datasource
         if (StringUtil.isBlank(getDatasource())) {
@@ -845,38 +854,38 @@ public class ScriptedSQLConfiguration extends AbstractConfiguration {
 
             // determine if you can get a connection to the database..
             if (getUser() == null) {
-                throw new IllegalArgumentException(getMessage("MSG_USER_BLANK"));
+                throw new IllegalArgumentException(getMessage(MSG_USER_BLANK));
             }
             // check that there is a pwd to query..
             if (getPassword() == null) {
-                throw new IllegalArgumentException(getMessage("MSG_PASSWORD_BLANK"));
+                throw new IllegalArgumentException(getMessage(MSG_PASSWORD_BLANK));
             }
             // host required
             if (getJdbcUrlTemplate().contains("%h")) {
                 if (StringUtil.isBlank(getHost())) {
-                    throw new IllegalArgumentException(getMessage("MSG_HOST_BLANK"));
+                    throw new IllegalArgumentException(getMessage(MSG_HOST_BLANK));
                 }
             }
             // port required
             if (getJdbcUrlTemplate().contains("%p")) {
                 if (StringUtil.isBlank(getPort())) {
-                    throw new IllegalArgumentException(getMessage("MSG_PORT_BLANK"));
+                    throw new IllegalArgumentException(getMessage(MSG_PORT_BLANK));
                 }
             }
             // database required
             if (getJdbcUrlTemplate().contains("%d")) {
                 if (StringUtil.isBlank(getDatabase())) {
-                    throw new IllegalArgumentException(getMessage("MSG_DATABASE_BLANK"));
+                    throw new IllegalArgumentException(getMessage(MSG_DATABASE_BLANK));
                 }
             }
             // make sure the jdbcDriver is in the class path..
             if (StringUtil.isBlank(getJdbcDriver())) {
-                throw new IllegalArgumentException(getMessage("MSG_JDBC_DRIVER_BLANK"));
+                throw new IllegalArgumentException(getMessage(MSG_JDBC_DRIVER_BLANK));
             }
             try {
                 Class.forName(getJdbcDriver());
             } catch (ClassNotFoundException e) {
-                throw new IllegalArgumentException(getMessage("MSG_JDBC_DRIVER_NOT_FOUND"));
+                throw new IllegalArgumentException(getMessage(MSG_JDBC_DRIVER_NOT_FOUND));
             }
             LOG.ok("driver configuration is ok");
         } else {

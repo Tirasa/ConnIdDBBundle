@@ -23,6 +23,8 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_PASSWORD_BLANK;
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_USER_BLANK;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_AUTHENTICATE_OP_NOT_SUPPORTED;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_AUTH_FAILED;
@@ -35,10 +37,8 @@ import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_INVALID_SYNC_TOKEN_VALUE;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_MORE_USERS_DELETED;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_NAME_BLANK;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_PASSWORD_BLANK;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_RESULT_HANDLER_NULL;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_UID_BLANK;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_USER_BLANK;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -151,7 +151,7 @@ public class DatabaseTableConnector implements
     /**
      * Setup logging for the {@link DatabaseTableConnector}.
      */
-    private static Log LOG = Log.getLog(DatabaseTableConnector.class);
+    private static final Log LOG = Log.getLog(DatabaseTableConnector.class);
 
     /**
      * A "hashed password" attribute. If this attribute is "true" then the value supplied for
