@@ -40,8 +40,6 @@ public class DatabaseTableConstants {
     /** The default password encoding charset to use */
     public static final String DEFAULT_PASSWORD_CHARSET = "UTF-8";
 
-    public static final String MSG_ACCOUNT_OBJECT_CLASS_REQUIRED = "acount.object.class.required";
-
     public static final String MSG_AUTH_FAILED = "auth.op.failed";
 
     public static final String MSG_AUTHENTICATE_OP_NOT_SUPPORTED = "auth.op.not.supported";
@@ -55,8 +53,6 @@ public class DatabaseTableConstants {
     public static final String MSG_CAN_NOT_UPDATE = "can.not.update";
 
     public static final String MSG_CHANGELOG_COLUMN_BLANK = "changelog.column.blank";
-
-    public static final String MSG_INVALID_ATTRIBUTE_SET = "invalid.attribute.set";
 
     public static final String MSG_INVALID_QUOTING = "invalid.quoting";
 
@@ -84,11 +80,7 @@ public class DatabaseTableConstants {
 
     public static final String MSG_QUERY_INVALID = "query.invalid";
 
-    public static final String MSG_RESULT_HANDLER_NULL = "result.handler.null";
-
     public static final String MSG_TABLE_BLANK = "table.blank";
-
-    public static final String MSG_UID_BLANK = "uid.blank";
 
     private DatabaseTableConstants() {
         throw new AssertionError();

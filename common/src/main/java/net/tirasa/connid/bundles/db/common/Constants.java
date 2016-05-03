@@ -40,6 +40,14 @@ public final class Constants {
 
     public static final String MSG_JDBC_DRIVER_NOT_FOUND = "jdbc.driver.not.found";
 
+    public static final String MSG_ACCOUNT_OBJECT_CLASS_REQUIRED = "acount.object.class.required";
+
+    public static final String MSG_INVALID_ATTRIBUTE_SET = "invalid.attribute.set";
+
+    public static final String MSG_UID_BLANK = "uid.blank";
+
+    public static final String MSG_RESULT_HANDLER_NULL = "result.handler.null";
+
     private Constants() {
         // private constructor for static utility class
     }

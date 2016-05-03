@@ -1,18 +1,18 @@
-/* 
+/*
  * ====================
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
  * except in compliance with the License.
- * 
+ *
  * You can obtain a copy of the License at
  * http://opensource.org/licenses/cddl1.php
  * See the License for the specific language governing permissions and limitations
  * under the License.
- * 
+ *
  * When distributing the Covered Code, include this CDDL Header Notice in each file
  * and include the License file at http://opensource.org/licenses/cddl1.php.
  * If applicable, add the following below this CDDL Header, with the fields
@@ -23,9 +23,12 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED;
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_INVALID_ATTRIBUTE_SET;
 import static net.tirasa.connid.bundles.db.common.Constants.MSG_PASSWORD_BLANK;
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_RESULT_HANDLER_NULL;
+import static net.tirasa.connid.bundles.db.common.Constants.MSG_UID_BLANK;
 import static net.tirasa.connid.bundles.db.common.Constants.MSG_USER_BLANK;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_AUTHENTICATE_OP_NOT_SUPPORTED;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_AUTH_FAILED;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_CREATE;
@@ -33,12 +36,9 @@ import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_READ;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_UPDATE;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CHANGELOG_COLUMN_BLANK;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_INVALID_ATTRIBUTE_SET;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_INVALID_SYNC_TOKEN_VALUE;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_MORE_USERS_DELETED;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_NAME_BLANK;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_RESULT_HANDLER_NULL;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_UID_BLANK;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -1390,12 +1390,10 @@ public class DatabaseTableConnector implements
                 if (param != null && param.getValue() != null) {
                     bld.addAttribute(AttributeBuilder.buildEnabled(isEnabled(param.getValue().toString())));
                 }
+            } else if (param != null && param.getValue() != null) {
+                bld.addAttribute(AttributeBuilder.build(columnName, param.getValue()));
             } else {
-                if (param != null && param.getValue() != null) {
-                    bld.addAttribute(AttributeBuilder.build(columnName, param.getValue()));
-                } else {
-                    bld.addAttribute(AttributeBuilder.build(columnName));
-                }
+                bld.addAttribute(AttributeBuilder.build(columnName));
             }
         }
 
@@ -1562,39 +1560,37 @@ public class DatabaseTableConnector implements
                     tokenVal = new Timestamp(DatabaseTableSQLUtil.tsAsLong(value.toString()));
                 }
                 builder.addBind(new SQLParam(quoteName(cname), tokenVal, sqlType));
-            } else {
-                if (cname.equalsIgnoreCase(config.getStatusColumn())) {
+            } else if (cname.equalsIgnoreCase(config.getStatusColumn())) {
+                builder.addBind(new SQLParam(
+                        quoteName(cname),
+                        getStatusColumnValue(value.toString()),
+                        sqlType));
+            } else if (cname.equalsIgnoreCase(config.getPasswordColumn())) {
+
+                if (hashedPassword) {
+                    final String[] password = { null };
+                    ((GuardedString) value).access(new GuardedString.Accessor() {
+
+                        @Override
+                        public void access(char[] clearChars) {
+                            password[0] = new String(clearChars);
+                        }
+                    });
+                    String encodedPassword = changeCaseOfEncodedPassword(password[0]);
+                    // password encryption                  
                     builder.addBind(new SQLParam(
                             quoteName(cname),
-                            getStatusColumnValue(value.toString()),
+                            new GuardedString(encodedPassword.toCharArray()),
                             sqlType));
-                } else if (cname.equalsIgnoreCase(config.getPasswordColumn())) {
-
-                    if (hashedPassword) {
-                        final String[] password = { null };
-                        ((GuardedString) value).access(new GuardedString.Accessor() {
-
-                            @Override
-                            public void access(char[] clearChars) {
-                                password[0] = new String(clearChars);
-                            }
-                        });
-                        String encodedPassword = changeCaseOfEncodedPassword(password[0]);
-                        // password encryption                  
-                        builder.addBind(new SQLParam(
-                                quoteName(cname),
-                                new GuardedString(encodedPassword.toCharArray()),
-                                sqlType));
-                    } else {
-                        // password encryption                  
-                        builder.addBind(new SQLParam(
-                                quoteName(cname),
-                                encodePassword((GuardedString) value),
-                                sqlType));
-                    }
                 } else {
-                    builder.addBind(new SQLParam(quoteName(cname), value, sqlType));
+                    // password encryption                  
+                    builder.addBind(new SQLParam(
+                            quoteName(cname),
+                            encodePassword((GuardedString) value),
+                            sqlType));
                 }
+            } else {
+                builder.addBind(new SQLParam(quoteName(cname), value, sqlType));
             }
         } catch (Throwable t) {
             LOG.error(t, "Error parsing value '{0}' of attribute {1}:{2}", value, cname, sqlType);
