@@ -341,6 +341,8 @@ public class ScriptedSQLConnector implements PoolableConnector, AuthenticateOp, 
         }
         if (schemaExecutor != null) {
             Map<String, Object> arguments = new HashMap<String, Object>();
+
+            arguments.put("connection", connection.getSqlConnection());
             arguments.put("action", "SCHEMA");
             arguments.put("log", LOG);
             arguments.put("builder", scmb);
