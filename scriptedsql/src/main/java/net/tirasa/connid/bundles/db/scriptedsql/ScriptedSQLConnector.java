@@ -52,6 +52,7 @@ import org.identityconnectors.framework.spi.Configuration;
 import org.identityconnectors.framework.spi.Connector;
 import org.identityconnectors.framework.spi.ConnectorClass;
 import org.identityconnectors.framework.spi.PoolableConnector;
+import org.identityconnectors.framework.spi.SearchResultsHandler;
 import org.identityconnectors.framework.spi.operations.*;
 
 /**
@@ -242,7 +243,7 @@ public class ScriptedSQLConnector implements PoolableConnector, AuthenticateOp, 
                 attrMap.put(attr.getName(), attr.getValue());
             }
             // let's get rid of __NAME__
-            attrMap.remove("__NAME__");
+            attrMap.remove(Name.NAME);
             arguments.put("attributes", attrMap);
 
             // Password - if allowed we provide it in clear
@@ -545,35 +546,53 @@ public class ScriptedSQLConnector implements PoolableConnector, AuthenticateOp, 
      */
     private void processResults(ObjectClass objClass, List<Map<String, Object>> results, ResultsHandler handler) {
         // Let's iterate over the results:
+        String pagedResultCookie = null;
         for (Map<String, Object> result : results) {
-            ConnectorObjectBuilder cobld = new ConnectorObjectBuilder();
-            for (Map.Entry<String, Object> entry : result.entrySet()) {
-                final String attrName = entry.getKey();
-                final Object attrValue = entry.getValue();
-                // Special first
-                if (attrName.equalsIgnoreCase("__UID__")) {
-                    if (attrValue == null) {
-                        throw new IllegalArgumentException("Uid cannot be null");
-                    }
-                    cobld.setUid(attrValue.toString());
-                } else if (attrName.equalsIgnoreCase("__NAME__")) {
-                    if (attrValue == null) {
-                        throw new IllegalArgumentException("Name cannot be null");
-                    }
-                    cobld.setName(attrValue.toString());
-                } else if (attrName.equalsIgnoreCase("password")) {
-                    // is there a chance we fetch password from search?
-                } else if (attrValue instanceof Collection) {
-                    cobld.addAttribute(AttributeBuilder.build(attrName, (Collection<?>) attrValue));
-                } else if (attrValue != null) {
-                    cobld.addAttribute(AttributeBuilder.build(attrName, attrValue));
-                } else {
-                    cobld.addAttribute(AttributeBuilder.build(attrName));
+            // special handling of paged result cookie
+            if (result.size() == 1) {
+                Map.Entry<String, Object> entry = result.entrySet().iterator().next();
+                if (OperationOptions.OP_PAGED_RESULTS_COOKIE.equalsIgnoreCase(entry.getKey())
+                        && entry.getValue() != null) {
+
+                    pagedResultCookie = entry.getValue().toString();
                 }
+            } else {
+                ConnectorObjectBuilder cobld = new ConnectorObjectBuilder();
+                for (Map.Entry<String, Object> entry : result.entrySet()) {
+                    final String attrName = entry.getKey();
+                    final Object attrValue = entry.getValue();
+                    // Special first
+                    if (Uid.NAME.equalsIgnoreCase(attrName)) {
+                        if (attrValue == null) {
+                            throw new IllegalArgumentException("Uid cannot be null");
+                        }
+                        cobld.setUid(attrValue.toString());
+                    } else if (Name.NAME.equalsIgnoreCase(attrName)) {
+                        if (attrValue == null) {
+                            throw new IllegalArgumentException("Name cannot be null");
+                        }
+                        cobld.setName(attrValue.toString());
+                    } else if (attrName.equalsIgnoreCase("password")) {
+                        // is there a chance we fetch password from search?
+                    } else if (attrValue instanceof Collection) {
+                        cobld.addAttribute(AttributeBuilder.build(attrName, (Collection<?>) attrValue));
+                    } else if (attrValue != null) {
+                        cobld.addAttribute(AttributeBuilder.build(attrName, attrValue));
+                    } else {
+                        cobld.addAttribute(AttributeBuilder.build(attrName));
+                    }
+                }
+                cobld.setObjectClass(objClass);
+                handler.handle(cobld.build());
+                LOG.ok("ConnectorObject is built");
             }
-            cobld.setObjectClass(objClass);
-            handler.handle(cobld.build());
-            LOG.ok("ConnectorObject is built");
+        }
+
+        if (handler instanceof SearchResultsHandler) {
+            SearchResultsHandler.class.cast(handler).handleResult(new SearchResult(pagedResultCookie, -1));
+        } else {
+            LOG.warn("Not expected, but found {0}: {1}",
+                    OperationOptions.OP_PAGED_RESULTS_COOKIE, pagedResultCookie);
         }
     }
 
