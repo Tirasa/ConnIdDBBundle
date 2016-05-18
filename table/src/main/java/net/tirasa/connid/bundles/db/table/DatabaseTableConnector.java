@@ -113,36 +113,19 @@ import org.identityconnectors.framework.spi.operations.TestOp;
 import org.identityconnectors.framework.spi.operations.UpdateOp;
 
 /**
- *
  * The database table {@link DatabaseTableConnector} is a basic, but easy to use {@link DatabaseTableConnector} for
- *
  * accounts in a relational database.
- * <p>
  * It supports create, update, search, and delete operations. It can also be used
- *
  * for pass-thru authentication, although it assumes the password is in clear text in the database.
- * <p>
- * This connector
- *
- * assumes that all account data is stored in a single database table. The delete action is implemented to simply remove
- *
- * the row from the table.
- * <p>
- *
- *
+ * This connector assumes that all account data is stored in a single database table. The delete action is implemented
+ * to simply remove the row from the table.
  *
  * @author Will Droste
- *
  * @author Keith Yarbrough
- *
  * @version $Revision $
- *
  * @since 1.0
- *
  */
-@ConnectorClass(displayNameKey = "DBTABLE_CONNECTOR",
-        configurationClass = DatabaseTableConfiguration.class)
-
+@ConnectorClass(displayNameKey = "DBTABLE_CONNECTOR", configurationClass = DatabaseTableConfiguration.class)
 public class DatabaseTableConnector implements
         PoolableConnector, CreateOp, SearchOp<FilterWhereBuilder>,
         DeleteOp, UpdateOp, SchemaOp, TestOp, AuthenticateOp, SyncOp,
@@ -155,9 +138,7 @@ public class DatabaseTableConnector implements
 
     /**
      * A "hashed password" attribute. If this attribute is "true" then the value supplied for
-     *
      * the password attribute is assumed to be hashed according to the defined password digest
-     *
      * algorithm, and hence is not hashed (again).
      */
     private static final String HASHED_PASSWORD_ATTRIBUTE = AttributeUtil.createSpecialName("HASHED_PASSWORD");
@@ -262,6 +243,10 @@ public class DatabaseTableConnector implements
 
     /**
      * Creates a row in the database representing an account.
+     *
+     * @param oclass
+     * @param attrs
+     * @param options
      */
     @Override
     public Uid create(final ObjectClass oclass, final Set<Attribute> attrs, final OperationOptions options) {
@@ -413,6 +398,10 @@ public class DatabaseTableConnector implements
 
     /**
      * Deletes a row from the table.
+     *
+     * @param oclass
+     * @param uid
+     * @param options
      */
     @Override
     public void delete(final ObjectClass oclass, final Uid uid, final OperationOptions options) {
@@ -477,10 +466,17 @@ public class DatabaseTableConnector implements
 
     /**
      * Update the database row with the data provided.
+     *
+     * @param oclass
+     * @param attrs
+     * @param options
      */
     @Override
     public Uid update(
-            final ObjectClass oclass, final Uid uid, final Set<Attribute> attrs, final OperationOptions options) {
+            final ObjectClass oclass,
+            final Uid uid,
+            final Set<Attribute> attrs,
+            final OperationOptions options) {
 
         LOG.info("update account, check the ObjectClass");
         final String SQL_TEMPLATE = "UPDATE {0} SET {1} WHERE {2} = ?";
@@ -578,6 +574,9 @@ public class DatabaseTableConnector implements
 
     /**
      * Creates a Database Table filter translator.
+     *
+     * @param oclass
+     * @param options
      */
     @Override
     public FilterTranslator<FilterWhereBuilder> createFilterTranslator(
@@ -593,9 +592,17 @@ public class DatabaseTableConnector implements
 
     /**
      * Search for rows.
+     *
+     * @param oclass
+     * @param where
+     * @param handler
+     * @param options
      */
     @Override
-    public void executeQuery(final ObjectClass oclass, final FilterWhereBuilder where, final ResultsHandler handler,
+    public void executeQuery(
+            final ObjectClass oclass,
+            final FilterWhereBuilder where,
+            final ResultsHandler handler,
             final OperationOptions options) {
 
         LOG.info("check the ObjectClass and result handler");
@@ -911,6 +918,11 @@ public class DatabaseTableConnector implements
 
     /**
      * Attempts to authenticate the given username combination.
+     *
+     * @param oclass
+     * @param username
+     * @param password
+     * @param options
      */
     @Override
     public Uid authenticate(
@@ -918,6 +930,7 @@ public class DatabaseTableConnector implements
             final String username,
             final GuardedString password,
             final OperationOptions options) {
+
         final String SQL_AUTH_QUERY = "SELECT {0} FROM {1} WHERE ( {0} = ? ) AND ( {2} = ? )";
 
         LOG.info("check the ObjectClass");
@@ -1006,9 +1019,13 @@ public class DatabaseTableConnector implements
 
     /**
      * Attempts to resolve the given username.
+     *
+     * @param oclass
+     * @param username
+     * @param options
      */
     @Override
-    public Uid resolveUsername(ObjectClass oclass, String username, OperationOptions options) {
+    public Uid resolveUsername(final ObjectClass oclass, final String username, final OperationOptions options) {
         final String SQL_AUTH_QUERY = "SELECT {0} FROM {1} WHERE ( {0} = ? )";
 
         LOG.info("check the ObjectClass");
