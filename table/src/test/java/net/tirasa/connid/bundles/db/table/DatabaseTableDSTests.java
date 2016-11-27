@@ -1,18 +1,18 @@
-/* 
+/*
  * ====================
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
  * except in compliance with the License.
- * 
+ *
  * You can obtain a copy of the License at
  * http://opensource.org/licenses/cddl1.php
  * See the License for the specific language governing permissions and limitations
  * under the License.
- * 
+ *
  * When distributing the Covered Code, include this CDDL Header Notice in each file
  * and include the License file at http://opensource.org/licenses/cddl1.php.
  * If applicable, add the following below this CDDL Header, with the fields
@@ -69,18 +69,15 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
         config.setPasswordColumn(PASSWORDCOLUMN);
         config.setPasswordCharset(PASSWORD_CHARSETNAME);
         config.setConnectorMessages(TestHelpers.createDummyMessages());
-
         // status fields configuration
         config.setStatusColumn(STATUS);
         config.setEnabledStatusValue(ENABLEDSTATUS);
         config.setEnabledStatusValue(DISABLEDSTATUS);
         config.setDefaultStatusValue(DEFAULTSTATUS);
-
         // password managemnet configuration
         config.setCipherAlgorithm(AES.class.getName());
         config.setCipherKey("cipherkeytoencodeanddecodepassword");
         config.setRetrievePassword(true);
-
         return config;
     }
 
@@ -92,7 +89,6 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
         @Override
         public Context getInitialContext(final @SuppressWarnings("rawtypes") java.util.Hashtable environment)
                 throws NamingException {
-
             return (Context) Proxy.newProxyInstance(
                     getClass().getClassLoader(),
                     new Class<?>[] { Context.class },
@@ -116,7 +112,6 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
                         new Class<?>[] { DataSource.class },
                         new DataSourceIH());
             }
-
             return null;
         }
     }
@@ -130,11 +125,9 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args)
                 throws Throwable {
-
             if (method.getName().equals("getConnection")) {
                 return DriverManager.getConnection(URL, USER, PASSWD);
             }
-
             throw new IllegalArgumentException("DataSource, invalid method:" + method.getName());
         }
     }

@@ -27,10 +27,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-
+import net.tirasa.connid.commons.db.SQLParam;
+import net.tirasa.connid.commons.db.SQLUtil;
 import org.identityconnectors.common.Assertions;
-import net.tirasa.connid.bundles.db.common.SQLParam;
-import net.tirasa.connid.bundles.db.common.SQLUtil;
 
 /**
  * The SQL get/set strategy class implementation.
@@ -38,7 +37,7 @@ import net.tirasa.connid.bundles.db.common.SQLUtil;
  */
 public class StringStrategy implements MappingStrategy {
 
-    private MappingStrategy delegate;
+    private final MappingStrategy delegate;
 
     /**
      * The SQL get/set strategy class implementation write as a string all types mapped as a String.

@@ -23,12 +23,6 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED;
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_INVALID_ATTRIBUTE_SET;
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_PASSWORD_BLANK;
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_RESULT_HANDLER_NULL;
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_UID_BLANK;
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_USER_BLANK;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_AUTHENTICATE_OP_NOT_SUPPORTED;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_AUTH_FAILED;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_CREATE;
@@ -39,6 +33,12 @@ import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_INVALID_SYNC_TOKEN_VALUE;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_MORE_USERS_DELETED;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_NAME_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED;
+import static net.tirasa.connid.commons.db.Constants.MSG_INVALID_ATTRIBUTE_SET;
+import static net.tirasa.connid.commons.db.Constants.MSG_PASSWORD_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_RESULT_HANDLER_NULL;
+import static net.tirasa.connid.commons.db.Constants.MSG_UID_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_USER_BLANK;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -66,14 +66,14 @@ import net.tirasa.connid.bundles.db.table.security.SupportedAlgorithm;
 import net.tirasa.connid.bundles.db.table.security.UnsupportedPasswordCharsetException;
 import net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants;
 import net.tirasa.connid.bundles.db.table.util.DatabaseTableSQLUtil;
-import net.tirasa.connid.bundles.db.common.DatabaseQueryBuilder;
-import net.tirasa.connid.bundles.db.common.FilterWhereBuilder;
-import net.tirasa.connid.bundles.db.common.InsertIntoBuilder;
-import net.tirasa.connid.bundles.db.common.SQLParam;
-import net.tirasa.connid.bundles.db.common.SQLUtil;
-import net.tirasa.connid.bundles.db.common.UpdateSetBuilder;
-import net.tirasa.connid.bundles.db.common.DatabaseQueryBuilder.OrderBy;
-import net.tirasa.connid.bundles.db.common.OperationBuilder;
+import net.tirasa.connid.commons.db.DatabaseQueryBuilder;
+import net.tirasa.connid.commons.db.DatabaseQueryBuilder.OrderBy;
+import net.tirasa.connid.commons.db.FilterWhereBuilder;
+import net.tirasa.connid.commons.db.InsertIntoBuilder;
+import net.tirasa.connid.commons.db.OperationBuilder;
+import net.tirasa.connid.commons.db.SQLParam;
+import net.tirasa.connid.commons.db.SQLUtil;
+import net.tirasa.connid.commons.db.UpdateSetBuilder;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.exceptions.InvalidCredentialException;
 import org.identityconnectors.framework.common.exceptions.UnknownUidException;

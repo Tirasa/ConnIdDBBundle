@@ -27,9 +27,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-
+import net.tirasa.connid.commons.db.SQLParam;
 import org.identityconnectors.common.Assertions;
-import net.tirasa.connid.bundles.db.common.SQLParam;
 
 /**
  * The SQL get/set strategy class implementation read native timestamps, and convert the value to the string

@@ -23,19 +23,18 @@
  */
 package net.tirasa.connid.bundles.db.scriptedsql;
 
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_DATABASE_BLANK;
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_HOST_BLANK;
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_JDBC_DRIVER_BLANK;
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_JDBC_DRIVER_NOT_FOUND;
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_JDBC_TEMPLATE_BLANK;
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_PASSWORD_BLANK;
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_PORT_BLANK;
-import static net.tirasa.connid.bundles.db.common.Constants.MSG_USER_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_DATABASE_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_HOST_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_JDBC_DRIVER_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_JDBC_DRIVER_NOT_FOUND;
+import static net.tirasa.connid.commons.db.Constants.MSG_JDBC_TEMPLATE_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_PASSWORD_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_PORT_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_USER_BLANK;
 
-import java.io.File;
-import net.tirasa.connid.bundles.db.common.JNDIUtil;
+import net.tirasa.connid.commons.db.JNDIUtil;
+import net.tirasa.connid.commons.scripted.AbstractScriptedConfiguration;
 import org.identityconnectors.common.StringUtil;
-import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.framework.spi.AbstractConfiguration;
 import org.identityconnectors.framework.spi.ConfigurationProperty;
@@ -44,12 +43,7 @@ import org.identityconnectors.framework.spi.ConfigurationProperty;
  * Extends the {@link AbstractConfiguration} class to provide all the necessary parameters to initialize the
  * ScriptedJDBC Connector.
  */
-public class ScriptedSQLConfiguration extends AbstractConfiguration {
-
-    /**
-     * Setup logging for the {@link ScriptedSQLConfiguration}.
-     */
-    private static final Log LOG = Log.getLog(ScriptedSQLConfiguration.class);
+public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
 
     public static final String EMPTY_STR = "";
 
@@ -460,380 +454,6 @@ public class ScriptedSQLConfiguration extends AbstractConfiguration {
     public void setJndiProperties(String[] value) {
         this.jndiProperties = value;
     }
-    // =======================================================================
-    // Scripts
-    // =======================================================================
-
-    /**
-     * Scripting language
-     */
-    private String scriptingLanguage = "GROOVY";
-
-    /**
-     * Return the scripting language string
-     *
-     * @return adapterCompat value
-     */
-    public String getScriptingLanguage() {
-        return scriptingLanguage;
-    }
-
-    /**
-     * Set the scripting language string
-     *
-     * @param value
-     */
-    public void setScriptingLanguage(String value) {
-        this.scriptingLanguage = value;
-    }
-
-    /**
-     * Should password be passed to scripts in clear text?
-     */
-    private boolean clearTextPasswordToScript = true;
-
-    /**
-     * Return the clearTextPasswordToScript boolean
-     *
-     * @return value
-     */
-    public boolean getClearTextPasswordToScript() {
-        return clearTextPasswordToScript;
-    }
-
-    /**
-     * Set the clearTextPasswordToScript value
-     *
-     * @param value
-     */
-    public void setClearTextPasswordToScript(boolean value) {
-        this.clearTextPasswordToScript = value;
-    }
-
-    /**
-     * By default, scripts are loaded and compiled when a connector instance
-     * is created and initialized. Setting reloadScriptOnExecution to true will
-     * make the connector load and compile the script every time it is called.
-     * Use only for test/debug purpose since this can have a significant impact on performance.
-     */
-    private boolean reloadScriptOnExecution = false;
-
-    /**
-     * Accessor for the reloadScriptOnExecution property
-     *
-     * @return the autoCommit
-     */
-    public boolean isReloadScriptOnExecution() {
-        return reloadScriptOnExecution;
-    }
-
-    /**
-     * Setter for the reloadScriptOnExecution property.
-     *
-     * @param reloadScriptOnExecution
-     */
-    public void setReloadScriptOnExecution(boolean reloadScriptOnExecution) {
-        this.reloadScriptOnExecution = reloadScriptOnExecution;
-    }
-
-    /**
-     * Create script string
-     */
-    private String createScript = "";
-
-    /**
-     * Return the Create script string
-     *
-     * @return value
-     */
-    public String getCreateScript() {
-        return createScript;
-    }
-
-    /**
-     * Set the Create script string
-     *
-     * @param value
-     */
-    public void setCreateScript(String value) {
-        this.createScript = value;
-    }
-
-    /**
-     * Update script string
-     */
-    private String updateScript = "";
-
-    /**
-     * Return the Update script string
-     *
-     * @return updateScript value
-     */
-    public String getUpdateScript() {
-        return updateScript;
-    }
-
-    /**
-     * Set the Update script string
-     *
-     * @param value
-     */
-    public void setUpdateScript(String value) {
-        this.updateScript = value;
-    }
-
-    /**
-     * Delete script string
-     */
-    private String deleteScript = "";
-
-    /**
-     * Return the Delete script string
-     *
-     * @return deleteScript value
-     */
-    public String getDeleteScript() {
-        return deleteScript;
-    }
-
-    /**
-     * Set the Delete script string
-     *
-     * @param value
-     */
-    public void setDeleteScript(String value) {
-        this.deleteScript = value;
-    }
-
-    /**
-     * Search script string
-     */
-    private String searchScript = "";
-
-    /**
-     * Return the Search script string
-     *
-     * @return searchScript value
-     */
-    public String getSearchScript() {
-        return searchScript;
-    }
-
-    /**
-     * Set the Search script string
-     *
-     * @param value
-     */
-    public void setSearchScript(String value) {
-        this.searchScript = value;
-    }
-
-    /**
-     * Sync script string
-     */
-    private String syncScript = "";
-
-    /**
-     * Return the Sync script string
-     *
-     * @return syncScript value
-     */
-    public String getSyncScript() {
-        return syncScript;
-    }
-
-    /**
-     * Set the Sync script string
-     *
-     * @param value
-     */
-    public void setSyncScript(String value) {
-        this.syncScript = value;
-    }
-
-    /**
-     * Test script string
-     */
-    private String testScript = "";
-
-    /**
-     * Return the Test script string
-     *
-     * @return testScript value
-     */
-    public String getTestScript() {
-        return testScript;
-    }
-
-    /**
-     * Set the Test script string
-     *
-     * @param value
-     */
-    public void setTestScript(String value) {
-        this.testScript = value;
-    }
-
-    /**
-     * Create script filename
-     */
-    private String createScriptFileName = null;
-
-    /**
-     * Return the Create script FileName
-     *
-     * @return value
-     */
-    public String getCreateScriptFileName() {
-        return createScriptFileName;
-    }
-
-    /**
-     * Set the Create script FileName
-     *
-     * @param value
-     */
-    public void setCreateScriptFileName(String value) {
-        this.createScriptFileName = value;
-    }
-
-    /**
-     * Update script FileName
-     */
-    private String updateScriptFileName = null;
-
-    /**
-     * Return the Update script FileName
-     *
-     * @return updateScriptFileName value
-     */
-    public String getUpdateScriptFileName() {
-        return updateScriptFileName;
-    }
-
-    /**
-     * Set the Update script FileName
-     *
-     * @param value
-     */
-    public void setUpdateScriptFileName(String value) {
-        this.updateScriptFileName = value;
-    }
-
-    /**
-     * Delete script FileName
-     */
-    private String deleteScriptFileName = null;
-
-    /**
-     * Return the Delete script FileName
-     *
-     * @return deleteScriptFileName value
-     */
-    public String getDeleteScriptFileName() {
-        return deleteScriptFileName;
-    }
-
-    /**
-     * Set the Delete script FileName
-     *
-     * @param value
-     */
-    public void setDeleteScriptFileName(String value) {
-        this.deleteScriptFileName = value;
-    }
-
-    /**
-     * Search script FileName
-     */
-    private String searchScriptFileName = null;
-
-    /**
-     * Return the Search script FileName
-     *
-     * @return searchScriptFileName value
-     */
-    public String getSearchScriptFileName() {
-        return searchScriptFileName;
-    }
-
-    /**
-     * Set the Search script FileName
-     *
-     * @param value
-     */
-    public void setSearchScriptFileName(String value) {
-        this.searchScriptFileName = value;
-    }
-
-    /**
-     * Sync script FileName
-     */
-    private String syncScriptFileName = null;
-
-    /**
-     * Return the Sync script FileName
-     *
-     * @return syncScriptFileName value
-     */
-    public String getSyncScriptFileName() {
-        return syncScriptFileName;
-    }
-
-    /**
-     * Set the Sync script FileName
-     *
-     * @param value
-     */
-    public void setSyncScriptFileName(String value) {
-        this.syncScriptFileName = value;
-    }
-
-    /**
-     * Schema script FileName
-     */
-    private String schemaScriptFileName = null;
-
-    /**
-     * Return the Schema script FileName
-     *
-     * @return schemaScriptFileName value
-     */
-    public String getSchemaScriptFileName() {
-        return schemaScriptFileName;
-    }
-
-    /**
-     * Set the Schema script FileName
-     *
-     * @param value
-     */
-    public void setSchemaScriptFileName(String value) {
-        this.schemaScriptFileName = value;
-    }
-
-    /**
-     * Test script FileName
-     */
-    private String testScriptFileName = null;
-
-    /**
-     * Return the Test script FileName
-     *
-     * @return testScriptFileName value
-     */
-    public String getTestScriptFileName() {
-        return testScriptFileName;
-    }
-
-    /**
-     * Set the Test script FileName
-     *
-     * @param value
-     */
-    public void setTestScriptFileName(String value) {
-        this.testScriptFileName = value;
-    }
 
     // =======================================================================
     // Configuration Interface
@@ -843,7 +463,8 @@ public class ScriptedSQLConfiguration extends AbstractConfiguration {
      */
     @Override
     public void validate() {
-        LOG.info("Validate ScriptedSQLConfiguration");
+        LOG.info("Validate " + getClass().getName());
+
         // check the url is configured
         if (StringUtil.isBlank(getJdbcUrlTemplate())) {
             throw new IllegalArgumentException(getMessage(MSG_JDBC_TEMPLATE_BLANK));
@@ -895,19 +516,7 @@ public class ScriptedSQLConfiguration extends AbstractConfiguration {
             LOG.ok("datasource configuration is ok");
         }
 
-        // Validate the actions
-        LOG.info("Checking Create Script filename");
-        checkFileIsReadable("Create", getCreateScriptFileName());
-        LOG.info("Checking Update Script filename");
-        checkFileIsReadable("Update", getUpdateScriptFileName());
-        LOG.info("Checking Delete Script filename");
-        checkFileIsReadable("Delete", getDeleteScriptFileName());
-        LOG.info("Checking Search Script filename");
-        checkFileIsReadable("Search", getSearchScriptFileName());
-        LOG.info("Checking Sync Script filename");
-        checkFileIsReadable("Sync", getSyncScriptFileName());
-        LOG.info("Checking Test Script filename");
-        checkFileIsReadable("Test", getTestScriptFileName());
+        super.validate();
 
         LOG.ok("Configuration is valid");
     }
@@ -930,14 +539,21 @@ public class ScriptedSQLConfiguration extends AbstractConfiguration {
             } else if (i + 1 < len) {
                 i++;
                 ch = url.charAt(i);
-                if (ch == '%') {
-                    b.append(ch);
-                } else if (ch == 'h') {
-                    b.append(getHost());
-                } else if (ch == 'p') {
-                    b.append(getPort());
-                } else if (ch == 'd') {
-                    b.append(getDatabase());
+                switch (ch) {
+                    case '%':
+                        b.append(ch);
+                        break;
+                    case 'h':
+                        b.append(getHost());
+                        break;
+                    case 'p':
+                        b.append(getPort());
+                        break;
+                    case 'd':
+                        b.append(getDatabase());
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -956,35 +572,5 @@ public class ScriptedSQLConfiguration extends AbstractConfiguration {
         final String fmt = getConnectorMessages().format(key, key);
         LOG.ok("Get for a key {0} connector message {1}", key, fmt);
         return fmt;
-    }
-
-    /**
-     * Format message with arguments
-     *
-     * @param key key of the message
-     * @param objects arguments
-     * @return the localized message string
-     */
-    public String getMessage(String key, Object... objects) {
-        final String fmt = getConnectorMessages().format(key, key, objects);
-        LOG.ok("Get for a key {0} connector message {1}", key, fmt);
-        return fmt;
-    }
-
-    private void checkFileIsReadable(final String type, final String fileName) {
-        if (fileName == null) {
-            LOG.info("{0} Script Filename is null", type);
-        } else {
-            File file = new File(ScriptedSQLConnector.resolveVariables(fileName));
-            try {
-                if (file.canRead()) {
-                    LOG.ok("{0} is readable", fileName);
-                } else {
-                    throw new IllegalArgumentException("Can't read " + fileName);
-                }
-            } catch (SecurityException e) {
-                throw new IllegalArgumentException("Can't read " + fileName, e);
-            }
-        }
     }
 }

@@ -30,7 +30,7 @@
   <parent>
     <groupId>net.tirasa.connid</groupId>
     <artifactId>connid</artifactId>
-    <version>1.4.0.0</version>
+    <version>1.4.1.0</version>
   </parent>
 
   <groupId>net.tirasa.connid.bundles.db</groupId>
@@ -81,22 +81,22 @@
   </mailingLists>
 
   <properties>
-    <connid.version>1.4.0.0</connid.version>
+    <connid.version>1.4.1.0</connid.version>
+    <commons.version>1.4.1.0-SNAPSHOT</commons.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencyManagement>
     <dependencies>            
       <dependency>
-        <groupId>net.tirasa.connid</groupId>
-        <artifactId>connector-framework</artifactId>
-        <version>${connid.version}</version>
+        <groupId>net.tirasa.connid.commons</groupId>
+        <artifactId>commons-db</artifactId>
+        <version>${commons.version}</version>
       </dependency>
-
       <dependency>
-        <groupId>net.tirasa.connid</groupId>
-        <artifactId>connector-framework-internal</artifactId>
-        <version>${connid.version}</version>
+        <groupId>net.tirasa.connid.commons</groupId>
+        <artifactId>commons-scripted</artifactId>
+        <version>${commons.version}</version>
       </dependency>
 
       <!-- TEST -->
@@ -138,7 +138,6 @@
   </build>
 
   <modules>
-    <module>common</module>
     <module>table</module>
     <module>scriptedsql</module>
   </modules>
