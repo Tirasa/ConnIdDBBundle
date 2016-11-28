@@ -23,7 +23,7 @@
  */
 package net.tirasa.connid.bundles.db.scriptedsql;
 
-import static net.tirasa.connid.commons.db.Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED;
+import static net.tirasa.connid.commons.scripted.Constants.MSG_OBJECT_CLASS_REQUIRED;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -93,7 +93,7 @@ public class ScriptedSQLConnector extends AbstractScriptedConnector<ScriptedSQLC
             final ObjectClass objClass, final OperationOptions options) {
 
         if (objClass == null) {
-            throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
+            throw new IllegalArgumentException(config.getMessage(MSG_OBJECT_CLASS_REQUIRED));
         }
         LOG.ok("ObjectClass: {0}", objClass.getObjectClassValue());
         return new ScriptedSQLFilterTranslator();
