@@ -61,7 +61,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      *
      * @return quoting value
      */
-    @ConfigurationProperty(displayMessageKey = "QUOTING_DISPLAY", helpMessageKey = "QUOTING_HELP")
+    @ConfigurationProperty(order = -15, displayMessageKey = "QUOTING_DISPLAY", helpMessageKey = "QUOTING_HELP")
     public String getQuoting() {
         return this.quoting;
     }
@@ -85,7 +85,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      *
      * @return host value
      */
-    @ConfigurationProperty(order = 2, displayMessageKey = "HOST_DISPLAY", helpMessageKey = "HOST_HELP")
+    @ConfigurationProperty(order = -14, displayMessageKey = "HOST_DISPLAY", helpMessageKey = "HOST_HELP")
     public String getHost() {
         return this.host;
     }
@@ -109,7 +109,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      *
      * @return port value
      */
-    @ConfigurationProperty(order = 3, displayMessageKey = "PORT_DISPLAY", helpMessageKey = "PORT_HELP")
+    @ConfigurationProperty(order = -13, displayMessageKey = "PORT_DISPLAY", helpMessageKey = "PORT_HELP")
     public String getPort() {
         return this.port;
     }
@@ -134,7 +134,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
     /**
      * @return user value
      */
-    @ConfigurationProperty(order = 4, displayMessageKey = "USER_DISPLAY", helpMessageKey = "USER_HELP")
+    @ConfigurationProperty(order = -12, displayMessageKey = "USER_DISPLAY", helpMessageKey = "USER_HELP")
     public String getUser() {
         return this.user;
     }
@@ -157,7 +157,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
     /**
      * @return password value
      */
-    @ConfigurationProperty(order = 5, confidential = true,
+    @ConfigurationProperty(order = -11, confidential = true,
             displayMessageKey = "PASSWORD_DISPLAY", helpMessageKey = "PASSWORD_HELP")
     public GuardedString getPassword() {
         return this.password;
@@ -178,7 +178,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
     /**
      * @return user value
      */
-    @ConfigurationProperty(order = 6, displayMessageKey = "DATABASE_DISPLAY", helpMessageKey = "DATABASE_HELP")
+    @ConfigurationProperty(order = -10, displayMessageKey = "DATABASE_DISPLAY", helpMessageKey = "DATABASE_HELP")
     public String getDatabase() {
         return this.database;
     }
@@ -207,7 +207,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
     /**
      * @return jdbcDriver value
      */
-    @ConfigurationProperty(order = 10, displayMessageKey = "JDBC_DRIVER_DISPLAY", helpMessageKey = "JDBC_DRIVER_HELP")
+    @ConfigurationProperty(order = -9, displayMessageKey = "JDBC_DRIVER_DISPLAY", helpMessageKey = "JDBC_DRIVER_HELP")
     public String getJdbcDriver() {
         return this.jdbcDriver;
     }
@@ -237,7 +237,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      *
      * @return url value
      */
-    @ConfigurationProperty(order = 11, displayMessageKey = "URL_TEMPLATE_DISPLAY", helpMessageKey = "URL_TEMPLATE_HELP")
+    @ConfigurationProperty(order = -8, displayMessageKey = "URL_TEMPLATE_DISPLAY", helpMessageKey = "URL_TEMPLATE_HELP")
     public String getJdbcUrlTemplate() {
         return jdbcUrlTemplate;
     }
@@ -260,6 +260,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      *
      * @return the autoCommit
      */
+    @ConfigurationProperty(order = -7, displayMessageKey = "AUTO_COMMIT_DISPLAY", helpMessageKey = "AUTO_COMMIT_HELP")
     public boolean isAutoCommit() {
         return autoCommit;
     }
@@ -284,7 +285,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      *
      * @return the enableEmptyString
      */
-    @ConfigurationProperty(order = 12,
+    @ConfigurationProperty(order = -6,
             displayMessageKey = "ENABLE_EMPTY_STRING_DISPLAY", helpMessageKey = "ENABLE_EMPTY_STRING_HELP")
     public boolean isEnableEmptyString() {
         return enableEmptyString;
@@ -311,7 +312,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      *
      * @return the rethrowAllSQLExceptions
      */
-    @ConfigurationProperty(order = 14,
+    @ConfigurationProperty(order = -5,
             displayMessageKey = "RETHROW_ALL_SQLEXCEPTIONS_DISPLAY", helpMessageKey = "RETHROW_ALL_SQLEXCEPTIONS_HELP")
     public boolean isRethrowAllSQLExceptions() {
         return rethrowAllSQLExceptions;
@@ -339,7 +340,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      *
      * @return the nativeTimestamps
      */
-    @ConfigurationProperty(order = 15,
+    @ConfigurationProperty(order = -4,
             displayMessageKey = "NATIVE_TIMESTAMPS_DISPLAY", helpMessageKey = "NATIVE_TIMESTAMPS_HELP")
     public boolean isNativeTimestamps() {
         return nativeTimestamps;
@@ -365,7 +366,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      *
      * @return the allNative
      */
-    @ConfigurationProperty(order = 16, displayMessageKey = "ALL_NATIVE_DISPLAY", helpMessageKey = "ALL_NATIVE_HELP")
+    @ConfigurationProperty(order = -3, displayMessageKey = "ALL_NATIVE_DISPLAY", helpMessageKey = "ALL_NATIVE_HELP")
     public boolean isAllNative() {
         return allNative;
     }
@@ -392,7 +393,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      *
      * @return validConnectionQuery value
      */
-    @ConfigurationProperty(order = 17,
+    @ConfigurationProperty(order = -2,
             displayMessageKey = "VALID_CONNECTION_QUERY_DISPLAY", helpMessageKey = "VALID_CONNECTION_QUERY_HELP")
     public String getValidConnectionQuery() {
         return this.validConnectionQuery;
@@ -420,7 +421,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      *
      * @return datasource value
      */
-    @ConfigurationProperty(order = 20, displayMessageKey = "DATASOURCE_DISPLAY", helpMessageKey = "DATASOURCE_HELP")
+    @ConfigurationProperty(order = -1, displayMessageKey = "DATASOURCE_DISPLAY", helpMessageKey = "DATASOURCE_HELP")
     public String getDatasource() {
         return datasource;
     }
@@ -442,7 +443,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      *
      * @return jndiFactory value
      */
-    @ConfigurationProperty(order = 21,
+    @ConfigurationProperty(order = 0,
             displayMessageKey = "JNDI_PROPERTIES_DISPLAY", helpMessageKey = "JNDI_PROPERTIES_HELP")
     public String[] getJndiProperties() {
         return jndiProperties;
