@@ -53,10 +53,10 @@
 
   <dependencySets>
     <dependencySet>
-      <includes>        
-        <include>net.tirasa.connid.bundles.db:net.tirasa.connid.bundles.db.common</include>
-      </includes>
       <outputDirectory>lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
     </dependencySet>
   </dependencySets>
 </assembly>

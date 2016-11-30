@@ -82,7 +82,7 @@
 
   <properties>
     <connid.version>1.4.1.0</connid.version>
-    <commons.version>1.4.1.0-SNAPSHOT</commons.version>
+    <commons.version>1.4.1.0</commons.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
