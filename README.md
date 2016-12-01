@@ -3,6 +3,11 @@ ConnIdDBBundle
 
 The DB bundle is part of the [ConnId](http://connid.tirasa.net) project.
 
+<a href="https://travis-ci.org/Tirasa/ConnIdDBBundle"><img src="https://api.travis-ci.org/Tirasa/ConnIdDBBundle.png"/></a>
+<a href="https://maven-badges.herokuapp.com/maven-central/net.tirasa.connid.bundles.db/net.tirasa.connid.bundles.db.scriptedsql">
+  <img src="https://maven-badges.herokuapp.com/maven-central/net.tirasa.connid.bundles.db/net.tirasa.connid.bundles.db.scriptedsql/badge.svg"/>
+</a>
+
 ## How to get it
 
 ### Maven
@@ -31,4 +36,3 @@ Available from [releases](https://github.com/Tirasa/ConnIdDBBundle/releases).
 
  * [wiki](https://connid.atlassian.net/wiki/display/BASE/Database)
  * [issues](https://connid.atlassian.net/browse/DB)
- * <a href="https://travis-ci.org/Tirasa/ConnIdDBBundle"><img src="https://api.travis-ci.org/Tirasa/ConnIdDBBundle.png"/></a>
