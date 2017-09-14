@@ -40,6 +40,10 @@
 
   <packaging>jar</packaging>
 
+  <properties>
+    <rootpom.basedir>${basedir}/..</rootpom.basedir>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>net.tirasa.connid.commons</groupId>
@@ -103,6 +107,19 @@
         </executions>
       </plugin>
     </plugins>
+        
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>..</directory>
+        <targetPath>META-INF</targetPath>
+        <includes>
+          <include>LICENSE</include>
+        </includes>
+      </resource>
+    </resources>
         
     <testResources>
       <testResource>
