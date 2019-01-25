@@ -30,7 +30,7 @@
   <parent>
     <groupId>net.tirasa.connid</groupId>
     <artifactId>connid</artifactId>
-    <version>1.4.1.0</version>
+    <version>1.4.5.1</version>
   </parent>
 
   <groupId>net.tirasa.connid.bundles.db</groupId>
@@ -82,8 +82,8 @@
   </mailingLists>
 
   <properties>
-    <connid.version>1.4.1.0</connid.version>
-    <commons.version>1.4.1.0</commons.version>
+    <connid.version>1.4.5.1</connid.version>
+    <commons.version>1.4.1.1</commons.version>
     <rootpom.basedir>${basedir}</rootpom.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -121,8 +121,8 @@
   <build>
     <plugins>            
       <plugin>
-        <groupId>com.mycila.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
         <inherited>true</inherited>
         <configuration>
           <header>https://raw.githubusercontent.com/Tirasa/ConnId/connid-${connid.version}/java/src/main/resources/header.txt</header>
@@ -140,7 +140,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>2.7</version>
         <executions>
           <execution>
             <id>copy-javadoc-legal-files</id>

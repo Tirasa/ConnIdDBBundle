@@ -729,7 +729,7 @@ public class DatabaseTableConnector implements
                 tokenVal = token.getValue();
             }
 
-            where.addBind(new SQLParam(changeLogColumnName, tokenVal, sqlType), ">");
+            where.addBind(new SQLParam(changeLogColumnName, tokenVal, sqlType), ">", false);
         }
 
         final DatabaseQueryBuilder query = new DatabaseQueryBuilder(tblname, columnNames);

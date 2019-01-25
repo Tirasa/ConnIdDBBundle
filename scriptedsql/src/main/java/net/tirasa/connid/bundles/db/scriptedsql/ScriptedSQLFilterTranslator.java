@@ -32,6 +32,7 @@ import org.identityconnectors.framework.common.objects.filter.AttributeFilter;
 import org.identityconnectors.framework.common.objects.filter.ContainsFilter;
 import org.identityconnectors.framework.common.objects.filter.EndsWithFilter;
 import org.identityconnectors.framework.common.objects.filter.EqualsFilter;
+import org.identityconnectors.framework.common.objects.filter.EqualsIgnoreCaseFilter;
 import org.identityconnectors.framework.common.objects.filter.GreaterThanFilter;
 import org.identityconnectors.framework.common.objects.filter.GreaterThanOrEqualFilter;
 import org.identityconnectors.framework.common.objects.filter.LessThanFilter;
@@ -96,6 +97,14 @@ public class ScriptedSQLFilterTranslator extends AbstractFilterTranslator<Map<St
     @Override
     protected Map<String, Object> createEqualsExpression(EqualsFilter filter, boolean not) {
         return createMap("EQUALS", filter, not);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Map<String, Object> createEqualsIgnoreCaseExpression(EqualsIgnoreCaseFilter filter, boolean not) {
+        return createMap("EQUALSIGNORECASE", filter, not);
     }
 
     /**
