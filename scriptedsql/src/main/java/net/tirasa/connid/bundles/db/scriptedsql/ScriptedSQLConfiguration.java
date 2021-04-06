@@ -69,7 +69,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
     /**
      * NameQuote Setter
      *
-     * @param value
+     * @param value value
      */
     public void setQuoting(String value) {
         this.quoting = value;
@@ -93,7 +93,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
     /**
      * host Setter
      *
-     * @param value
+     * @param value value
      */
     public void setHost(String value) {
         this.host = value;
@@ -117,7 +117,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
     /**
      * port Setter
      *
-     * @param value
+     * @param value value
      */
     public void setPort(String value) {
         this.port = value;
@@ -139,9 +139,6 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
         return this.user;
     }
 
-    /**
-     * @param value
-     */
     public void setUser(String value) {
         this.user = value;
     }
@@ -163,9 +160,6 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
         return this.password;
     }
 
-    /**
-     * @param value
-     */
     public void setPassword(GuardedString value) {
         this.password = value;
     }
@@ -183,9 +177,6 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
         return this.database;
     }
 
-    /**
-     * @param value
-     */
     public void setDatabase(String value) {
         this.database = value;
     }
@@ -212,9 +203,6 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
         return this.jdbcDriver;
     }
 
-    /**
-     * @param value
-     */
     public void setJdbcDriver(String value) {
         this.jdbcDriver = value;
     }
@@ -242,9 +230,6 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
         return jdbcUrlTemplate;
     }
 
-    /**
-     * @param value
-     */
     public void setJdbcUrlTemplate(String value) {
         this.jdbcUrlTemplate = value;
     }
@@ -268,7 +253,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
     /**
      * Setter for the autoCommit property.
      *
-     * @param autoCommit
+     * @param autoCommit auto commit
      */
     public void setAutoCommit(boolean autoCommit) {
         this.autoCommit = autoCommit;
@@ -402,7 +387,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
     /**
      * Connection validation query setter
      *
-     * @param value
+     * @param value value
      */
     public void setValidConnectionQuery(String value) {
         this.validConnectionQuery = value;
@@ -426,9 +411,6 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
         return datasource;
     }
 
-    /**
-     * @param value
-     */
     public void setDatasource(String value) {
         this.datasource = value;
     }
@@ -449,9 +431,6 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
         return jndiProperties;
     }
 
-    /**
-     * @param value
-     */
     public void setJndiProperties(String[] value) {
         this.jndiProperties = value;
     }

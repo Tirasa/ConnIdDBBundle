@@ -93,7 +93,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * NameQuote Setter
      *
-     * @param value
+     * @param value value
      */
     public void setQuoting(final String value) {
         this.quoting = value;
@@ -105,8 +105,6 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     private String host = EMPTY_STR;
 
     /**
-     * NameQoute getter
-     *
      * @return quoting value
      */
     @ConfigurationProperty(order = 2,
@@ -116,11 +114,6 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         return this.host;
     }
 
-    /**
-     * NameQuote Setter
-     *
-     * @param value
-     */
     public void setHost(final String value) {
         this.host = value;
     }
@@ -145,7 +138,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * NameQuote Setter
      *
-     * @param value
+     * @param value value
      */
     public void setPort(final String value) {
         this.port = value;
@@ -168,9 +161,6 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         return this.user;
     }
 
-    /**
-     * @param value
-     */
     public void setUser(final String value) {
         this.user = value;
     }
@@ -192,9 +182,6 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         return this.password;
     }
 
-    /**
-     * @param value
-     */
     public void setPassword(final GuardedString value) {
         this.password = value;
     }
@@ -214,9 +201,6 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         return this.database;
     }
 
-    /**
-     * @param value
-     */
     public void setDatabase(final String value) {
         this.database = value;
     }
@@ -297,7 +281,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * Password Column setter
      *
-     * @param value
+     * @param value value
      */
     public void setPasswordColumn(String value) {
         this.passwordColumn = value;
@@ -318,7 +302,6 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     @ConfigurationProperty(order = 10,
             displayMessageKey = "STATUS_COLUMN_DISPLAY",
             helpMessageKey = "STATUS_COLUMN_HELP")
-
     public String getStatusColumn() {
         return statusColumn;
     }
@@ -427,9 +410,6 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         return this.jdbcDriver;
     }
 
-    /**
-     * @param value
-     */
     public void setJdbcDriver(String value) {
         this.jdbcDriver = value;
     }
@@ -584,7 +564,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * Connection validation query setter
      *
-     * @param value
+     * @param value value
      */
     public void setValidConnectionQuery(String value) {
         this.validConnectionQuery = value;
@@ -733,7 +713,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * Return password character set used by resource to encode clear password specified as required by java.nio.Charset
      * http://docs.oracle.com/javase/6/docs/api/java/nio/charset/Charset.html
      *
-     * @return
+     * @return password character set used by resource to encode clear password
      */
     @ConfigurationProperty(order = 28, required = false,
             displayMessageKey = "PASSWORD_CHARSET_DISPLAY",

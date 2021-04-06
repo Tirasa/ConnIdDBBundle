@@ -241,13 +241,6 @@ public class DatabaseTableConnector implements
         this.columnSQLTypes = null;
     }
 
-    /**
-     * Creates a row in the database representing an account.
-     *
-     * @param oclass
-     * @param attrs
-     * @param options
-     */
     @Override
     public Uid create(final ObjectClass oclass, final Set<Attribute> attrs, final OperationOptions options) {
         LOG.info("create account, check the ObjectClass");
@@ -396,13 +389,6 @@ public class DatabaseTableConnector implements
         return config.isEnableEmptyString() && getStringColumnReguired().contains(columnName) && value == null;
     }
 
-    /**
-     * Deletes a row from the table.
-     *
-     * @param oclass
-     * @param uid
-     * @param options
-     */
     @Override
     public void delete(final ObjectClass oclass, final Uid uid, final OperationOptions options) {
         LOG.info("delete account, check the ObjectClass");
@@ -464,13 +450,6 @@ public class DatabaseTableConnector implements
         LOG.ok("Account Uid {0} deleted", accountUid);
     }
 
-    /**
-     * Update the database row with the data provided.
-     *
-     * @param oclass
-     * @param attrs
-     * @param options
-     */
     @Override
     public Uid update(
             final ObjectClass oclass,
@@ -572,12 +551,6 @@ public class DatabaseTableConnector implements
         return ret;
     }
 
-    /**
-     * Creates a Database Table filter translator.
-     *
-     * @param oclass
-     * @param options
-     */
     @Override
     public FilterTranslator<FilterWhereBuilder> createFilterTranslator(
             final ObjectClass oclass, final OperationOptions options) {
@@ -590,14 +563,6 @@ public class DatabaseTableConnector implements
         return new DatabaseTableFilterTranslator(this, oclass, options);
     }
 
-    /**
-     * Search for rows.
-     *
-     * @param oclass
-     * @param where
-     * @param handler
-     * @param options
-     */
     @Override
     public void executeQuery(
             final ObjectClass oclass,
@@ -878,9 +843,6 @@ public class DatabaseTableConnector implements
         return schema;
     }
 
-    /**
-     * Test the configuration and connection.
-     */
     @Override
     public void test() {
         LOG.info("test");
@@ -902,28 +864,14 @@ public class DatabaseTableConnector implements
         getConn().closeConnection();
     }
 
-    /**
-     * @throws SQLException
-     */
     private void openConnection() throws SQLException {
         getConn().openConnection();
     }
 
-    /**
-     * @throws SQLException
-     */
     private void commit() throws SQLException {
         getConn().getConnection().commit();
     }
 
-    /**
-     * Attempts to authenticate the given username combination.
-     *
-     * @param oclass
-     * @param username
-     * @param password
-     * @param options
-     */
     @Override
     public Uid authenticate(
             final ObjectClass oclass,
@@ -1017,13 +965,6 @@ public class DatabaseTableConnector implements
         return uid;
     }
 
-    /**
-     * Attempts to resolve the given username.
-     *
-     * @param oclass
-     * @param username
-     * @param options
-     */
     @Override
     public Uid resolveUsername(final ObjectClass oclass, final String username, final OperationOptions options) {
         final String SQL_AUTH_QUERY = "SELECT {0} FROM {1} WHERE ( {0} = ? )";
@@ -1133,7 +1074,7 @@ public class DatabaseTableConnector implements
     /**
      * Convert the attribute name to resource specific columnName
      *
-     * @param attributeName
+     * @param attributeName attribute bane
      * @return the Column Name value
      */
     public String getColumnName(final String attributeName) {
@@ -1271,9 +1212,9 @@ public class DatabaseTableConnector implements
     /**
      * Return the set of AttributeInfo based on the database query meta-data.
      *
-     * @param rset
-     * @return
-     * @throws SQLException
+     * @param rset result set
+     * @return attribute info
+     * @throws SQLException if anything goes wrong
      */
     private Set<AttributeInfo> buildAttributeInfoSet(final ResultSet rset) throws SQLException {
         LOG.info("build AttributeInfoSet");
@@ -1368,7 +1309,6 @@ public class DatabaseTableConnector implements
      * @return ConnectorObjectBuilder object
      */
     private ConnectorObjectBuilder buildConnectorObject(final Map<String, SQLParam> columnValues) {
-
         LOG.info("build ConnectorObject");
         String uidValue = null;
         ConnectorObjectBuilder bld = new ConnectorObjectBuilder();
@@ -1471,11 +1411,6 @@ public class DatabaseTableConnector implements
         return bld;
     }
 
-    /**
-     * @param options
-     *
-     * @return
-     */
     private Set<String> resolveColumnNamesToGet(final OperationOptions options) {
         Set<String> attributesToGet = getDefaultAttributesToGet();
 

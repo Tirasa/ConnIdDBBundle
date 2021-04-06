@@ -39,12 +39,12 @@ import net.tirasa.connid.commons.db.SQLUtil;
  */
 public class AttributeConvertor implements MappingStrategy {
 
-    MappingStrategy delegate;
+    private final MappingStrategy delegate;
 
     /**
      * Final sql mapping
      *
-     * @param delegate
+     * @param delegate delegate
      */
     public AttributeConvertor(MappingStrategy delegate) {
         Assertions.nullCheck(delegate, "MappingStrategy delegate");

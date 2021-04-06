@@ -46,8 +46,7 @@ import org.identityconnectors.framework.common.objects.filter.StartsWithFilter;
  * method should return null. This level of filtering is present only to allow any
  * native constructs that may be available to help reduce the result set for the framework,
  * which will (strictly) reapply all filters specified after the connector does the initial
- * filtering.<p>
- * <p>
+ * filtering.
  * Note: The generic query type is most commonly a String, but does not have to be.
  */
 public class ScriptedSQLFilterTranslator extends AbstractFilterTranslator<Map<String, Object>> {

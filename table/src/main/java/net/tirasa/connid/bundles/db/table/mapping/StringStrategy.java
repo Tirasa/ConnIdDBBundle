@@ -43,7 +43,7 @@ public class StringStrategy implements MappingStrategy {
      * The SQL get/set strategy class implementation write as a string all types mapped as a String.
      * Final sql mapping
      *
-     * @param delegate
+     * @param delegate delegate
      */
     public StringStrategy(final MappingStrategy delegate) {
         Assertions.nullCheck(delegate, "MappingStrategy delegate");

@@ -39,20 +39,10 @@ public class DatabaseTableFilterTranslator extends DatabaseFilterTranslator {
 
     private final DatabaseTableConnector connector;
 
-    /**
-     *
-     * @param connector the database table connector
-     *
-     * @param oclass
-     *
-     * @param options
-     *
-     */
     public DatabaseTableFilterTranslator(
             final DatabaseTableConnector connector, final ObjectClass oclass, final OperationOptions options) {
 
         super(oclass, options);
-
         this.connector = connector;
     }
 
@@ -61,16 +51,12 @@ public class DatabaseTableFilterTranslator extends DatabaseFilterTranslator {
             final Attribute attribute, final ObjectClass oclass, final OperationOptions options) {
 
         final Object value = AttributeUtil.getSingleValue(attribute);
-
         final String columnName = connector.getColumnName(attribute.getName());
 
         if (StringUtil.isNotBlank(columnName)) {
             final Integer columnType = connector.getColumnType(columnName);
-
             final String quoting = ((DatabaseTableConfiguration) this.connector.getConfiguration()).getQuoting();
-
             final String quotedName = DatabaseTableSQLUtil.quoteName(quoting, columnName);
-
             return new SQLParam(columnName, value, columnType, quotedName);
         } else {
             return null;

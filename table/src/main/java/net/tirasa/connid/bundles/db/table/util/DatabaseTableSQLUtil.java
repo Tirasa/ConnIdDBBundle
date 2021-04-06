@@ -38,9 +38,7 @@ import java.util.Map;
 import org.identityconnectors.common.Assertions;
 import org.identityconnectors.common.CollectionUtil;
 import org.identityconnectors.common.StringUtil;
-import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
-import net.tirasa.connid.bundles.db.table.DatabaseTableConnector;
 import net.tirasa.connid.bundles.db.table.mapping.MappingStrategy;
 import net.tirasa.connid.commons.db.SQLParam;
 
@@ -51,11 +49,6 @@ import net.tirasa.connid.commons.db.SQLParam;
  * @since 1.0
  */
 public final class DatabaseTableSQLUtil {
-
-    /**
-     * Setup logging for the {@link DatabaseTableConnector}.
-     */
-    private static final Log LOG = Log.getLog(DatabaseTableSQLUtil.class);
 
     /**
      * Never allow this to be instantiated.
@@ -71,8 +64,8 @@ public final class DatabaseTableSQLUtil {
      * visible.
      * </p>
      *
-     * @param sms
-     * @param statement
+     * @param sms mapping strategy
+     * @param statement statement
      * @param params a <CODE>List</CODE> of the object arguments
      * @throws SQLException an exception in statement
      */
@@ -96,8 +89,8 @@ public final class DatabaseTableSQLUtil {
      * visible.
      * </p>
      *
-     * @param sms
-     * @param statement
+     * @param sms mapping strategy
+     * @param statement statement
      * @param params a <CODE>List</CODE> of the object arguments
      * @throws SQLException an exception in statement
      */
@@ -136,7 +129,7 @@ public final class DatabaseTableSQLUtil {
      * @param sms a mapping strategy
      * @param resultSet database data
      * @return The transformed column values map
-     * @throws SQLException
+     * @throws SQLException a SQL exception
      */
     public static Map<String, SQLParam> getColumnValues(final MappingStrategy sms, final ResultSet resultSet)
             throws SQLException {
@@ -157,11 +150,11 @@ public final class DatabaseTableSQLUtil {
     /**
      * The helper guardedString bind method
      *
-     * @param sms
+     * @param sms a mapping strategy
      * @param stmt to bind to
      * @param idx index of the object
      * @param param a <CODE>GuardedString</CODE> parameter
-     * @throws SQLException
+     * @throws SQLException a SQL exception
      */
     static void setGuardedStringParam(final MappingStrategy sms, final PreparedStatement stmt, final int idx,
             SQLParam param) throws SQLException {

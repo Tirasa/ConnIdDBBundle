@@ -38,12 +38,12 @@ import org.identityconnectors.common.Assertions;
  */
 public class NativeTimestampsStrategy implements MappingStrategy {
 
-    private MappingStrategy delegate;
+    private final MappingStrategy delegate;
 
     /**
      * Final sql mapping
      *
-     * @param delegate
+     * @param delegate delegate
      */
     public NativeTimestampsStrategy(final MappingStrategy delegate) {
         Assertions.nullCheck(delegate, "MappingStrategy delegate");

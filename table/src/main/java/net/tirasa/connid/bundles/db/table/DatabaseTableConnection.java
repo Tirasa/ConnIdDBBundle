@@ -210,20 +210,13 @@ public class DatabaseTableConnection extends DatabaseConnection {
     }
 
     /**
-     *
      * The strategy utility
      *
-     *
-     *
-     * @param conn
-     *
-     * @param config
-     *
+     * @param conn connection
+     * @param config configuration
      * @return the created strategy
-     *
      */
     public MappingStrategy createMappingStrategy(Connection conn, DatabaseTableConfiguration config) {
-
         LOG.info("Create: DefaultStrategy");
         LOG.info("Append: JdbcConvertor");
         // tail is always convert to jdbc and do the default statement
@@ -247,61 +240,35 @@ public class DatabaseTableConnection extends DatabaseConnection {
     }
 
     /**
+     * Get the Column Values map.
      *
-     * Get the Column Values map
-     *
-     *
-     *
-     * @param result
-     *
+     * @param result result set
      * @return the result of Column Values map
-     *
-     * @throws SQLException
-     *
+     * @throws SQLException if anything goes wrong
      */
     public Map<String, SQLParam> getColumnValues(final ResultSet result) throws SQLException {
         return DatabaseTableSQLUtil.getColumnValues(sms, result);
     }
 
     /**
-     *
      * Accessor for the sms property
      *
-     *
-     *
      * @return the sms
-     *
      */
     public MappingStrategy getSms() {
         return sms;
-
     }
 
     /**
-     *
      * Indirect call of prepareCall statement with mapped callable statement parameters
      *
-     *
-     *
-     * @param sql
-     *
-     * a <CODE>String</CODE> sql statement definition
-     *
-     * @param params
-     *
-     * the bind parameter values
-     *
+     * @param sql * a <CODE>String</CODE> sql statement definition
+     * @param params the bind parameter values
      * @return return a callable statement
-     *
-     * @throws SQLException
-     *
-     * an exception in statement
-     *
+     * @throws SQLException an exception in statement
      */
     @Override
-
     public CallableStatement prepareCall(final String sql, final List<SQLParam> params) throws SQLException {
-
         LOG.info("Prepare SQL Call : {0}", sql);
         final CallableStatement prepareCall = getConnection().prepareCall(sql);
         DatabaseTableSQLUtil.setParams(sms, prepareCall, params);
@@ -310,49 +277,26 @@ public class DatabaseTableConnection extends DatabaseConnection {
     }
 
     /**
-     *
      * Indirect call of prepare statement with mapped prepare statement parameters
      *
-     *
-     *
-     * @param sql
-     *
-     * a <CODE>String</CODE> sql statement definition
-     *
-     * @param params
-     *
-     * the bind parameter values
-     *
+     * @param sql <CODE>String</CODE> sql statement definition
+     * @param params the bind parameter values
      * @return return a prepared statement
-     *
-     * @throws SQLException
-     *
-     * an exception in statement
-     *
+     * @throws SQLException an exception in statement
      */
     @Override
     public PreparedStatement prepareStatement(final String sql, final List<SQLParam> params) throws SQLException {
-
         LOG.info("Prepare SQL Statement : {0}", sql);
-        final PreparedStatement prepareStatement = getConnection().
-                prepareStatement(sql);
+        final PreparedStatement prepareStatement = getConnection().prepareStatement(sql);
         DatabaseTableSQLUtil.setParams(sms, prepareStatement, params);
         LOG.ok("SQL Statement ok");
         return prepareStatement;
     }
 
     /**
-     *
      * Determines if the underlying JDBC {@link java.sql.Connection} is valid.
      *
-     *
-     *
-     * @throws RuntimeException
-     *
-     * if the underlying JDBC {@link java.sql.Connection} is not
-     *
-     * valid otherwise do nothing.
-     *
+     * @throws RuntimeException if the underlying JDBC {@link java.sql.Connection} is not valid otherwise do nothing.
      */
     @Override
     public void test() {
@@ -386,26 +330,10 @@ public class DatabaseTableConnection extends DatabaseConnection {
         }
     }
 
-    /**
-     *
-     * Setter for the sms
-     *
-     *
-     *
-     * @param sms
-     *
-     * the strategy
-     *
-     */
     void setSms(MappingStrategy sms) {
         this.sms = sms;
     }
 
-    /**
-     *
-     * Close connection if pooled
-     *
-     */
     void closeConnection() {
 
         if (getConnection() != null && StringUtil.isNotBlank(config.
@@ -416,13 +344,6 @@ public class DatabaseTableConnection extends DatabaseConnection {
         }
     }
 
-    /**
-     *
-     * Create new connection if pooled and taken from the datasource
-     *
-     * @throws SQLException
-     *
-     */
     void openConnection()
             throws SQLException {
 

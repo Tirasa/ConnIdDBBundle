@@ -131,7 +131,7 @@ public class ScriptedSQLConnection {
     /**
      * Set the internal JDBC connection.
      *
-     * @param connection
+     * @param connection connection
      */
     public void setSqlConnection(Connection connection) {
         this.sqlConn = connection;
