@@ -83,7 +83,7 @@
 
   <properties>
     <connid.version>1.4.5.1</connid.version>
-    <commons.version>1.4.1.2-SNAPSHOT</commons.version>
+    <commons.version>1.4.1.2</commons.version>
     <rootpom.basedir>${basedir}</rootpom.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
