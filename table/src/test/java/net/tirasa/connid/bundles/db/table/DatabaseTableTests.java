@@ -23,11 +23,11 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
-import static org.identityconnectors.common.ByteUtil.randomBytes;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -53,6 +53,7 @@ import net.tirasa.connid.bundles.db.table.security.AES;
 import net.tirasa.connid.commons.db.ExpectProxy;
 import net.tirasa.connid.commons.db.SQLParam;
 import net.tirasa.connid.commons.db.SQLUtil;
+import org.identityconnectors.common.ByteUtil;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeBuilder;
@@ -68,9 +69,9 @@ import org.identityconnectors.framework.common.objects.SyncToken;
 import org.identityconnectors.framework.common.objects.Uid;
 import org.identityconnectors.framework.common.objects.filter.FilterBuilder;
 import org.identityconnectors.test.common.TestHelpers;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -86,9 +87,8 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
      *
      * @throws Exception *
      */
-    @BeforeClass
-    public static void createDatabase()
-            throws Exception {
+    @BeforeAll
+    public static void createDatabase() throws Exception {
         final String url;
         if (StringUtil.isNotBlank(DRIVER) && DRIVER.contains("derby")) {
             if (StringUtil.isNotBlank(DB)) {
@@ -124,12 +124,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         }
     }
 
-    /**
-     *
-     * test method
-     *
-     */
-    @AfterClass
+    @AfterAll
     public static void deleteDatabase() {
         try {
             if (StringUtil.isNotBlank(DRIVER) && DRIVER.contains("derby")) {
@@ -184,7 +179,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
      */
     @Override
     protected Set<Attribute> getCreateAttributeSet(DatabaseTableConfiguration cfg) throws Exception {
-        final Set<Attribute> ret = new HashSet<Attribute>();
+        final Set<Attribute> ret = new HashSet<>();
         // set __ENABLED__ attribute
         ret.add(AttributeBuilder.buildEnabled(true));
         final String accountId = randomString(50);
@@ -212,7 +207,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
             ret.add(AttributeBuilder.build(ACCESSED, v > 100000L || v < -100000L ? v / 10000L : v));
         }
         ret.add(AttributeBuilder.build(SALARY, new BigDecimal("360536.75")));
-        ret.add(AttributeBuilder.build(JPEGPHOTO, randomBytes(RANDOM, 2000)));
+        ret.add(AttributeBuilder.build(JPEGPHOTO, ByteUtil.randomBytes(RANDOM, 2000)));
         ret.add(AttributeBuilder.build(OPENTIME, new java.sql.Time(System.currentTimeMillis()).toString()));
         ret.add(AttributeBuilder.build(ACTIVATE, new java.sql.Date(System.currentTimeMillis()).toString()));
         ret.add(AttributeBuilder.build(CHANGED, new Timestamp(System.currentTimeMillis() / 1000 * 1000).toString()));
@@ -272,7 +267,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         final DatabaseTableConfiguration cfg = getConfiguration();
         cfg.setRethrowAllSQLExceptions(false);
         con = getConnector(cfg);
-        final ExpectProxy<MappingStrategy> smse = new ExpectProxy<MappingStrategy>();
+        final ExpectProxy<MappingStrategy> smse = new ExpectProxy<>();
         final MappingStrategy sms = smse.getProxy(MappingStrategy.class);
 //Schema
         for (int i = 0; i < 16; i++) {
@@ -288,57 +283,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         Set<Attribute> expected = getCreateAttributeSet(cfg);
         final Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
         con.update(ObjectClass.ACCOUNT, uid, expected, null);
-        assertTrue("setSQLParam not called", smse.isDone());
-    }
-
-    /**
-     *
-     * For testing purposes we creating connection an not the framework.
-     *
-     * @throws Exception *
-     */
-    @Test(expected = ConnectorException.class)
-    public void testNonZeroSQLExceptions()
-            throws Exception {
-        final DatabaseTableConfiguration cfg = getConfiguration();
-        cfg.setRethrowAllSQLExceptions(false);
-        con = getConnector(cfg);
-        final ExpectProxy<MappingStrategy> smse = new ExpectProxy<MappingStrategy>();
-        final MappingStrategy sms = smse.getProxy(MappingStrategy.class);
-        for (int i = 0; i < 16; i++) {
-            smse.expectAndReturn("getSQLAttributeType", String.class);
-        }
-        smse.expectAndThrow(
-                "setSQLParam", new SQLException("test reason", "411", 411));
-        con.getConn().setSms(sms);
-        final Set<Attribute> expected = getCreateAttributeSet(cfg);
-        con.create(ObjectClass.ACCOUNT, expected, null);
-        assertTrue("setSQLParam not called", smse.isDone());
-    }
-
-    /**
-     *
-     * For testing purposes we creating connection an not the framework.
-     *
-     * @throws Exception *
-     */
-    @Test(expected = ConnectorException.class)
-    public void testRethrowAllSQLExceptions()
-            throws Exception {
-        final DatabaseTableConfiguration cfg = getConfiguration();
-        cfg.setRethrowAllSQLExceptions(true);
-        con = getConnector(cfg);
-        final ExpectProxy<MappingStrategy> smse = new ExpectProxy<MappingStrategy>();
-        final MappingStrategy sms = smse.getProxy(MappingStrategy.class);
-        for (int i = 0; i < 16; i++) {
-            smse.expectAndReturn("getSQLAttributeType", String.class);
-        }
-        smse.expectAndThrow(
-                "setSQLParam", new SQLException("test reason", "0", 0));
-        con.getConn().setSms(sms);
-        Set<Attribute> expected = getCreateAttributeSet(cfg);
-        con.create(ObjectClass.ACCOUNT, expected, null);
-        assertTrue("setSQLParam not called", smse.isDone());
+        assertTrue(smse.isDone());
     }
 
     /**
@@ -348,8 +293,52 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
      * @throws Exception *
      */
     @Test
-    public void testSchema()
-            throws Exception {
+    public void testNonZeroSQLExceptions() throws Exception {
+        final DatabaseTableConfiguration cfg = getConfiguration();
+        cfg.setRethrowAllSQLExceptions(false);
+        con = getConnector(cfg);
+        final ExpectProxy<MappingStrategy> smse = new ExpectProxy<>();
+        final MappingStrategy sms = smse.getProxy(MappingStrategy.class);
+        for (int i = 0; i < 16; i++) {
+            smse.expectAndReturn("getSQLAttributeType", String.class);
+        }
+        smse.expectAndThrow("setSQLParam", new SQLException("test reason", "411", 411));
+        con.getConn().setSms(sms);
+        final Set<Attribute> expected = getCreateAttributeSet(cfg);
+        assertThrows(ConnectorException.class, () -> con.create(ObjectClass.ACCOUNT, expected, null));
+        assertTrue(smse.isDone());
+    }
+
+    /**
+     * For testing purposes we creating connection an not the framework.
+     *
+     * @throws Exception *
+     */
+    @Test
+    public void testRethrowAllSQLExceptions() throws Exception {
+        final DatabaseTableConfiguration cfg = getConfiguration();
+        cfg.setRethrowAllSQLExceptions(true);
+        con = getConnector(cfg);
+        final ExpectProxy<MappingStrategy> smse = new ExpectProxy<>();
+        final MappingStrategy sms = smse.getProxy(MappingStrategy.class);
+        for (int i = 0; i < 16; i++) {
+            smse.expectAndReturn("getSQLAttributeType", String.class);
+        }
+        smse.expectAndThrow("setSQLParam", new SQLException("test reason", "0", 0));
+        con.getConn().setSms(sms);
+        Set<Attribute> expected = getCreateAttributeSet(cfg);
+        assertThrows(ConnectorException.class, () -> con.create(ObjectClass.ACCOUNT, expected, null));
+        assertTrue(smse.isDone());
+    }
+
+    /**
+     *
+     * For testing purposes we creating connection an not the framework.
+     *
+     * @throws Exception *
+     */
+    @Test
+    public void testSchema() throws Exception {
         DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
         // check if this works..
@@ -369,8 +358,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
      *
      * @throws Exception *
      */
-    void checkSchema(Schema schema)
-            throws Exception {
+    void checkSchema(Schema schema) throws Exception {
         // Schema should not be null
         assertNotNull(schema);
         final Set<ObjectClassInfo> objectInfos = schema.getObjectClassInfo();
@@ -398,23 +386,21 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
                     if (attInfo.getType().equals(BigDecimal.class)) {
                         // Oracle return BigDecimal instead of Integer or Long 
                         // or something else
-                        assertTrue("field: " + fieldName,
+                        assertTrue(
                                 valueClass == null
                                 || valueClass.equals(Integer.class)
                                 || valueClass.equals(Long.class)
                                 || valueClass.equals(BigDecimal.class));
                     } else {
-                        assertTrue("field: " + fieldName,
+                        assertTrue(
                                 valueClass == null
-                                || OperationalAttributes.ENABLE_NAME.equals(attInfo.
-                                        getName())
+                                || OperationalAttributes.ENABLE_NAME.equals(attInfo.getName())
                                 || valueClass.equals(attInfo.getType()));
                     }
                 }
             }
             // all the attribute has to be removed
-            assertTrue(
-                    "Missing attributes in the schema: " + keys, keys.isEmpty());
+            assertTrue(keys.isEmpty());
         }
     }
 
@@ -427,8 +413,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
      * @throws SQLException *
      */
     @Test
-    public void testGetLatestSyncToken()
-            throws Exception {
+    public void testGetLatestSyncToken() throws Exception {
         final String SQL_TEMPLATE = "UPDATE Accounts SET changelog = ? WHERE accountId = ?";
         final DatabaseTableConfiguration cfg = getConfiguration();
         con = getConnector(cfg);
@@ -442,7 +427,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         DatabaseTableConnection conn = null;
         try {
             conn = DatabaseTableConnection.createDBTableConnection(getConfiguration());
-            final List<SQLParam> values = new ArrayList<SQLParam>();
+            final List<SQLParam> values = new ArrayList<>();
             final Integer sqlType = con.getColumnType("changelog");
             Object tokenVal;
             try {
@@ -485,8 +470,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
      * @throws Exception *
      */
     @Test
-    public void testTimestampColumnNative()
-            throws Exception {
+    public void testTimestampColumnNative() throws Exception {
         if (DRIVER.contains("mysql")) {
             // MySql doesn't permit to store microseconds. 
             // This test is not applicable for this DBMS.
@@ -503,16 +487,15 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
                 Timestamp.valueOf("2005-12-07 10:29:01.5").toString()));
         Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
         // attempt to get the record back..
-        List<ConnectorObject> results = TestHelpers.searchToList(con,
-                ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
-        assertTrue("expect 1 connector object", results.size() == 1);
+        List<ConnectorObject> results = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
+        assertTrue(results.size() == 1);
         final ConnectorObject co = results.get(0);
         assertNotNull(co);
         final Set<Attribute> actual = co.getAttributes();
         assertNotNull(actual);
         Attribute tmsAtr = AttributeUtil.find(CHANGED, actual);
         String timestampTest = AttributeUtil.getStringValue(tmsAtr);
-        if (timestampTest == null || timestampTest.indexOf(".5") == -1) {
+        if (timestampTest == null || !timestampTest.contains(".5")) {
             fail("testcase for bug#17551 failed, "
                     + "expected 5 in the milli-seconds part, "
                     + "but got timestamp " + timestampTest);
@@ -546,14 +529,14 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         // attempt to get the record back..
         List<ConnectorObject> results = TestHelpers.searchToList(con,
                 ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
-        assertTrue("expect 1 connector object", results.size() == 1);
+        assertEquals(1, results.size());
         final ConnectorObject co = results.get(0);
         assertNotNull(co);
         final Set<Attribute> actual = co.getAttributes();
         assertNotNull(actual);
         Attribute tmsAtr = AttributeUtil.find(CHANGED, actual);
         String timestampTest = AttributeUtil.getStringValue(tmsAtr);
-        if (timestampTest != null && timestampTest.indexOf(".5") == -1) {
+        if (timestampTest != null && !timestampTest.contains(".5")) {
             fail("testcase for bug#17551 failed, "
                     + "expected 5 in the milli-seconds part, "
                     + "but got timestamp " + timestampTest);

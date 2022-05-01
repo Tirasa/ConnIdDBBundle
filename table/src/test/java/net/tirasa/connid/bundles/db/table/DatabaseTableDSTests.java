@@ -87,8 +87,9 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
     public static class MockContextFactory implements InitialContextFactory {
 
         @Override
-        public Context getInitialContext(final @SuppressWarnings("rawtypes") java.util.Hashtable environment)
-                throws NamingException {
+        public Context getInitialContext(
+                final @SuppressWarnings("rawtypes") java.util.Hashtable environment) throws NamingException {
+
             return (Context) Proxy.newProxyInstance(
                     getClass().getClassLoader(),
                     new Class<?>[] { Context.class },

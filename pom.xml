@@ -30,7 +30,7 @@
   <parent>
     <groupId>net.tirasa.connid</groupId>
     <artifactId>connid</artifactId>
-    <version>1.4.5.1</version>
+    <version>1.5.1.0</version>
   </parent>
 
   <groupId>net.tirasa.connid.bundles.db</groupId>
@@ -82,8 +82,8 @@
   </mailingLists>
 
   <properties>
-    <connid.version>1.4.5.1</connid.version>
-    <commons.version>1.4.1.2</commons.version>
+    <connid.version>1.5.1.0</connid.version>
+    <commons.version>1.4.1.3-SNAPSHOT</commons.version>
     <rootpom.basedir>${basedir}</rootpom.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

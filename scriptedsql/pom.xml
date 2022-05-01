@@ -55,13 +55,14 @@
     </dependency>
 
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>net.tirasa.connid</groupId>
+      <artifactId>connector-test-common</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>net.tirasa.connid</groupId>
-      <artifactId>connector-test-common</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -81,9 +82,11 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
+        <inherited>true</inherited>
         <configuration>
-          <appendAssemblyId>false</appendAssemblyId>
+          <appendAssemblyId>true</appendAssemblyId>
           <descriptors>
             <descriptor>src/assemble/connector.xml</descriptor>
           </descriptors>
@@ -94,8 +97,8 @@
               <ConnectorBundle-Name>${project.artifactId}</ConnectorBundle-Name>
               <ConnectorBundle-Version>${project.version}</ConnectorBundle-Version>
             </manifestEntries>
-          </archive>                    
-        </configuration>                
+          </archive>
+        </configuration>
         <executions>
           <execution>
             <id>make-assembly</id>

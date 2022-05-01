@@ -23,9 +23,9 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -44,7 +44,7 @@ import net.tirasa.connid.commons.db.ExpectProxy;
 import net.tirasa.connid.commons.db.SQLParam;
 import org.identityconnectors.common.Pair;
 import org.identityconnectors.common.security.GuardedString;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * The SQL util tests
@@ -70,12 +70,12 @@ public class DatabaseTableSQLUtilTests {
         final String TEST_VAL2 = "testValue2";
 
         //Resultset
-        final ExpectProxy<ResultSet> trs = new ExpectProxy<ResultSet>();
+        final ExpectProxy<ResultSet> trs = new ExpectProxy<>();
 
         ResultSet resultSetProxy = trs.getProxy(ResultSet.class);
 
         //Metadata
-        final ExpectProxy<ResultSetMetaData> trsmd = new ExpectProxy<ResultSetMetaData>();
+        final ExpectProxy<ResultSetMetaData> trsmd = new ExpectProxy<>();
 
         ResultSetMetaData metaDataProxy = trsmd.getProxy(ResultSetMetaData.class);
 
@@ -98,25 +98,17 @@ public class DatabaseTableSQLUtilTests {
         final DefaultStrategy derbyDbStrategy = new DefaultStrategy();
 
         final Map<String, SQLParam> actual = DatabaseTableSQLUtil.getColumnValues(derbyDbStrategy, resultSetProxy);
-
-        assertTrue("getString not called", trs.isDone());
-
-        assertTrue("getColumnType not called", trsmd.isDone());
-
+        assertTrue(trs.isDone());
+        assertTrue(trsmd.isDone());
         assertEquals(2, actual.size());
 
         final SQLParam tv1 = actual.get(TEST1);
-
         assertNotNull(tv1);
-
         assertEquals(TEST_VAL1, tv1.getValue());
 
         final SQLParam tv2 = actual.get(TEST2);
-
         assertNotNull(tv2);
-
         assertEquals(TEST_VAL2, tv2.getValue());
-
     }
 
     /**
@@ -126,26 +118,17 @@ public class DatabaseTableSQLUtilTests {
      */
     @Test
     public void testQuoting() throws Exception {
-        final Map<String, Pair<String, String>> data = new HashMap<String, Pair<String, String>>();
-
-        data.put("none", new Pair<String, String>("afklj", "afklj"));
-
-        data.put("double", new Pair<String, String>("123jd", "\"123jd\""));
-
-        data.put("single", new Pair<String, String>("di3nfd", "'di3nfd'"));
-
-        data.put("back", new Pair<String, String>("fadfk3", "`fadfk3`"));
-
-        data.put("brackets", new Pair<String, String>("fadlkfj", "[fadlkfj]"));
+        final Map<String, Pair<String, String>> data = new HashMap<>();
+        data.put("none", new Pair<>("afklj", "afklj"));
+        data.put("double", new Pair<>("123jd", "\"123jd\""));
+        data.put("single", new Pair<>("di3nfd", "'di3nfd'"));
+        data.put("back", new Pair<>("fadfk3", "`fadfk3`"));
+        data.put("brackets", new Pair<>("fadlkfj", "[fadlkfj]"));
 
         for (Map.Entry<String, Pair<String, String>> entry : data.entrySet()) {
-
             final String actual = DatabaseTableSQLUtil.quoteName(entry.getKey(), entry.getValue().first);
-
             assertEquals(entry.getValue().second, actual);
-
         }
-
     }
 
     /**
@@ -155,44 +138,33 @@ public class DatabaseTableSQLUtilTests {
      */
     @Test
     public void testSetParams() throws Exception {
-        final ExpectProxy<MappingStrategy> mse = new ExpectProxy<MappingStrategy>();
-
+        final ExpectProxy<MappingStrategy> mse = new ExpectProxy<>();
         MappingStrategy ms = mse.getProxy(MappingStrategy.class);
 
-        final ExpectProxy<PreparedStatement> pse = new ExpectProxy<PreparedStatement>();
-
+        final ExpectProxy<PreparedStatement> pse = new ExpectProxy<>();
         PreparedStatement ps = pse.getProxy(PreparedStatement.class);
 
-        final ExpectProxy<CallableStatement> cse = new ExpectProxy<CallableStatement>();
-
+        final ExpectProxy<CallableStatement> cse = new ExpectProxy<>();
         CallableStatement cs = cse.getProxy(CallableStatement.class);
 
-        List<SQLParam> params = new ArrayList<SQLParam>();
-
+        List<SQLParam> params = new ArrayList<>();
         params.add(new SQLParam("test", "test", Types.VARCHAR));
-
         params.add(new SQLParam("password", new GuardedString("tst".toCharArray()), Types.VARCHAR));
 
         mse.expect("setSQLParam");
-
         mse.expect("setSQLParam");
 
         DatabaseTableSQLUtil.setParams(ms, ps, params);
 
-        assertTrue("setSQLParam not called", mse.isDone());
-
-        assertTrue("setSQLParam not called", pse.isDone());
+        assertTrue(mse.isDone());
+        assertTrue(pse.isDone());
 
         mse.expect("setSQLParam");
-
         mse.expect("setSQLParam");
 
         DatabaseTableSQLUtil.setParams(ms, cs, params);
 
-        assertTrue("setSQLParam not called", mse.isDone());
-
-        assertTrue("setSQLParam not called", cse.isDone());
-
+        assertTrue(mse.isDone());
+        assertTrue(cse.isDone());
     }
-
 }

@@ -23,12 +23,14 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import net.tirasa.connid.bundles.db.table.security.SupportedAlgorithm;
 import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.test.common.TestHelpers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Attempts to test the Connector with the framework.
@@ -154,83 +156,58 @@ public class DatabaseTableConfigurationTests {
         assertEquals("VALID", config.getValidConnectionQuery());
     }
 
-    /**
-     * test method
-     */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConfigurationEmptyHost() {
         // attempt to test driver info..
         DatabaseTableConfiguration config = getConfiguration();
         config.setHost("");
         // check defaults..
-        config.validate();
+        assertThrows(IllegalArgumentException.class, () -> config.validate());
     }
 
-    /**
-     * test method
-     */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConfigurationEmptyPort() {
         DatabaseTableConfiguration config = getConfiguration();
         config.setPort("");
         // check defaults..
-        config.validate();
+        assertThrows(IllegalArgumentException.class, () -> config.validate());
     }
 
-    /**
-     * test method
-     */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConfigurationEmptyDatabase() {
         DatabaseTableConfiguration config = getConfiguration();
         config.setDatabase("");
         // check defaults..
-        config.validate();
-        fail("empty database");
+        assertThrows(IllegalArgumentException.class, () -> config.validate());
     }
 
-    /**
-     * test method
-     */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConfigurationKeyEQPassword() {
         DatabaseTableConfiguration config = getConfiguration();
         config.setKeyColumn("a");
         config.setPasswordColumn("a");
         // check defaults..
-        config.validate();
-        fail("testConfigurationKeyEQPassword");
+        assertThrows(IllegalArgumentException.class, () -> config.validate());
     }
 
-    /**
-     * test method
-     */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConfigurationKeyEQChange() {
         DatabaseTableConfiguration config = getConfiguration();
         config.setKeyColumn("a");
         config.setChangeLogColumn("a");
         // check defaults..
-        config.validate();
-        fail("testConfigurationKeyEQChange");
+        assertThrows(IllegalArgumentException.class, () -> config.validate());
     }
 
-    /**
-     * test method
-     */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConfigurationPasswdEQChange() {
         DatabaseTableConfiguration config = getConfiguration();
         config.setPasswordColumn("a");
         config.setChangeLogColumn("a");
         // check defaults..
-        config.validate();
-        fail("testConfigurationPasswdEQChange");
+        assertThrows(IllegalArgumentException.class, () -> config.validate());
     }
 
-    /**
-     * test method
-     */
     @Test
     public void testConfigurationDataSource() {
         // attempt to test driver info..
@@ -240,9 +217,6 @@ public class DatabaseTableConfigurationTests {
         config.validate();
     }
 
-    /**
-     * test method
-     */
     @Test
     public void testConfigurationJndi() {
         // attempt to test driver info..
@@ -257,10 +231,7 @@ public class DatabaseTableConfigurationTests {
         config.validate();
     }
 
-    /**
-     * test method
-     */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConfigurationInvalidJndi() {
         // attempt to test driver info..
         DatabaseTableConfiguration config = getConfiguration();
@@ -268,7 +239,7 @@ public class DatabaseTableConfigurationTests {
         config.setDatasource("DS");
         final String[] tstpr = { "a=A", "b" };
         config.setJndiProperties(tstpr);
-        config.validate();
+        assertThrows(IllegalArgumentException.class, () -> config.validate());
     }
 
     @Test
@@ -307,12 +278,12 @@ public class DatabaseTableConfigurationTests {
     /**
      * test method unsupported charset
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConfigurationUnsupportedCharset() {
         // attempt to test password Charset
         DatabaseTableConfiguration config = getConfiguration();
         // check defaults..
         config.setPasswordCharset("UTF-9");
-        config.validate();
+        assertThrows(IllegalArgumentException.class, () -> config.validate());
     }
 }
