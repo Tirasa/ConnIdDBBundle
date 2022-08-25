@@ -66,7 +66,7 @@ switch ( action ) {
     case "ADD_ATTRIBUTE_VALUES":
     break
 
-    case "ADD_ATTRIBUTE_VALUES":
+    case "REMOVE_ATTRIBUTE_VALUES":
     break
 
     case "UPDATE_DELTA":
