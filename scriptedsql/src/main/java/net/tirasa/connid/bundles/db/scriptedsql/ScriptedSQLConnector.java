@@ -83,7 +83,7 @@ public class ScriptedSQLConnector extends AbstractScriptedConnector<ScriptedSQLC
 
     @Override
     protected Map<String, Object> buildArguments() {
-        final Map<String, Object> arguments = new HashMap<String, Object>();
+        final Map<String, Object> arguments = new HashMap<>();
         arguments.put("configuration", config);
         arguments.put("connection", connection.getSqlConnection());
         return arguments;
@@ -99,5 +99,4 @@ public class ScriptedSQLConnector extends AbstractScriptedConnector<ScriptedSQLC
         LOG.ok("ObjectClass: {0}", objClass.getObjectClassValue());
         return new ScriptedSQLFilterTranslator();
     }
-
 }
