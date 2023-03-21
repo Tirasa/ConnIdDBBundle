@@ -26,10 +26,9 @@ package net.tirasa.connid.bundles.db.table.mapping;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+import net.tirasa.connid.bundles.db.commons.SQLParam;
+import net.tirasa.connid.bundles.db.commons.SQLUtil;
 import org.identityconnectors.common.Assertions;
-import net.tirasa.connid.commons.db.SQLParam;
-import net.tirasa.connid.commons.db.SQLUtil;
 
 /**
  * The SQL get/set strategy class implementation convert all jdbc types to attribute supported types.

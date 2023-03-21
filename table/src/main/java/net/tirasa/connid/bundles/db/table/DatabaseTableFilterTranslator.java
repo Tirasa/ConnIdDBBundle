@@ -23,10 +23,10 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
+import net.tirasa.connid.bundles.db.commons.DatabaseFilterTranslator;
+import net.tirasa.connid.bundles.db.commons.SQLParam;
 import org.identityconnectors.common.StringUtil;
 import net.tirasa.connid.bundles.db.table.util.DatabaseTableSQLUtil;
-import net.tirasa.connid.commons.db.DatabaseFilterTranslator;
-import net.tirasa.connid.commons.db.SQLParam;
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeUtil;
 import org.identityconnectors.framework.common.objects.ObjectClass;

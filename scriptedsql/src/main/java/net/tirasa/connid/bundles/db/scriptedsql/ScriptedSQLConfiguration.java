@@ -23,16 +23,16 @@
  */
 package net.tirasa.connid.bundles.db.scriptedsql;
 
-import static net.tirasa.connid.commons.db.Constants.MSG_DATABASE_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_HOST_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_JDBC_DRIVER_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_JDBC_DRIVER_NOT_FOUND;
-import static net.tirasa.connid.commons.db.Constants.MSG_JDBC_TEMPLATE_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_PASSWORD_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_PORT_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_USER_BLANK;
+import static net.tirasa.connid.bundles.db.commons.Constants.MSG_DATABASE_BLANK;
+import static net.tirasa.connid.bundles.db.commons.Constants.MSG_HOST_BLANK;
+import static net.tirasa.connid.bundles.db.commons.Constants.MSG_JDBC_DRIVER_BLANK;
+import static net.tirasa.connid.bundles.db.commons.Constants.MSG_JDBC_DRIVER_NOT_FOUND;
+import static net.tirasa.connid.bundles.db.commons.Constants.MSG_JDBC_TEMPLATE_BLANK;
+import static net.tirasa.connid.bundles.db.commons.Constants.MSG_PASSWORD_BLANK;
+import static net.tirasa.connid.bundles.db.commons.Constants.MSG_PORT_BLANK;
+import static net.tirasa.connid.bundles.db.commons.Constants.MSG_USER_BLANK;
 
-import net.tirasa.connid.commons.db.JNDIUtil;
+import net.tirasa.connid.bundles.db.commons.JNDIUtil;
 import net.tirasa.connid.commons.scripted.AbstractScriptedConfiguration;
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.security.GuardedString;
