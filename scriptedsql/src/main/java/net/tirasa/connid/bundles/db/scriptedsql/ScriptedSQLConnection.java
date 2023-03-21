@@ -26,8 +26,8 @@ package net.tirasa.connid.bundles.db.scriptedsql;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
-import net.tirasa.connid.commons.db.JNDIUtil;
-import net.tirasa.connid.commons.db.SQLUtil;
+import net.tirasa.connid.bundles.db.commons.JNDIUtil;
+import net.tirasa.connid.bundles.db.commons.SQLUtil;
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
@@ -44,7 +44,7 @@ public class ScriptedSQLConnection {
      */
     private static final Log LOG = Log.getLog(ScriptedSQLConnection.class);
 
-    private ScriptedSQLConfiguration _configuration;
+    private final ScriptedSQLConfiguration _configuration;
 
     private Connection sqlConn = null;
 

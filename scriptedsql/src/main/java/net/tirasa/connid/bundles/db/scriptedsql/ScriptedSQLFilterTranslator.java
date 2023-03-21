@@ -23,10 +23,10 @@
  */
 package net.tirasa.connid.bundles.db.scriptedsql;
 
-import java.util.Map;
 import java.util.HashMap;
-import org.identityconnectors.framework.common.objects.AttributeUtil;
+import java.util.Map;
 import org.identityconnectors.common.StringUtil;
+import org.identityconnectors.framework.common.objects.AttributeUtil;
 import org.identityconnectors.framework.common.objects.filter.AbstractFilterTranslator;
 import org.identityconnectors.framework.common.objects.filter.AttributeFilter;
 import org.identityconnectors.framework.common.objects.filter.ContainsFilter;
@@ -55,7 +55,7 @@ public class ScriptedSQLFilterTranslator extends AbstractFilterTranslator<Map<St
      * {@inheritDoc}
      */
     private Map<String, Object> createMap(String operation, AttributeFilter filter, boolean not) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         String name = filter.getAttribute().getName();
         String value = AttributeUtil.getAsStringValue(filter.getAttribute());
         if (StringUtil.isBlank(value)) {
@@ -113,7 +113,7 @@ public class ScriptedSQLFilterTranslator extends AbstractFilterTranslator<Map<St
     protected Map<String, Object> createAndExpression(
             Map<String, Object> leftExpression, Map<String, Object> rightExpression) {
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("operation", "AND");
         map.put("left", leftExpression);
         map.put("right", rightExpression);
@@ -127,7 +127,7 @@ public class ScriptedSQLFilterTranslator extends AbstractFilterTranslator<Map<St
     protected Map<String, Object> createOrExpression(
             Map<String, Object> leftExpression, Map<String, Object> rightExpression) {
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("operation", "OR");
         map.put("left", leftExpression);
         map.put("right", rightExpression);

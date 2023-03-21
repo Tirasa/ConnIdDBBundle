@@ -33,12 +33,20 @@
   <formats>
     <format>jar</format>
   </formats>
-    
+
   <includeBaseDirectory>false</includeBaseDirectory>
 
   <fileSets>
     <fileSet>
-      <directory>${project.build.directory}/classes</directory>
+      <directory>${project.build.outputDirectory}</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}/../table/target/classes</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}/../scriptedsql/target/classes</directory>
       <outputDirectory></outputDirectory>
     </fileSet>
   </fileSets>
@@ -52,6 +60,8 @@
       <excludes>
         <exclude>net.tirasa.connid:connector-framework</exclude>
         <exclude>net.tirasa.connid:connector-framework-internal</exclude>
+        <exclude>net.tirasa.connid.bundles.db:table</exclude>
+        <exclude>net.tirasa.connid.bundles.db:scriptedsql</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

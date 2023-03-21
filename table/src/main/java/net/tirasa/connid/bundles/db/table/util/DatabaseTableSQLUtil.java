@@ -34,13 +34,12 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.List;
 import java.util.Map;
-
+import net.tirasa.connid.bundles.db.commons.SQLParam;
+import net.tirasa.connid.bundles.db.table.mapping.MappingStrategy;
 import org.identityconnectors.common.Assertions;
 import org.identityconnectors.common.CollectionUtil;
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.security.GuardedString;
-import net.tirasa.connid.bundles.db.table.mapping.MappingStrategy;
-import net.tirasa.connid.commons.db.SQLParam;
 
 /**
  * The SQL helper/util class

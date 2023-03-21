@@ -30,11 +30,11 @@
   <parent>
     <groupId>net.tirasa.connid.bundles.db</groupId>
     <artifactId>db</artifactId>
-    <version>2.2.11-SNAPSHOT</version>
+    <version>2.3.0-SNAPSHOT</version>
   </parent>
 
   <groupId>net.tirasa.connid.bundles.db</groupId>
-  <artifactId>net.tirasa.connid.bundles.db.scriptedsql</artifactId>
+  <artifactId>scriptedsql</artifactId>
 
   <name>Bundles: DB: ScriptedSQL</name>
 
@@ -46,9 +46,11 @@
 
   <dependencies>
     <dependency>
-      <groupId>net.tirasa.connid.commons</groupId>
-      <artifactId>commons-db</artifactId>
+      <groupId>net.tirasa.connid.bundles.db</groupId>
+      <artifactId>commons</artifactId>
+      <version>${project.version}</version>
     </dependency>
+
     <dependency>
       <groupId>net.tirasa.connid.commons</groupId>
       <artifactId>commons-scripted</artifactId>
@@ -80,37 +82,8 @@
           </includes>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <inherited>true</inherited>
-        <configuration>
-          <appendAssemblyId>true</appendAssemblyId>
-          <descriptors>
-            <descriptor>src/assemble/connector.xml</descriptor>
-          </descriptors>
-          <archive>
-            <index>true</index>
-            <manifestEntries>
-              <ConnectorBundle-FrameworkVersion>${connid.version}</ConnectorBundle-FrameworkVersion>
-              <ConnectorBundle-Name>${project.artifactId}</ConnectorBundle-Name>
-              <ConnectorBundle-Version>${project.version}</ConnectorBundle-Version>
-            </manifestEntries>
-          </archive>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
-        
+
     <resources>
       <resource>
         <directory>src/main/resources</directory>
