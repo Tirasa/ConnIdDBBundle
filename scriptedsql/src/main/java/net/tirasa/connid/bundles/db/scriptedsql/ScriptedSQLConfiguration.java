@@ -509,7 +509,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      */
     public String formatUrlTemplate() {
         LOG.info("format UrlTemplate");
-        final StringBuffer b = new StringBuffer();
+        final StringBuilder b = new StringBuilder();
         final String url = getJdbcUrlTemplate();
         final int len = url.length();
         for (int i = 0; i < len; i++) {

@@ -285,7 +285,7 @@ public class DatabaseTableConnector implements
 
         LOG.info("process and check the Attribute Set");
 
-        final Set<Attribute> attrToBeProcessed = new HashSet<Attribute>(attrs);
+        final Set<Attribute> attrToBeProcessed = new HashSet<>(attrs);
 
         // If status column is specified attribute __ENABLED__ must be specified.
         // If attribute __ENABLED__ is not specified a default value must be
@@ -993,7 +993,7 @@ public class DatabaseTableConnector implements
         final String keyColumnName = quoteName(config.getKeyColumn());
         final String passwordColumnName = quoteName(config.getPasswordColumn());
         final String sql = MessageFormat.format(SQL_AUTH_QUERY, keyColumnName, config.getTable(), passwordColumnName);
-        final List<SQLParam> values = new ArrayList<SQLParam>();
+        final List<SQLParam> values = new ArrayList<>();
         values.add(new SQLParam(keyColumnName, username, getColumnType(config.getKeyColumn()))); // real username
 
         PreparedStatement stmt = null;
@@ -1114,7 +1114,7 @@ public class DatabaseTableConnector implements
         LOG.info("cacheSchema on {0}", attrInfoSet);
 
         // Cache the attributes to get
-        defaultAttributesToGet = new HashSet<String>();
+        defaultAttributesToGet = new HashSet<>();
 
         for (AttributeInfo info : attrInfoSet) {
             final String name = info.getName();
@@ -1219,7 +1219,7 @@ public class DatabaseTableConnector implements
     private Set<AttributeInfo> buildAttributeInfoSet(final ResultSet rset) throws SQLException {
         LOG.info("build AttributeInfoSet");
 
-        final Set<AttributeInfo> attrInfo = new HashSet<AttributeInfo>();
+        final Set<AttributeInfo> attrInfo = new HashSet<>();
 
         columnSQLTypes = CollectionUtil.<Integer>newCaseInsensitiveMap();
         stringColumnRequired = CollectionUtil.newCaseInsensitiveSet();
@@ -1420,7 +1420,7 @@ public class DatabaseTableConnector implements
         }
 
         // Replace attributes to quoted columnNames
-        Set<String> columnNamesToGet = new HashSet<String>();
+        Set<String> columnNamesToGet = new HashSet<>();
 
         for (String attributeName : attributesToGet) {
             final String columnName = getColumnName(attributeName);
@@ -1561,7 +1561,7 @@ public class DatabaseTableConnector implements
         final EncodeAlgorithm algorithm;
 
         try {
-            algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).newInstance();
+            algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).getDeclaredConstructor().newInstance();
             if (StringUtil.isNotBlank(cipherKey)) {
                 algorithm.setKey(cipherKey);
             }
@@ -1618,7 +1618,7 @@ public class DatabaseTableConnector implements
         final String cipherKey = config.getCipherKey();
         final EncodeAlgorithm algorithm;
         try {
-            algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).newInstance();
+            algorithm = (EncodeAlgorithm) Class.forName(cipherAlgorithm).getDeclaredConstructor().newInstance();
             if (StringUtil.isNotBlank(cipherKey)) {
                 algorithm.setKey(cipherKey);
             }
