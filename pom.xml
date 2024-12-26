@@ -85,6 +85,8 @@
     <connid.version>1.5.2.0</connid.version>
     <commons.version>1.5.2.0</commons.version>
     <rootpom.basedir>${basedir}</rootpom.basedir>
+
+    <targetJdk>8</targetJdk>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
