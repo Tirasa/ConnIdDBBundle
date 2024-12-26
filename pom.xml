@@ -85,7 +85,7 @@
     <connid.version>1.6.0.0-SNAPSHOT</connid.version>
     <rootpom.basedir>${basedir}</rootpom.basedir>
 
-    <targetJdk>17</targetJdk>
+    <targetJdk>21</targetJdk>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -118,13 +118,13 @@
       <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derby</artifactId>
-        <version>10.16.1.1</version>
+        <version>10.17.1.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derbytools</artifactId>
-        <version>10.16.1.1</version>
+        <version>10.17.1.0</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
