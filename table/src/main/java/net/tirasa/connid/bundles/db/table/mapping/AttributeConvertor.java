@@ -26,8 +26,8 @@ package net.tirasa.connid.bundles.db.table.mapping;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import net.tirasa.connid.bundles.db.commons.SQLParam;
-import net.tirasa.connid.bundles.db.commons.SQLUtil;
+import net.tirasa.connid.commons.db.SQLParam;
+import net.tirasa.connid.commons.db.SQLUtil;
 import org.identityconnectors.common.Assertions;
 
 /**

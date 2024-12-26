@@ -23,14 +23,6 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
-import static net.tirasa.connid.bundles.db.commons.Constants.MSG_DATABASE_BLANK;
-import static net.tirasa.connid.bundles.db.commons.Constants.MSG_HOST_BLANK;
-import static net.tirasa.connid.bundles.db.commons.Constants.MSG_JDBC_DRIVER_BLANK;
-import static net.tirasa.connid.bundles.db.commons.Constants.MSG_JDBC_DRIVER_NOT_FOUND;
-import static net.tirasa.connid.bundles.db.commons.Constants.MSG_JDBC_TEMPLATE_BLANK;
-import static net.tirasa.connid.bundles.db.commons.Constants.MSG_PASSWORD_BLANK;
-import static net.tirasa.connid.bundles.db.commons.Constants.MSG_PORT_BLANK;
-import static net.tirasa.connid.bundles.db.commons.Constants.MSG_USER_BLANK;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.DEFAULT_PASSWORD_CHARSET;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.EMPTY_STR;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_INVALID_QUOTING;
@@ -40,14 +32,22 @@ import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_PASSWD_COLUMN_EQ_KEY_COLUMN;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_PWD_ENCODING_UNSUPPORTED;
 import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_TABLE_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_DATABASE_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_HOST_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_JDBC_DRIVER_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_JDBC_DRIVER_NOT_FOUND;
+import static net.tirasa.connid.commons.db.Constants.MSG_JDBC_TEMPLATE_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_PASSWORD_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_PORT_BLANK;
+import static net.tirasa.connid.commons.db.Constants.MSG_USER_BLANK;
 
 import java.nio.charset.Charset;
-import net.tirasa.connid.bundles.db.commons.JNDIUtil;
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
 import net.tirasa.connid.bundles.db.table.util.DatabaseTableSQLUtil;
 import net.tirasa.connid.bundles.db.table.security.SupportedAlgorithm;
+import net.tirasa.connid.commons.db.JNDIUtil;
 import org.identityconnectors.framework.common.serializer.SerializerUtil;
 import org.identityconnectors.framework.spi.AbstractConfiguration;
 import org.identityconnectors.framework.spi.Configuration;

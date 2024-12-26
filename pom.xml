@@ -93,12 +93,7 @@
     <dependencies>
       <dependency>
         <groupId>net.tirasa.connid</groupId>
-        <artifactId>connector-framework</artifactId>
-        <version>${connid.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.tirasa.connid</groupId>
-        <artifactId>connector-framework-internal</artifactId>
+        <artifactId>commons-db</artifactId>
         <version>${connid.version}</version>
       </dependency>
       <dependency>
@@ -271,7 +266,6 @@
   </build>
 
   <modules>
-    <module>commons</module>
     <module>table</module>
     <module>scriptedsql</module>
     <module>bundle</module>

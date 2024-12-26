@@ -46,11 +46,11 @@
 
   <dependencies>
     <dependency>
-      <groupId>net.tirasa.connid.bundles.db</groupId>
-      <artifactId>commons</artifactId>
-      <version>${project.version}</version>
+      <groupId>net.tirasa.connid</groupId>
+      <artifactId>commons-db</artifactId>
     </dependency>
-    
+
+    <!-- TEST -->    
     <dependency>
       <groupId>net.tirasa.connid</groupId>
       <artifactId>connector-test-common</artifactId>

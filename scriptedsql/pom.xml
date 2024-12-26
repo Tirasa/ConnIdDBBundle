@@ -46,16 +46,15 @@
 
   <dependencies>
     <dependency>
-      <groupId>net.tirasa.connid.bundles.db</groupId>
-      <artifactId>commons</artifactId>
-      <version>${project.version}</version>
+      <groupId>net.tirasa.connid</groupId>
+      <artifactId>commons-db</artifactId>
     </dependency>
-
     <dependency>
       <groupId>net.tirasa.connid</groupId>
       <artifactId>commons-scripted</artifactId>
     </dependency>
 
+    <!-- TEST -->
     <dependency>
       <groupId>net.tirasa.connid</groupId>
       <artifactId>connector-test-common</artifactId>
@@ -69,8 +68,7 @@
     </dependency>
   </dependencies>
 
-  <build>
-        
+  <build>        
     <plugins>     
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

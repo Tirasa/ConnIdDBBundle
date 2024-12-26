@@ -36,10 +36,6 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import net.tirasa.connid.bundles.db.commons.DatabaseConnection;
-import net.tirasa.connid.bundles.db.commons.JNDIUtil;
-import net.tirasa.connid.bundles.db.commons.SQLParam;
-import net.tirasa.connid.bundles.db.commons.SQLUtil;
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
@@ -50,6 +46,10 @@ import net.tirasa.connid.bundles.db.table.mapping.MappingStrategy;
 import net.tirasa.connid.bundles.db.table.mapping.NativeTimestampsStrategy;
 import net.tirasa.connid.bundles.db.table.mapping.StringStrategy;
 import net.tirasa.connid.bundles.db.table.util.DatabaseTableSQLUtil;
+import net.tirasa.connid.commons.db.DatabaseConnection;
+import net.tirasa.connid.commons.db.JNDIUtil;
+import net.tirasa.connid.commons.db.SQLParam;
+import net.tirasa.connid.commons.db.SQLUtil;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.objects.ConnectorMessages;
 import org.identityconnectors.framework.spi.Configuration;
@@ -95,7 +95,6 @@ public class DatabaseTableConnection extends DatabaseConnection {
      *
      */
     private static java.sql.Connection getNativeConnection(DatabaseTableConfiguration config) {
-
         java.sql.Connection connection;
         final String login = config.getUser();
         final GuardedString password = config.getPassword();

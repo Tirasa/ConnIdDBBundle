@@ -27,7 +27,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import net.tirasa.connid.bundles.db.commons.SQLParam;
+import net.tirasa.connid.commons.db.SQLParam;
 
 /**
  * The SQL mapping interface.
