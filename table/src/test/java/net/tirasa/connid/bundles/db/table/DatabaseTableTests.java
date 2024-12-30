@@ -29,8 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -91,9 +91,8 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         final String url;
         if (StringUtil.isNotBlank(DRIVER) && DRIVER.contains("derby")) {
             if (StringUtil.isNotBlank(DB)) {
-                final File f = new File(DB);
                 // clear out the test database directory..
-                IOUtil.delete(f);
+                IOUtil.delete(Path.of(DB).toFile());
             }
             url = URL + ";create=true";
         } else {
@@ -129,9 +128,8 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
             if (StringUtil.isNotBlank(DRIVER) && DRIVER.contains("derby")) {
                 DriverManager.getConnection(URL + ";shutdown=true");
                 if (StringUtil.isNotBlank(DB)) {
-                    final File f = new File(DB);
                     // clear out the test database directory..
-                    IOUtil.delete(f);
+                    IOUtil.delete(Path.of(DB).toFile());
                 }
             }
         } catch (Exception ex) {
