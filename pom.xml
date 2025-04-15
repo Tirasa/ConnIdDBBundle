@@ -30,7 +30,7 @@
   <parent>
     <groupId>net.tirasa.connid</groupId>
     <artifactId>connid</artifactId>
-    <version>1.6.0.0</version>
+    <version>1.6.0.1</version>
   </parent>
 
   <groupId>net.tirasa.connid.bundles.db</groupId>
@@ -68,21 +68,8 @@
     <url>https://github.com/Tirasa/ConnIdDBBundle/actions</url>
   </ciManagement>
 
-  <mailingLists>
-    <mailingList>
-      <name>connid-dev</name>
-      <post>connid-dev@googlegroups.com</post>
-      <archive>http://groups.google.com/group/connid-dev</archive>
-    </mailingList>
-    <mailingList>
-      <name>connid-users</name>
-      <post>connid-users@googlegroups.com</post>
-      <archive>http://groups.google.com/group/connid-users</archive>
-    </mailingList>
-  </mailingLists>
-
   <properties>
-    <connid.version>1.6.0.0</connid.version>
+    <connid.version>1.6.0.1</connid.version>
     <rootpom.basedir>${basedir}</rootpom.basedir>
 
     <targetJdk>21</targetJdk>
@@ -165,40 +152,20 @@
         <artifactId>license-maven-plugin</artifactId>
         <inherited>true</inherited>
         <configuration>
-          <header>https://raw.githubusercontent.com/Tirasa/ConnId/master/java/src/main/resources/header.txt</header>
-          <headerDefinitions>
-            <headerDefinition>https://raw.githubusercontent.com/Tirasa/ConnId/master/java/src/main/resources/java-single-star.xml</headerDefinition>
-          </headerDefinitions>          
-          <excludes>
-            <exclude>README.md</exclude>
-            <exclude>**/LICENSE*</exclude>
-            <exclude>**/.*</exclude>
-          </excludes>                    
+          <licenseSets>
+            <licenseSet>
+              <header>https://raw.githubusercontent.com/Tirasa/ConnId/master/java/src/main/resources/header.txt</header>
+              <headerDefinitions>
+                <headerDefinition>https://raw.githubusercontent.com/Tirasa/ConnId/master/java/src/main/resources/java-single-star.xml</headerDefinition>
+              </headerDefinitions>          
+              <excludes>
+                <exclude>README.md</exclude>
+                <exclude>**/LICENSE*</exclude>
+                <exclude>**/.*</exclude>
+              </excludes>
+            </licenseSet>
+          </licenseSets>      
         </configuration>
-      </plugin>      
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.5.0</version>
-        <executions>
-          <execution>
-            <id>default-cli</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireJavaVersion>
-                  <version>${targetJdk}</version>
-                </requireJavaVersion>
-                <requireMavenVersion>
-                  <version>3.9.5</version>
-                </requireMavenVersion>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
 
       <!-- Put NOTICE and LICENSE files in all artifacts and javadocs -->
@@ -252,18 +219,4 @@
     <module>scriptedsql</module>
     <module>bundle</module>
   </modules>
-
-  <repositories>
-    <repository>
-      <id>sonatype</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
 </project>
