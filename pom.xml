@@ -30,7 +30,7 @@
   <parent>
     <groupId>net.tirasa.connid</groupId>
     <artifactId>connid</artifactId>
-    <version>1.5.2.0</version>
+    <version>1.5.3.0-SNAPSHOT</version>
   </parent>
 
   <groupId>net.tirasa.connid.bundles.db</groupId>
@@ -82,7 +82,7 @@
   </mailingLists>
 
   <properties>
-    <connid.version>1.5.2.0</connid.version>
+    <connid.version>1.5.3.0-SNAPSHOT</connid.version>
     <commons.version>1.5.2.0</commons.version>
     <rootpom.basedir>${basedir}</rootpom.basedir>
 
@@ -133,9 +133,9 @@
         <artifactId>license-maven-plugin</artifactId>
         <inherited>true</inherited>
         <configuration>
-          <header>https://raw.githubusercontent.com/Tirasa/ConnId/connid-${connid.version}/java/src/main/resources/header.txt</header>
+          <header>https://raw.githubusercontent.com/Tirasa/ConnId/connid-1.5.2.1/java/src/main/resources/header.txt</header>
           <headerDefinitions>
-            <headerDefinition>https://raw.githubusercontent.com/Tirasa/ConnId/connid-${connid.version}/java/src/main/resources/java-single-star.xml</headerDefinition>
+            <headerDefinition>https://raw.githubusercontent.com/Tirasa/ConnId/connid-1.5.2.1/java/src/main/resources/java-single-star.xml</headerDefinition>
           </headerDefinitions>          
           <excludes>
             <exclude>README.md</exclude>
@@ -172,7 +172,7 @@
       <plugin>
         <groupId>org.gaul</groupId>
         <artifactId>modernizer-maven-plugin</artifactId>
-        <version>2.9.0</version>
+        <version>3.2.0</version>
         <configuration>
           <javaVersion>${targetJdk}</javaVersion>
         </configuration>
@@ -223,8 +223,8 @@
 
   <repositories>
     <repository>
-      <id>sonatype</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <id>central-portal-snapshots</id>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
       <releases>
         <enabled>false</enabled>
       </releases>
@@ -233,5 +233,4 @@
       </snapshots>
     </repository>
   </repositories>
-
 </project>
