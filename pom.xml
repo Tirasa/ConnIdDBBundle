@@ -30,7 +30,7 @@
   <parent>
     <groupId>net.tirasa.connid</groupId>
     <artifactId>connid</artifactId>
-    <version>1.6.1.0-SNAPSHOT</version>
+    <version>1.6.1.0</version>
   </parent>
 
   <groupId>net.tirasa.connid.bundles.db</groupId>
@@ -69,7 +69,7 @@
   </ciManagement>
 
   <properties>
-    <connid.version>1.6.1.0-SNAPSHOT</connid.version>
+    <connid.version>1.6.1.0</connid.version>
     <rootpom.basedir>${basedir}</rootpom.basedir>
 
     <targetJdk>21</targetJdk>
