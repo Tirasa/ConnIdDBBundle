@@ -7,7 +7,7 @@ The DB bundle is part of the [ConnId](http://connid.tirasa.net) project.
   <img src="https://github.com/Tirasa/ConnIdDBBundle/actions/workflows/ci.yml/badge.svg"/>
 </a>
 <a href="#">
-  <img src="https://img.shields.io/maven-central/v/net.tirasa.connid.bundles.db/net.tirasa.connid.bundles.db.scriptedsql.svg"/>
+  <img src="https://img.shields.io/maven-central/v/net.tirasa.connid.bundles.db/net.tirasa.connid.bundles.db.svg"/>
 </a>
 
 ## How to get it
