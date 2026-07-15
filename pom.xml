@@ -69,7 +69,7 @@
   </ciManagement>
 
   <properties>
-    <connid.version>1.6.1.0</connid.version>
+    <connid.version>1.6.1.1</connid.version>
     <rootpom.basedir>${basedir}</rootpom.basedir>
 
     <targetJdk>21</targetJdk>
