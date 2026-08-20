@@ -282,7 +282,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      * to the statement with zero ErrorCode. This mean no error. This switch
      * allow to switch off ignoring this SQLError
      */
-    public boolean rethrowAllSQLExceptions = true;
+    private boolean rethrowAllSQLExceptions = true;
 
     /**
      * Accessor for the rethrowAllSQLExceptions property
@@ -310,7 +310,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      * table. To get correct value , one needs to use rs.getTimestamp() rather
      * rs.getString().
      */
-    public boolean nativeTimestamps = false;
+    private boolean nativeTimestamps = false;
 
     /**
      * Accessor for the nativeTimestamps property
@@ -336,7 +336,7 @@ public class ScriptedSQLConfiguration extends AbstractScriptedConfiguration {
      * Some JDBC drivers (ex: DerbyDB) may need to access all the datatypes with
      * native types to get correct value.
      */
-    public boolean allNative = false;
+    private boolean allNative = false;
 
     /**
      * Accessor for the allNativeproperty

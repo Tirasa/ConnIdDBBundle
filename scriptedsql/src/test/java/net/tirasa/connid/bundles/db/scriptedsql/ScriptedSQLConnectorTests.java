@@ -51,22 +51,22 @@ class ScriptedSQLConnectorTests {
             log.info("Entering {0} Script", action);
             def sql = new Sql(connection);
                                               
-            sql.eachRow("select * from Users", { println it.uid} );                                              
+            sql.eachRow("select * from Users", { println it.uid} );
             """;
 
     private static final String SEARCH_SCRIPT =
             """
             import groovy.sql.Sql;
-        
+
             log.info("Entering {0} Script", action);
             def sql = new Sql(connection);
             def result = []
-                                                                   
-            sql.eachRow("select * from Users", { row -> 
+
+            sql.eachRow("select * from Users", { row ->
                 result.add([__UID__:row["uid"], __NAME__:row["uid"]])
             })
-            
-            return result                       
+
+            return result
             """;
 
     private static String JDBC_URL;

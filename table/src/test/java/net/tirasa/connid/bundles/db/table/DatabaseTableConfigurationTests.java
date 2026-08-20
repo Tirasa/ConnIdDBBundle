@@ -25,7 +25,6 @@ package net.tirasa.connid.bundles.db.table;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import net.tirasa.connid.bundles.db.table.security.SupportedAlgorithm;
 import org.identityconnectors.common.security.GuardedString;
@@ -58,7 +57,7 @@ public class DatabaseTableConfigurationTests {
 
     static final String PASSDCOLUMN = "tstPasswordColumn";
 
-    final static String PASSWORD_CHARSETNAME = "UTF-8";
+    static final String PASSWORD_CHARSETNAME = "UTF-8";
 
     static final String CHANGELOG = "tstChangelogColumn";
 

@@ -23,23 +23,6 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_AUTHENTICATE_OP_NOT_SUPPORTED;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_AUTH_FAILED;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_CREATE;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_DELETE;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_READ;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_UPDATE;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CHANGELOG_COLUMN_BLANK;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_INVALID_SYNC_TOKEN_VALUE;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_MORE_USERS_DELETED;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_NAME_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED;
-import static net.tirasa.connid.commons.db.Constants.MSG_INVALID_ATTRIBUTE_SET;
-import static net.tirasa.connid.commons.db.Constants.MSG_PASSWORD_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_RESULT_HANDLER_NULL;
-import static net.tirasa.connid.commons.db.Constants.MSG_UID_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_USER_BLANK;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -54,11 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.identityconnectors.common.Assertions;
-import org.identityconnectors.common.CollectionUtil;
-import org.identityconnectors.common.StringUtil;
-import org.identityconnectors.common.logging.Log;
-import org.identityconnectors.common.security.GuardedString;
 import net.tirasa.connid.bundles.db.table.security.EncodeAlgorithm;
 import net.tirasa.connid.bundles.db.table.security.PasswordDecodingException;
 import net.tirasa.connid.bundles.db.table.security.PasswordEncodingException;
@@ -66,6 +44,7 @@ import net.tirasa.connid.bundles.db.table.security.SupportedAlgorithm;
 import net.tirasa.connid.bundles.db.table.security.UnsupportedPasswordCharsetException;
 import net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants;
 import net.tirasa.connid.bundles.db.table.util.DatabaseTableSQLUtil;
+import net.tirasa.connid.commons.db.Constants;
 import net.tirasa.connid.commons.db.DatabaseQueryBuilder;
 import net.tirasa.connid.commons.db.DatabaseQueryBuilder.OrderBy;
 import net.tirasa.connid.commons.db.FilterWhereBuilder;
@@ -74,6 +53,11 @@ import net.tirasa.connid.commons.db.OperationBuilder;
 import net.tirasa.connid.commons.db.SQLParam;
 import net.tirasa.connid.commons.db.SQLUtil;
 import net.tirasa.connid.commons.db.UpdateSetBuilder;
+import org.identityconnectors.common.Assertions;
+import org.identityconnectors.common.CollectionUtil;
+import org.identityconnectors.common.StringUtil;
+import org.identityconnectors.common.logging.Log;
+import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.exceptions.InvalidCredentialException;
 import org.identityconnectors.framework.common.exceptions.UnknownUidException;
@@ -142,6 +126,23 @@ public class DatabaseTableConnector implements
      * algorithm, and hence is not hashed (again).
      */
     private static final String HASHED_PASSWORD_ATTRIBUTE = AttributeUtil.createSpecialName("HASHED_PASSWORD");
+
+    private static final String SQL_INSERT = "INSERT INTO {0} ( {1} ) VALUES ( {2} )";
+
+    private static final String SQL_DELETE = "DELETE FROM {0} WHERE {1} = ?";
+
+    private static final String SQL_TEMPLATE = "UPDATE {0} SET {1} WHERE {2} = ?";
+
+    private static final String SQL_SELECT = "SELECT MAX( {0} ) FROM {1}";
+
+    private static final String SQL_AUTH_QUERY_1 = "SELECT {0} FROM {1} WHERE ( {0} = ? ) AND ( {2} = ? )";
+
+    private static final String SQL_AUTH_QUERY_2 = "SELECT {0} FROM {1} WHERE ( {0} = ? )";
+
+    /**
+     * Template for a empty query to get the columns of the table.
+     */
+    private static final String SCHEMA_QUERY = "SELECT * FROM {0} WHERE {1} IS NULL";
 
     /**
      * Place holder for the {@link Connection} passed into the callback.
@@ -246,13 +247,13 @@ public class DatabaseTableConnector implements
         LOG.info("create account, check the ObjectClass");
 
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
-            throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
         }
 
         LOG.ok("Object class ok");
 
         if (attrs == null || attrs.isEmpty()) {
-            throw new IllegalArgumentException(config.getMessage(MSG_INVALID_ATTRIBUTE_SET));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_INVALID_ATTRIBUTE_SET));
         }
 
         LOG.ok("Attribute set is not empty");
@@ -261,7 +262,7 @@ public class DatabaseTableConnector implements
         final Name name = AttributeUtil.getNameFromAttributes(attrs);
 
         if (name == null) {
-            throw new IllegalArgumentException(config.getMessage(MSG_NAME_BLANK));
+            throw new IllegalArgumentException(config.getMessage(DatabaseTableConstants.MSG_NAME_BLANK));
         }
 
         final String accountName = name.getNameValue();
@@ -336,8 +337,6 @@ public class DatabaseTableConnector implements
             }
         }
 
-        final String SQL_INSERT = "INSERT INTO {0} ( {1} ) VALUES ( {2} )";
-
         // create the prepared statement..
         final String sql = MessageFormat.format(SQL_INSERT, tblname, bld.getInto(), bld.getValues());
 
@@ -354,7 +353,8 @@ public class DatabaseTableConnector implements
             LOG.error(e, "Create account ''{0}'' error", accountName);
             if (throwIt(e.getErrorCode())) {
                 SQLUtil.rollbackQuietly(getConn());
-                throw new ConnectorException(config.getMessage(MSG_CAN_NOT_CREATE, accountName), e);
+                throw new ConnectorException(
+                        config.getMessage(DatabaseTableConstants.MSG_CAN_NOT_CREATE, accountName), e);
             }
         } finally {
             // clean up...
@@ -393,16 +393,15 @@ public class DatabaseTableConnector implements
     public void delete(final ObjectClass oclass, final Uid uid, final OperationOptions options) {
         LOG.info("delete account, check the ObjectClass");
 
-        final String SQL_DELETE = "DELETE FROM {0} WHERE {1} = ?";
         PreparedStatement stmt = null;
         // create the SQL string..
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
-            throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
         }
 
         LOG.ok("The ObjectClass is ok");
         if (uid == null || (uid.getUidValue() == null)) {
-            throw new IllegalArgumentException(config.getMessage(MSG_UID_BLANK));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_UID_BLANK));
         }
 
         final String accountUid = uid.getUidValue();
@@ -432,7 +431,8 @@ public class DatabaseTableConnector implements
             if (dr > 1) {
                 LOG.error("More then one account Uid: {0} found", accountUid);
                 SQLUtil.rollbackQuietly(getConn());
-                throw new IllegalArgumentException(config.getMessage(MSG_MORE_USERS_DELETED, accountUid));
+                throw new IllegalArgumentException(
+                        config.getMessage(DatabaseTableConstants.MSG_MORE_USERS_DELETED, accountUid));
             }
 
             LOG.info("Delete account {0} commit", accountUid);
@@ -440,7 +440,7 @@ public class DatabaseTableConnector implements
         } catch (SQLException e) {
             LOG.error(e, "Delete account ''{0}'' SQL error", accountUid);
             SQLUtil.rollbackQuietly(getConn());
-            throw new ConnectorException(config.getMessage(MSG_CAN_NOT_DELETE, accountUid), e);
+            throw new ConnectorException(config.getMessage(DatabaseTableConstants.MSG_CAN_NOT_DELETE, accountUid), e);
         } finally {
             // clean up..
             SQLUtil.closeQuietly(stmt);
@@ -458,17 +458,16 @@ public class DatabaseTableConnector implements
             final OperationOptions options) {
 
         LOG.info("update account, check the ObjectClass");
-        final String SQL_TEMPLATE = "UPDATE {0} SET {1} WHERE {2} = ?";
 
         // create the sql statement..
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
-            throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
         }
 
         LOG.ok("The ObjectClass is ok");
 
         if (attrs == null || attrs.isEmpty()) {
-            throw new IllegalArgumentException(config.getMessage(MSG_INVALID_ATTRIBUTE_SET));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_INVALID_ATTRIBUTE_SET));
         }
 
         LOG.ok("Attribute set is not empty");
@@ -540,7 +539,8 @@ public class DatabaseTableConnector implements
             LOG.error(e, "Update account {0} error", accountName);
             if (throwIt(e.getErrorCode())) {
                 SQLUtil.rollbackQuietly(getConn());
-                throw new ConnectorException(config.getMessage(MSG_CAN_NOT_UPDATE, accountName), e);
+                throw new ConnectorException(
+                        config.getMessage(DatabaseTableConstants.MSG_CAN_NOT_UPDATE, accountName), e);
             }
         } finally {
             // clean up..
@@ -557,7 +557,7 @@ public class DatabaseTableConnector implements
 
         LOG.info("check the ObjectClass");
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
-            throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
         }
         LOG.ok("The ObjectClass is ok");
         return new DatabaseTableFilterTranslator(this, oclass, options);
@@ -574,11 +574,11 @@ public class DatabaseTableConnector implements
 
         // Contract tests
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
-            throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
         }
 
         if (handler == null) {
-            throw new IllegalArgumentException(config.getMessage(MSG_RESULT_HANDLER_NULL));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_RESULT_HANDLER_NULL));
         }
 
         LOG.ok("The ObjectClass and result handler is ok");
@@ -623,7 +623,7 @@ public class DatabaseTableConnector implements
             LOG.error(e, "Query {0} on {1} error", query.getSQL(), oclass);
             SQLUtil.rollbackQuietly(getConn());
             if (throwIt(e.getErrorCode())) {
-                throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ, tblname), e);
+                throw new ConnectorException(config.getMessage(DatabaseTableConstants.MSG_CAN_NOT_READ, tblname), e);
             }
         } finally {
             SQLUtil.closeQuietly(result);
@@ -645,20 +645,20 @@ public class DatabaseTableConnector implements
 
         // Contract tests    
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
-            throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
         }
 
         LOG.ok("The object class is ok");
 
         if (handler == null) {
-            throw new IllegalArgumentException(config.getMessage(MSG_RESULT_HANDLER_NULL));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_RESULT_HANDLER_NULL));
         }
 
         LOG.ok("The result handles is not null");
 
         // Check if changelog column is defined in the config
         if (StringUtil.isBlank(config.getChangeLogColumn())) {
-            throw new IllegalArgumentException(config.getMessage(MSG_CHANGELOG_COLUMN_BLANK));
+            throw new IllegalArgumentException(config.getMessage(DatabaseTableConstants.MSG_CHANGELOG_COLUMN_BLANK));
         }
 
         LOG.ok("The change log column is ok");
@@ -728,7 +728,7 @@ public class DatabaseTableConnector implements
         } catch (SQLException e) {
             LOG.error(e, "sync {0} on {1} error", query.getSQL(), oclass);
             SQLUtil.rollbackQuietly(getConn());
-            throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ, tblname), e);
+            throw new ConnectorException(config.getMessage(DatabaseTableConstants.MSG_CAN_NOT_READ, tblname), e);
         } finally {
             SQLUtil.closeQuietly(result);
             SQLUtil.closeQuietly(statement);
@@ -742,22 +742,21 @@ public class DatabaseTableConnector implements
     public SyncToken getLatestSyncToken(final ObjectClass oclass) {
         LOG.info("check the ObjectClass");
 
-        // Contract tests    
+        // Contract tests
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
-            throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
         }
 
         LOG.ok("The object class is ok");
 
         // Check if changelog column is defined in the config
         if (StringUtil.isBlank(config.getChangeLogColumn())) {
-            throw new IllegalArgumentException(config.getMessage(MSG_CHANGELOG_COLUMN_BLANK));
+            throw new IllegalArgumentException(config.getMessage(DatabaseTableConstants.MSG_CHANGELOG_COLUMN_BLANK));
         }
 
         LOG.ok("The change log column is ok");
 
         // Format the update query
-        final String SQL_SELECT = "SELECT MAX( {0} ) FROM {1}";
         final String tblname = config.getTable();
         final String chlogName = quoteName(config.getChangeLogColumn());
         final String sql = MessageFormat.format(SQL_SELECT, chlogName, tblname);
@@ -785,7 +784,7 @@ public class DatabaseTableConnector implements
 
                     int sqlType = getColumnType(chlogName);
 
-                    // Parse as string to be independent of DBMS.                    
+                    // Parse as string to be independent of DBMS
                     final boolean isDate = sqlType == 91 || sqlType == 93 || sqlType == 92;
 
                     if (isDate) {
@@ -807,7 +806,7 @@ public class DatabaseTableConnector implements
         } catch (SQLException e) {
             LOG.error(e, "getLatestSyncToken sql {0} on {1} error", sql, oclass);
             SQLUtil.rollbackQuietly(getConn());
-            throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ, tblname), e);
+            throw new ConnectorException(config.getMessage(DatabaseTableConstants.MSG_CAN_NOT_READ, tblname), e);
         } finally {
             // clean up..
             SQLUtil.closeQuietly(rset);
@@ -879,32 +878,31 @@ public class DatabaseTableConnector implements
             final GuardedString password,
             final OperationOptions options) {
 
-        final String SQL_AUTH_QUERY = "SELECT {0} FROM {1} WHERE ( {0} = ? ) AND ( {2} = ? )";
-
         LOG.info("check the ObjectClass");
 
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
-            throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
         }
 
         LOG.ok("The object class is ok");
 
         if (StringUtil.isBlank(config.getPasswordColumn())) {
-            throw new UnsupportedOperationException(config.getMessage(MSG_AUTHENTICATE_OP_NOT_SUPPORTED));
+            throw new UnsupportedOperationException(
+                    config.getMessage(DatabaseTableConstants.MSG_AUTHENTICATE_OP_NOT_SUPPORTED));
         }
 
         LOG.ok("The Password Column is ok");
 
         // determine if you can get a connection to the database..
         if (StringUtil.isBlank(username)) {
-            throw new IllegalArgumentException(config.getMessage(MSG_USER_BLANK));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_USER_BLANK));
         }
 
         LOG.ok("The username is ok");
 
         // check that there is a pwd to query..
         if (password == null) {
-            throw new IllegalArgumentException(config.getMessage(MSG_PASSWORD_BLANK));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_PASSWORD_BLANK));
         }
 
         LOG.ok("The password is ok");
@@ -920,7 +918,7 @@ public class DatabaseTableConnector implements
 
         final String keyColumnName = quoteName(config.getKeyColumn());
         final String passwordColumnName = quoteName(config.getPasswordColumn());
-        final String sql = MessageFormat.format(SQL_AUTH_QUERY, keyColumnName, config.getTable(), passwordColumnName);
+        final String sql = MessageFormat.format(SQL_AUTH_QUERY_1, keyColumnName, config.getTable(), passwordColumnName);
         final List<SQLParam> values = new ArrayList<>();
 
         values.add(new SQLParam(keyColumnName, username, getColumnType(config.getKeyColumn()))); // real username
@@ -943,7 +941,8 @@ public class DatabaseTableConnector implements
             //No PasswordExpired capability
             if (!result.next()) {
                 LOG.error("authenticate query for account {0} has no result ", username);
-                throw new InvalidCredentialException(config.getMessage(MSG_AUTH_FAILED, username));
+                throw new InvalidCredentialException(
+                        config.getMessage(DatabaseTableConstants.MSG_AUTH_FAILED, username));
             }
 
             uid = new Uid(result.getString(1));
@@ -954,7 +953,8 @@ public class DatabaseTableConnector implements
         } catch (SQLException e) {
             LOG.error(e, "Account: {0} authentication failed ", username);
             SQLUtil.rollbackQuietly(getConn());
-            throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ, config.getTable()), e);
+            throw new ConnectorException(
+                    config.getMessage(DatabaseTableConstants.MSG_CAN_NOT_READ, config.getTable()), e);
         } finally {
             SQLUtil.closeQuietly(result);
             SQLUtil.closeQuietly(stmt);
@@ -967,32 +967,31 @@ public class DatabaseTableConnector implements
 
     @Override
     public Uid resolveUsername(final ObjectClass oclass, final String username, final OperationOptions options) {
-        final String SQL_AUTH_QUERY = "SELECT {0} FROM {1} WHERE ( {0} = ? )";
-
         LOG.info("check the ObjectClass");
 
         if (oclass == null || (!oclass.equals(ObjectClass.ACCOUNT))) {
-            throw new IllegalArgumentException(config.getMessage(MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_ACCOUNT_OBJECT_CLASS_REQUIRED));
         }
 
         LOG.ok("The object class is ok");
 
         if (StringUtil.isBlank(config.getPasswordColumn())) {
-            throw new UnsupportedOperationException(config.getMessage(MSG_AUTHENTICATE_OP_NOT_SUPPORTED));
+            throw new UnsupportedOperationException(
+                    config.getMessage(DatabaseTableConstants.MSG_AUTHENTICATE_OP_NOT_SUPPORTED));
         }
 
         LOG.ok("The Password Column is ok");
 
         // determine if you can get a connection to the database..
         if (StringUtil.isBlank(username)) {
-            throw new IllegalArgumentException(config.getMessage(MSG_USER_BLANK));
+            throw new IllegalArgumentException(config.getMessage(Constants.MSG_USER_BLANK));
         }
 
         LOG.ok("The username is ok");
 
         final String keyColumnName = quoteName(config.getKeyColumn());
         final String passwordColumnName = quoteName(config.getPasswordColumn());
-        final String sql = MessageFormat.format(SQL_AUTH_QUERY, keyColumnName, config.getTable(), passwordColumnName);
+        final String sql = MessageFormat.format(SQL_AUTH_QUERY_2, keyColumnName, config.getTable(), passwordColumnName);
         final List<SQLParam> values = new ArrayList<>();
         values.add(new SQLParam(keyColumnName, username, getColumnType(config.getKeyColumn()))); // real username
 
@@ -1015,7 +1014,8 @@ public class DatabaseTableConnector implements
             //No PasswordExpired capability
             if (!result.next()) {
                 LOG.error("authenticate query for account {0} has no result ", username);
-                throw new InvalidCredentialException(config.getMessage(MSG_AUTH_FAILED, username));
+                throw new InvalidCredentialException(
+                        config.getMessage(DatabaseTableConstants.MSG_AUTH_FAILED, username));
             }
 
             uid = new Uid(result.getString(1));
@@ -1026,7 +1026,8 @@ public class DatabaseTableConnector implements
         } catch (SQLException e) {
             LOG.error(e, "Account: {0} authentication failed ", username);
             SQLUtil.rollbackQuietly(getConn());
-            throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ, config.getTable()), e);
+            throw new ConnectorException(
+                    config.getMessage(DatabaseTableConstants.MSG_CAN_NOT_READ, config.getTable()), e);
         } finally {
             SQLUtil.closeQuietly(result);
             SQLUtil.closeQuietly(stmt);
@@ -1167,11 +1168,6 @@ public class DatabaseTableConnector implements
      * @return Schema based on a empty SELECT query.
      */
     private Set<AttributeInfo> buildSelectBasedAttributeInfos() {
-        /**
-         * Template for a empty query to get the columns of the table.
-         */
-        final String SCHEMA_QUERY = "SELECT * FROM {0} WHERE {1} IS NULL";
-
         LOG.info("get schema from the table");
 
         final Set<AttributeInfo> attrInfo;
@@ -1199,7 +1195,8 @@ public class DatabaseTableConnector implements
         } catch (SQLException ex) {
             LOG.error(ex, "buildSelectBasedAttributeInfo in SQL: ''{0}''", sql);
             SQLUtil.rollbackQuietly(getConn());
-            throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ, config.getTable()), ex);
+            throw new ConnectorException(
+                    config.getMessage(DatabaseTableConstants.MSG_CAN_NOT_READ, config.getTable()), ex);
         } finally {
             SQLUtil.closeQuietly(rset);
             SQLUtil.closeQuietly(stmt);
@@ -1387,7 +1384,7 @@ public class DatabaseTableConnector implements
         SQLParam tokenParam = columnValues.get(config.getChangeLogColumn());
 
         if (tokenParam == null) {
-            throw new IllegalArgumentException(config.getMessage(MSG_INVALID_SYNC_TOKEN_VALUE));
+            throw new IllegalArgumentException(config.getMessage(DatabaseTableConstants.MSG_INVALID_SYNC_TOKEN_VALUE));
         }
 
         Object token = tokenParam.getValue();
@@ -1529,13 +1526,13 @@ public class DatabaseTableConnector implements
                         }
                     });
                     String encodedPassword = changeCaseOfEncodedPassword(password[0]);
-                    // password encryption                  
+                    // password encryption
                     builder.addBind(new SQLParam(
                             quoteName(cname),
                             new GuardedString(encodedPassword.toCharArray()),
                             sqlType));
                 } else {
-                    // password encryption                  
+                    // password encryption
                     builder.addBind(new SQLParam(
                             quoteName(cname),
                             encodePassword((GuardedString) value),
@@ -1565,7 +1562,6 @@ public class DatabaseTableConnector implements
             if (StringUtil.isNotBlank(cipherKey)) {
                 algorithm.setKey(cipherKey);
             }
-
         } catch (Exception e) {
             LOG.error(e, "Error retrieving algorithm {0}", cipherAlgorithm);
             throw new PasswordEncodingException(e.getMessage());

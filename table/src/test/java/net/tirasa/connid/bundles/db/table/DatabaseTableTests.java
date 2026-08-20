@@ -43,16 +43,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.identityconnectors.common.CollectionUtil;
-import org.identityconnectors.common.IOUtil;
-import org.identityconnectors.common.StringUtil;
-import org.identityconnectors.common.security.GuardedString;
 import net.tirasa.connid.bundles.db.table.mapping.MappingStrategy;
 import net.tirasa.connid.bundles.db.table.security.AES;
 import net.tirasa.connid.commons.db.ExpectProxy;
 import net.tirasa.connid.commons.db.SQLParam;
 import net.tirasa.connid.commons.db.SQLUtil;
 import org.identityconnectors.common.ByteUtil;
+import org.identityconnectors.common.CollectionUtil;
+import org.identityconnectors.common.IOUtil;
+import org.identityconnectors.common.StringUtil;
+import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeBuilder;
@@ -263,7 +263,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
             throws Exception {
         final DatabaseTableConfiguration cfg = getConfiguration();
         cfg.setRethrowAllSQLExceptions(false);
-        con = getConnector(cfg);
+        conn = getConnector(cfg);
         final ExpectProxy<MappingStrategy> smse = new ExpectProxy<>();
         final MappingStrategy sms = smse.getProxy(MappingStrategy.class);
 //Schema
@@ -276,10 +276,10 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         //Update fail
         smse.expectAndThrow(
                 "setSQLParam", new SQLException("test reason", "0", 0));
-        con.getConn().setSms(sms);
+        conn.getConn().setSms(sms);
         Set<Attribute> expected = getCreateAttributeSet(cfg);
-        final Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
-        con.update(ObjectClass.ACCOUNT, uid, expected, null);
+        final Uid uid = conn.create(ObjectClass.ACCOUNT, expected, null);
+        conn.update(ObjectClass.ACCOUNT, uid, expected, null);
         assertTrue(smse.isDone());
     }
 
@@ -293,16 +293,16 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
     public void testNonZeroSQLExceptions() throws Exception {
         final DatabaseTableConfiguration cfg = getConfiguration();
         cfg.setRethrowAllSQLExceptions(false);
-        con = getConnector(cfg);
+        conn = getConnector(cfg);
         final ExpectProxy<MappingStrategy> smse = new ExpectProxy<>();
         final MappingStrategy sms = smse.getProxy(MappingStrategy.class);
         for (int i = 0; i < 16; i++) {
             smse.expectAndReturn("getSQLAttributeType", String.class);
         }
         smse.expectAndThrow("setSQLParam", new SQLException("test reason", "411", 411));
-        con.getConn().setSms(sms);
+        conn.getConn().setSms(sms);
         final Set<Attribute> expected = getCreateAttributeSet(cfg);
-        assertThrows(ConnectorException.class, () -> con.create(ObjectClass.ACCOUNT, expected, null));
+        assertThrows(ConnectorException.class, () -> conn.create(ObjectClass.ACCOUNT, expected, null));
         assertTrue(smse.isDone());
     }
 
@@ -315,16 +315,16 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
     public void testRethrowAllSQLExceptions() throws Exception {
         final DatabaseTableConfiguration cfg = getConfiguration();
         cfg.setRethrowAllSQLExceptions(true);
-        con = getConnector(cfg);
+        conn = getConnector(cfg);
         final ExpectProxy<MappingStrategy> smse = new ExpectProxy<>();
         final MappingStrategy sms = smse.getProxy(MappingStrategy.class);
         for (int i = 0; i < 16; i++) {
             smse.expectAndReturn("getSQLAttributeType", String.class);
         }
         smse.expectAndThrow("setSQLParam", new SQLException("test reason", "0", 0));
-        con.getConn().setSms(sms);
+        conn.getConn().setSms(sms);
         Set<Attribute> expected = getCreateAttributeSet(cfg);
-        assertThrows(ConnectorException.class, () -> con.create(ObjectClass.ACCOUNT, expected, null));
+        assertThrows(ConnectorException.class, () -> conn.create(ObjectClass.ACCOUNT, expected, null));
         assertTrue(smse.isDone());
     }
 
@@ -337,9 +337,9 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
     @Test
     public void testSchema() throws Exception {
         DatabaseTableConfiguration cfg = getConfiguration();
-        con = getConnector(cfg);
+        conn = getConnector(cfg);
         // check if this works..
-        Schema schema = con.schema();
+        Schema schema = conn.schema();
         checkSchema(schema);
     }
 
@@ -381,7 +381,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
                     final Object field = AttributeUtil.getSingleValue(fa);
                     final Class<?> valueClass = field != null ? field.getClass() : null;
                     if (attInfo.getType().equals(BigDecimal.class)) {
-                        // Oracle return BigDecimal instead of Integer or Long 
+                        // Oracle return BigDecimal instead of Integer or Long
                         // or something else
                         assertTrue(
                                 valueClass == null
@@ -411,12 +411,12 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
      */
     @Test
     public void testGetLatestSyncToken() throws Exception {
-        final String SQL_TEMPLATE = "UPDATE Accounts SET changelog = ? WHERE accountId = ?";
+        final String sqlTemplate = "UPDATE Accounts SET changelog = ? WHERE accountId = ?";
         final DatabaseTableConfiguration cfg = getConfiguration();
-        con = getConnector(cfg);
-        deleteAllFromAccounts(con.getConn());
+        conn = getConnector(cfg);
+        deleteAllFromAccounts(conn.getConn());
         final Set<Attribute> expected = getCreateAttributeSet(cfg);
-        final Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
+        final Uid uid = conn.create(ObjectClass.ACCOUNT, expected, null);
         assertNotNull(uid);
         final Long changelog = 9999999999999L; //Some really big value
         // update the last change
@@ -425,7 +425,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
         try {
             conn = DatabaseTableConnection.createDBTableConnection(getConfiguration());
             final List<SQLParam> values = new ArrayList<>();
-            final Integer sqlType = con.getColumnType("changelog");
+            final Integer sqlType = this.conn.getColumnType("changelog");
             Object tokenVal;
             try {
                 tokenVal = SQLUtil.attribute2jdbcValue(changelog.toString(), sqlType);
@@ -434,7 +434,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
             }
             values.add(new SQLParam("changelog", tokenVal, sqlType));
             values.add(new SQLParam("accountId", uid.getUidValue(), Types.VARCHAR));
-            ps = conn.prepareStatement(SQL_TEMPLATE, values);
+            ps = conn.prepareStatement(sqlTemplate, values);
             ps.execute();
             conn.commit();
         } finally {
@@ -442,7 +442,7 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
             SQLUtil.closeQuietly(conn);
         }
         // attempt to find the newly created object..
-        final SyncToken latestSyncToken = con.getLatestSyncToken(ObjectClass.ACCOUNT);
+        final SyncToken latestSyncToken = this.conn.getLatestSyncToken(ObjectClass.ACCOUNT);
         assertNotNull(latestSyncToken);
         final Object actual = latestSyncToken.getValue();
         assertEquals(changelog, actual);
@@ -469,22 +469,22 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
     @Test
     public void testTimestampColumnNative() throws Exception {
         if (DRIVER.contains("mysql")) {
-            // MySql doesn't permit to store microseconds. 
+            // MySql doesn't permit to store microseconds.
             // This test is not applicable for this DBMS.
             return;
         }
         LOG.ok("testCreateCall");
         DatabaseTableConfiguration cfg = getConfiguration();
         cfg.setNativeTimestamps(true);
-        con = getConnector(cfg);
+        conn = getConnector(cfg);
         Set<Attribute> expected = getCreateAttributeSet(cfg);
         Attribute changed = AttributeUtil.find(CHANGED, expected);
         expected.remove(changed);
         expected.add(AttributeBuilder.build(CHANGED,
                 Timestamp.valueOf("2005-12-07 10:29:01.5").toString()));
-        Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
+        Uid uid = conn.create(ObjectClass.ACCOUNT, expected, null);
         // attempt to get the record back..
-        List<ConnectorObject> results = TestHelpers.searchToList(con, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
+        List<ConnectorObject> results = TestHelpers.searchToList(conn, ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
         assertTrue(results.size() == 1);
         final ConnectorObject co = results.get(0);
         assertNotNull(co);
@@ -509,22 +509,22 @@ public class DatabaseTableTests extends DatabaseTableTestBase {
     public void testTimestampColumnNotNative()
             throws Exception {
         if (DRIVER.contains("mysql")) {
-            // MySql doesn't permit to store microseconds. 
+            // MySql doesn't permit to store microseconds.
             // This test is not applicable for this DBMS.
             return;
         }
         LOG.ok("testCreateCall");
         DatabaseTableConfiguration cfg = getConfiguration();
         cfg.setNativeTimestamps(false);
-        con = getConnector(cfg);
+        conn = getConnector(cfg);
         Set<Attribute> expected = getCreateAttributeSet(cfg);
         Attribute changed = AttributeUtil.find(CHANGED, expected);
         expected.remove(changed);
         expected.add(AttributeBuilder.build(CHANGED,
                 Timestamp.valueOf("2005-12-07 10:29:01.5").toString()));
-        Uid uid = con.create(ObjectClass.ACCOUNT, expected, null);
+        Uid uid = conn.create(ObjectClass.ACCOUNT, expected, null);
         // attempt to get the record back..
-        List<ConnectorObject> results = TestHelpers.searchToList(con,
+        List<ConnectorObject> results = TestHelpers.searchToList(conn,
                 ObjectClass.ACCOUNT, FilterBuilder.equalTo(uid));
         assertEquals(1, results.size());
         final ConnectorObject co = results.get(0);

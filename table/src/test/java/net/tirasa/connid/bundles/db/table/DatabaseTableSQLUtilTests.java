@@ -61,13 +61,10 @@ public class DatabaseTableSQLUtilTests {
      */
     @Test
     public void testGetColumnValues() throws SQLException {
-        final String TEST1 = "test1";
-
-        final String TEST_VAL1 = "testValue1";
-
-        final String TEST2 = "test2";
-
-        final String TEST_VAL2 = "testValue2";
+        final String test1 = "test1";
+        final String testVal1 = "testValue1";
+        final String test2 = "test2";
+        final String testVal2 = "testValue2";
 
         //Resultset
         final ExpectProxy<ResultSet> trs = new ExpectProxy<>();
@@ -83,17 +80,17 @@ public class DatabaseTableSQLUtilTests {
 
         trsmd.expectAndReturn("getColumnCount", 2);
 
-        trsmd.expectAndReturn("getColumnName", TEST1);
+        trsmd.expectAndReturn("getColumnName", test1);
 
         trsmd.expectAndReturn("getColumnType", Types.VARCHAR);
 
-        trs.expectAndReturn("getString", TEST_VAL1);
+        trs.expectAndReturn("getString", testVal1);
 
-        trsmd.expectAndReturn("getColumnName", TEST2);
+        trsmd.expectAndReturn("getColumnName", test2);
 
         trsmd.expectAndReturn("getColumnType", Types.VARCHAR);
 
-        trs.expectAndReturn("getString", TEST_VAL2);
+        trs.expectAndReturn("getString", testVal2);
 
         final DefaultStrategy derbyDbStrategy = new DefaultStrategy();
 
@@ -102,13 +99,13 @@ public class DatabaseTableSQLUtilTests {
         assertTrue(trsmd.isDone());
         assertEquals(2, actual.size());
 
-        final SQLParam tv1 = actual.get(TEST1);
+        final SQLParam tv1 = actual.get(test1);
         assertNotNull(tv1);
-        assertEquals(TEST_VAL1, tv1.getValue());
+        assertEquals(testVal1, tv1.getValue());
 
-        final SQLParam tv2 = actual.get(TEST2);
+        final SQLParam tv2 = actual.get(test2);
         assertNotNull(tv2);
-        assertEquals(TEST_VAL2, tv2.getValue());
+        assertEquals(testVal2, tv2.getValue());
     }
 
     /**
@@ -126,8 +123,8 @@ public class DatabaseTableSQLUtilTests {
         data.put("brackets", new Pair<>("fadlkfj", "[fadlkfj]"));
 
         for (Map.Entry<String, Pair<String, String>> entry : data.entrySet()) {
-            final String actual = DatabaseTableSQLUtil.quoteName(entry.getKey(), entry.getValue().first);
-            assertEquals(entry.getValue().second, actual);
+            final String actual = DatabaseTableSQLUtil.quoteName(entry.getKey(), entry.getValue().getKey());
+            assertEquals(entry.getValue().getValue(), actual);
         }
     }
 

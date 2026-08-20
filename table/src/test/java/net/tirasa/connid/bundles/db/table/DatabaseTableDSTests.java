@@ -47,7 +47,7 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
     private static final String TEST_DS = "testDS";
 
     //jndi for datasource
-    private static final String[] jndiProperties = new String[] {
+    private static final String[] JNDI_PROPERTIES = new String[] {
         "java.naming.factory.initial=" + MockContextFactory.class.getName() };
 
     /**
@@ -63,7 +63,7 @@ public class DatabaseTableDSTests extends DatabaseTableTests {
         config.setJdbcDriver(DRIVER);
         config.setDatasource(TEST_DS);
         config.setTable(DB_TABLE);
-        config.setJndiProperties(jndiProperties);
+        config.setJndiProperties(JNDI_PROPERTIES);
         config.setChangeLogColumn(CHANGELOG);
         config.setKeyColumn(KEYCOLUMN);
         config.setPasswordColumn(PASSWORDCOLUMN);

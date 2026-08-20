@@ -28,7 +28,7 @@ import java.nio.charset.Charset;
 
 public class ClearText extends EncodeAlgorithm {
 
-    private final static String NAME = "CLEARTEXT";
+    private static final String NAME = "CLEARTEXT";
 
     @Override
     public String encode(final String clearPwd, final String charsetName)

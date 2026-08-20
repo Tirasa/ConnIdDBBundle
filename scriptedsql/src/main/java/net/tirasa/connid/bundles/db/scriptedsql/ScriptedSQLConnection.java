@@ -44,12 +44,12 @@ public class ScriptedSQLConnection {
      */
     private static final Log LOG = Log.getLog(ScriptedSQLConnection.class);
 
-    private final ScriptedSQLConfiguration _configuration;
+    private final ScriptedSQLConfiguration configuration;
 
     private Connection sqlConn = null;
 
     public ScriptedSQLConnection(final ScriptedSQLConfiguration configuration) {
-        _configuration = configuration;
+        this.configuration = configuration;
     }
 
     /**
@@ -123,7 +123,7 @@ public class ScriptedSQLConnection {
      */
     public Connection getSqlConnection() {
         if (sqlConn == null) {
-            sqlConn = connect(_configuration);
+            sqlConn = connect(configuration);
         }
         return this.sqlConn;
     }

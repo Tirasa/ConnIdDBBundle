@@ -23,31 +23,15 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.DEFAULT_PASSWORD_CHARSET;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.EMPTY_STR;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_INVALID_QUOTING;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_KEY_COLUMN_BLANK;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_KEY_COLUMN_EQ_CHANGE_LOG_COLUMN;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_PASSWD_COLUMN_EQ_CHANGE_LOG_COLUMN;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_PASSWD_COLUMN_EQ_KEY_COLUMN;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_PWD_ENCODING_UNSUPPORTED;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_TABLE_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_DATABASE_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_HOST_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_JDBC_DRIVER_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_JDBC_DRIVER_NOT_FOUND;
-import static net.tirasa.connid.commons.db.Constants.MSG_JDBC_TEMPLATE_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_PASSWORD_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_PORT_BLANK;
-import static net.tirasa.connid.commons.db.Constants.MSG_USER_BLANK;
-
 import java.nio.charset.Charset;
+import net.tirasa.connid.bundles.db.table.security.SupportedAlgorithm;
+import net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants;
+import net.tirasa.connid.bundles.db.table.util.DatabaseTableSQLUtil;
+import net.tirasa.connid.commons.db.Constants;
+import net.tirasa.connid.commons.db.JNDIUtil;
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
-import net.tirasa.connid.bundles.db.table.util.DatabaseTableSQLUtil;
-import net.tirasa.connid.bundles.db.table.security.SupportedAlgorithm;
-import net.tirasa.connid.commons.db.JNDIUtil;
 import org.identityconnectors.framework.common.serializer.SerializerUtil;
 import org.identityconnectors.framework.spi.AbstractConfiguration;
 import org.identityconnectors.framework.spi.Configuration;
@@ -76,7 +60,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * How to quote a column in SQL statements. Possible values can be NONE, SINGLE, DOUBLE, BRACKETS, BACKSLASH
      */
-    private String quoting = EMPTY_STR;
+    private String quoting = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * NameQoute getter
@@ -102,7 +86,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * The host value
      */
-    private String host = EMPTY_STR;
+    private String host = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * @return quoting value
@@ -121,7 +105,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * The port value
      */
-    private String port = EMPTY_STR;
+    private String port = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * NameQuote getter
@@ -149,7 +133,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * should have rights to insert/update/delete the rows in the configured identity holder table. Required
      * configuration property, and should be validated
      */
-    private String user = EMPTY_STR;
+    private String user = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * @return user value
@@ -189,7 +173,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * Database name.
      */
-    private String database = EMPTY_STR;
+    private String database = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * @return user value
@@ -208,7 +192,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * Database Table name. The name of the identity holder table (Integration table).
      */
-    private String table = EMPTY_STR;
+    private String table = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * The table name
@@ -234,7 +218,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * Key Column, The name of the key column is required This non empty value must be validated
      */
-    private String keyColumn = EMPTY_STR;
+    private String keyColumn = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * Key Column getter
@@ -263,7 +247,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * Password Column. If non empty, password is supported in the schema empty password column means, the password is
      * not supported and also should not be in the schema
      */
-    private String passwordColumn = EMPTY_STR;
+    private String passwordColumn = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * Password Column getter
@@ -292,7 +276,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * given by property 'disabledStatusValue'. Enabled status value are given by property 'enabledStatusValue'. Default
      * value will be 'defaultStatusValue'.
      */
-    private String statusColumn = EMPTY_STR;
+    private String statusColumn = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * Status Column getter
@@ -398,7 +382,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * The Driver class. The jdbcDriver is located by connector framework to connect to database. *
      * Required configuration property (when not using a Datasource), and should be validated
      */
-    private String jdbcDriver = EMPTY_STR;
+    private String jdbcDriver = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * @return jdbcDriver value
@@ -418,7 +402,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * Database connection URL. The url is used to connect to database. Required configuration *
      * property (when not using a Datasource), and should be validated
      */
-    private String jdbcUrlTemplate = EMPTY_STR;
+    private String jdbcUrlTemplate = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * Return the jdbcUrlTemplate
@@ -439,7 +423,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * The empty string setting allow conversion of a null into an empty string for not-null char columns
      */
-    public boolean enableEmptyString = false;
+    private boolean enableEmptyString = false;
 
     /**
      * Accessor for the enableEmptyString property
@@ -466,7 +450,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * Some database drivers will throw the SQLError when setting the parameters to the statement with zero ErrorCode.
      * This mean no error. This switch allow to switch off ignoring this SQLError
      */
-    public boolean rethrowAllSQLExceptions = true;
+    private boolean rethrowAllSQLExceptions = true;
 
     /**
      * Accessor for the rethrowAllSQLExceptions property
@@ -493,7 +477,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * Some JDBC drivers (ex: Oracle) may not be able to get correct string representation of TIMESTAMP data type of the
      * column from the database table. To get correct value , one needs to use rs.getTimestamp() rather rs.getString().
      */
-    public boolean nativeTimestamps = false;
+    private boolean nativeTimestamps = false;
 
     /**
      * Accessor for the nativeTimestamps property
@@ -519,7 +503,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * Some JDBC drivers (ex: DerbyDB) may need to access all the datatypes with native types to get correct value.
      */
-    public boolean allNative = false;
+    private boolean allNative = false;
 
     /**
      * Accessor for the allNativeproperty
@@ -574,7 +558,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
      * Change Log Column (should automatically add ORDER BY) If the value is non empty, the SyncOp should be supported
      * It could be nativeTimestamps.
      */
-    private String changeLogColumn = EMPTY_STR;
+    private String changeLogColumn = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * Log Column is required be SyncOp
@@ -598,7 +582,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * The datasource name is used to connect to database.
      */
-    private String datasource = EMPTY_STR;
+    private String datasource = DatabaseTableConstants.EMPTY_STR;
 
     /**
      * Return the datasource
@@ -707,7 +691,7 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
     /**
      * clear password character set used by resource
      */
-    private String passwordCharset = DEFAULT_PASSWORD_CHARSET;
+    private String passwordCharset = DatabaseTableConstants.DEFAULT_PASSWORD_CHARSET;
 
     /**
      * Return password character set used by resource to encode clear password specified as required by java.nio.Charset
@@ -739,24 +723,25 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
         // check that there is a table to query..
         if (StringUtil.isBlank(getTable())) {
-            throw new IllegalArgumentException(getMessage(MSG_TABLE_BLANK));
+            throw new IllegalArgumentException(getMessage(DatabaseTableConstants.MSG_TABLE_BLANK));
         }
 
         // determine if you can get a key column
         if (StringUtil.isBlank(getKeyColumn())) {
-            throw new IllegalArgumentException(getMessage(MSG_KEY_COLUMN_BLANK));
+            throw new IllegalArgumentException(getMessage(DatabaseTableConstants.MSG_KEY_COLUMN_BLANK));
         } else if (getKeyColumn().equalsIgnoreCase(getChangeLogColumn())) {
-            throw new IllegalArgumentException(getMessage(MSG_KEY_COLUMN_EQ_CHANGE_LOG_COLUMN));
+            throw new IllegalArgumentException(getMessage(DatabaseTableConstants.MSG_KEY_COLUMN_EQ_CHANGE_LOG_COLUMN));
         }
 
         // key column, password column
         if (StringUtil.isNotBlank(getPasswordColumn())) {
             if (getPasswordColumn().equalsIgnoreCase(getKeyColumn())) {
-                throw new IllegalArgumentException(getMessage(MSG_PASSWD_COLUMN_EQ_KEY_COLUMN));
+                throw new IllegalArgumentException(getMessage(DatabaseTableConstants.MSG_PASSWD_COLUMN_EQ_KEY_COLUMN));
             }
 
             if (getPasswordColumn().equalsIgnoreCase(getChangeLogColumn())) {
-                throw new IllegalArgumentException(getMessage(MSG_PASSWD_COLUMN_EQ_CHANGE_LOG_COLUMN));
+                throw new IllegalArgumentException(getMessage(
+                        DatabaseTableConstants.MSG_PASSWD_COLUMN_EQ_CHANGE_LOG_COLUMN));
             }
         }
 
@@ -766,45 +751,45 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
 
             // determine if you can get a connection to the database..
             if (getUser() == null) {
-                throw new IllegalArgumentException(getMessage(MSG_USER_BLANK));
+                throw new IllegalArgumentException(getMessage(Constants.MSG_USER_BLANK));
             }
 
             // check that there is a pwd to query..
             if (getPassword() == null) {
-                throw new IllegalArgumentException(getMessage(MSG_PASSWORD_BLANK));
+                throw new IllegalArgumentException(getMessage(Constants.MSG_PASSWORD_BLANK));
             }
 
             // check the url is configured
             if (StringUtil.isBlank(getJdbcUrlTemplate())) {
-                throw new IllegalArgumentException(getMessage(MSG_JDBC_TEMPLATE_BLANK));
+                throw new IllegalArgumentException(getMessage(Constants.MSG_JDBC_TEMPLATE_BLANK));
             }
 
             // host required
             if (getJdbcUrlTemplate().contains("%h") && StringUtil.isBlank(getHost())) {
-                throw new IllegalArgumentException(getMessage(MSG_HOST_BLANK));
+                throw new IllegalArgumentException(getMessage(Constants.MSG_HOST_BLANK));
             }
 
             // port required
             if (getJdbcUrlTemplate().contains("%p") && StringUtil.isBlank(getPort())) {
 
-                throw new IllegalArgumentException(getMessage(MSG_PORT_BLANK));
+                throw new IllegalArgumentException(getMessage(Constants.MSG_PORT_BLANK));
 
             }
 
             // database required            
             if (getJdbcUrlTemplate().contains("%d") && StringUtil.isBlank(getDatabase())) {
-                throw new IllegalArgumentException(getMessage(MSG_DATABASE_BLANK));
+                throw new IllegalArgumentException(getMessage(Constants.MSG_DATABASE_BLANK));
             }
 
             // make sure the jdbcDriver is in the class path..
             if (StringUtil.isBlank(getJdbcDriver())) {
-                throw new IllegalArgumentException(getMessage(MSG_JDBC_DRIVER_BLANK));
+                throw new IllegalArgumentException(getMessage(Constants.MSG_JDBC_DRIVER_BLANK));
             }
 
             try {
                 Class.forName(getJdbcDriver());
             } catch (ClassNotFoundException e) {
-                throw new IllegalArgumentException(getMessage(MSG_JDBC_DRIVER_NOT_FOUND));
+                throw new IllegalArgumentException(getMessage(Constants.MSG_JDBC_DRIVER_NOT_FOUND));
             }
 
             LOG.ok("Driver configuration is ok");
@@ -820,13 +805,13 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         try {
             DatabaseTableSQLUtil.quoteName(getQuoting(), "test");
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(getMessage(MSG_INVALID_QUOTING, getQuoting()));
+            throw new IllegalArgumentException(getMessage(DatabaseTableConstants.MSG_INVALID_QUOTING, getQuoting()));
         }
 
         // check there if specified password encoding is supported         
         if (StringUtil.isNotBlank(getPasswordCharset())) {
             if (!Charset.availableCharsets().keySet().contains(getPasswordCharset())) {
-                throw new IllegalArgumentException(getMessage(MSG_PWD_ENCODING_UNSUPPORTED));
+                throw new IllegalArgumentException(getMessage(DatabaseTableConstants.MSG_PWD_ENCODING_UNSUPPORTED));
             }
         }
 
@@ -853,14 +838,17 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
             } else if (i + 1 < len) {
                 i++;
                 ch = url.charAt(i);
-                if (ch == '%') {
-                    b.append(ch);
-                } else if (ch == 'h') {
-                    b.append(getHost());
-                } else if (ch == 'p') {
-                    b.append(getPort());
-                } else if (ch == 'd') {
-                    b.append(getDatabase());
+                switch (ch) {
+                    case '%' ->
+                        b.append(ch);
+                    case 'h' ->
+                        b.append(getHost());
+                    case 'p' ->
+                        b.append(getPort());
+                    case 'd' ->
+                        b.append(getDatabase());
+                    default -> {
+                    }
                 }
             }
         }
@@ -894,5 +882,4 @@ public class DatabaseTableConfiguration extends AbstractConfiguration {
         LOG.ok("Get for a key {0} connector message {1}", key, fmt);
         return fmt;
     }
-
 }

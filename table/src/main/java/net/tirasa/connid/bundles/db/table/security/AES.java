@@ -33,7 +33,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class AES extends EncodeAlgorithm {
 
-    private final static String NAME = "AES";
+    private static final String NAME = "AES";
 
     private SecretKeySpec keySpec = null;
 

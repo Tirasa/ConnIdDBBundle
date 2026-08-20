@@ -26,7 +26,7 @@ package net.tirasa.connid.bundles.db.table.util;
 /**
  * The database table constants.
  */
-public class DatabaseTableConstants {
+public final class DatabaseTableConstants {
 
     /** The default value for the RA_DRIVER resource attribute. */
     public static final String DEFAULT_DRIVER = "oracle.jdbc.driver.OracleDriver";
@@ -83,7 +83,5 @@ public class DatabaseTableConstants {
     public static final String MSG_TABLE_BLANK = "table.blank";
 
     private DatabaseTableConstants() {
-        throw new AssertionError();
     }
-
 }

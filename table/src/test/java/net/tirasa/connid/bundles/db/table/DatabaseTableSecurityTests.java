@@ -30,15 +30,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import net.tirasa.connid.bundles.db.table.security.AES;
 import net.tirasa.connid.bundles.db.table.security.EncodeAlgorithm;
 import net.tirasa.connid.bundles.db.table.security.MD5;
-import net.tirasa.connid.bundles.db.table.security.SHA_1;
-import net.tirasa.connid.bundles.db.table.security.SHA_256;
+import net.tirasa.connid.bundles.db.table.security.SHA1;
+import net.tirasa.connid.bundles.db.table.security.SHA256;
 import org.junit.jupiter.api.Test;
 
 public class DatabaseTableSecurityTests {
 
-    final static String UTF8_CHARSETNAME = "UTF-8";
+    private static final String UTF8_CHARSETNAME = "UTF-8";
 
-    final static String LATIN1_CHARSETNAME = "ISO-8859-1";
+    private static final String LATIN1_CHARSETNAME = "ISO-8859-1";
 
     @Test
     public void aes() throws Exception {
@@ -78,8 +78,8 @@ public class DatabaseTableSecurityTests {
     }
 
     @Test
-    public void sha_1() throws Exception {
-        final String clazz = SHA_1.class.getName();
+    public void sha1() throws Exception {
+        final String clazz = SHA1.class.getName();
         final EncodeAlgorithm algorithm = (EncodeAlgorithm) Class.forName(clazz).getDeclaredConstructor().newInstance();
         assertEquals("SHA-1", algorithm.getName());
 
@@ -98,8 +98,8 @@ public class DatabaseTableSecurityTests {
     }
 
     @Test
-    public void sha_256() throws Exception {
-        final String clazz = SHA_256.class.getName();
+    public void sha256() throws Exception {
+        final String clazz = SHA256.class.getName();
         final EncodeAlgorithm algorithm = (EncodeAlgorithm) Class.forName(clazz).getDeclaredConstructor().newInstance();
         assertEquals("SHA-256", algorithm.getName());
 

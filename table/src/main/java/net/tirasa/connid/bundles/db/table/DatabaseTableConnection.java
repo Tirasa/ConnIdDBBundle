@@ -23,9 +23,6 @@
  */
 package net.tirasa.connid.bundles.db.table;
 
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_CAN_NOT_READ;
-import static net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants.MSG_QUERY_INVALID;
-
 import java.lang.reflect.Method;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -36,20 +33,21 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import org.identityconnectors.common.StringUtil;
-import org.identityconnectors.common.logging.Log;
-import org.identityconnectors.common.security.GuardedString;
 import net.tirasa.connid.bundles.db.table.mapping.AttributeConvertor;
 import net.tirasa.connid.bundles.db.table.mapping.DefaultStrategy;
 import net.tirasa.connid.bundles.db.table.mapping.JdbcConvertor;
 import net.tirasa.connid.bundles.db.table.mapping.MappingStrategy;
 import net.tirasa.connid.bundles.db.table.mapping.NativeTimestampsStrategy;
 import net.tirasa.connid.bundles.db.table.mapping.StringStrategy;
+import net.tirasa.connid.bundles.db.table.util.DatabaseTableConstants;
 import net.tirasa.connid.bundles.db.table.util.DatabaseTableSQLUtil;
 import net.tirasa.connid.commons.db.DatabaseConnection;
 import net.tirasa.connid.commons.db.JNDIUtil;
 import net.tirasa.connid.commons.db.SQLParam;
 import net.tirasa.connid.commons.db.SQLUtil;
+import org.identityconnectors.common.StringUtil;
+import org.identityconnectors.common.logging.Log;
+import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.objects.ConnectorMessages;
 import org.identityconnectors.framework.spi.Configuration;
@@ -59,41 +57,21 @@ import org.identityconnectors.framework.spi.Configuration;
  * Wraps JDBC connections extends the DatabaseConnection overriding the test method.
  *
  */
-public class DatabaseTableConnection extends DatabaseConnection {
+public final class DatabaseTableConnection extends DatabaseConnection {
+
+    private static final Log LOG = Log.getLog(DatabaseTableConnection.class);
 
     /**
-     *
-     * Setup logging for the {@link DatabaseTableConnection}.
-     *
-     */
-    private static Log LOG = Log.getLog(DatabaseTableConnection.class);
-
-    /**
-     *
      * Get the instance method
      *
-     *
-     *
-     * @param config
-     *
-     * a {@link DatabaseTableConfiguration} object
-     *
+     * @param config a {@link DatabaseTableConfiguration} object
      * @return a new {@link DatabaseTableConnection} connection
-     *
      */
     static DatabaseTableConnection createDBTableConnection(DatabaseTableConfiguration config) {
         Connection connection = getNativeConnection(config);
         return new DatabaseTableConnection(connection, config);
-
     }
 
-    /**
-     *
-     * @param config
-     *
-     * @return
-     *
-     */
     private static java.sql.Connection getNativeConnection(DatabaseTableConfiguration config) {
         java.sql.Connection connection;
         final String login = config.getUser();
@@ -115,13 +93,11 @@ public class DatabaseTableConnection extends DatabaseConnection {
             }
 
             LOG.ok("The new connection using datasource {0} created", datasource);
-
         } else {
             final String driver = config.getJdbcDriver();
             final String connectionUrl = config.formatUrlTemplate();
 
-            LOG.info(
-                    "Get a new connection using connection url {0} and user {1}", connectionUrl, login);
+            LOG.info("Get a new connection using connection url {0} and user {1}", connectionUrl, login);
             connection = SQLUtil.getDriverMangerConnection(driver, connectionUrl, login, password);
             LOG.ok("The new connection using connection url {0} and user {1} created", connectionUrl, login);
         }
@@ -165,43 +141,25 @@ public class DatabaseTableConnection extends DatabaseConnection {
     }
 
     /**
-     *
      * DefaultStrategy is a default jdbc attribute mapping strategy
-     *
      */
     private MappingStrategy sms = null;
 
     /**
      *
      * Information from the {@link Configuration} can help determine how to test the viability of the {@link Connection}
-     *
-     * .
-     *
      */
-    final DatabaseTableConfiguration config;
+    private final DatabaseTableConfiguration config;
 
     /**
-     *
      * Use the {@link Configuration} passed in to immediately connect to a database. If the {@link Connection} fails a
-     *
      * {@link RuntimeException} will be thrown.
      *
-     *
-     *
-     * @param conn
-     *
-     * Connection created in the time of calling the newConnection
-     *
-     * @param config
-     *
-     * Configuration required to obtain a valid connection.
-     *
-     * @throws RuntimeException
-     *
-     * if there is a problem creating a {@link java.sql.Connection}.
-     *
+     * @param conn Connection created in the time of calling the newConnection
+     * @param config Configuration required to obtain a valid connection.
+     * @throws RuntimeException if there is a problem creating a {@link java.sql.Connection}.
      */
-    private DatabaseTableConnection(Connection conn, DatabaseTableConfiguration config) {
+    private DatabaseTableConnection(final Connection conn, final DatabaseTableConfiguration config) {
         super(conn);
         this.config = config;
         this.sms = createMappingStrategy(conn, config);
@@ -315,14 +273,13 @@ public class DatabaseTableConnection extends DatabaseConnection {
                     // should have thrown if server was down don't get the
                     // ResultSet, we don't want it if we got to this point and
                     // the SQL was not a query, give a hint why we failed
-                    throw new ConnectorException(config.getMessage(MSG_QUERY_INVALID, sql));
+                    throw new ConnectorException(config.getMessage(DatabaseTableConstants.MSG_QUERY_INVALID, sql));
                 }
                 LOG.ok("connection is valid");
             } catch (Exception ex) {
-
                 // anything, not just SQLException
                 // nothing to do, just invalidate the connection
-                throw new ConnectorException(config.getMessage(MSG_CAN_NOT_READ, sql), ex);
+                throw new ConnectorException(config.getMessage(DatabaseTableConstants.MSG_CAN_NOT_READ, sql), ex);
             } finally {
                 SQLUtil.closeQuietly(stmt);
             }

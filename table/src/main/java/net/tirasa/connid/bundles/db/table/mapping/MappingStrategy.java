@@ -56,7 +56,7 @@ public interface MappingStrategy {
      * @param parm parameter
      * @throws SQLException any SQL error
      */
-    void setSQLParam(final PreparedStatement stmt, final int idx, SQLParam parm) throws SQLException;
+    void setSQLParam(PreparedStatement stmt, int idx, SQLParam parm) throws SQLException;
 
     /**
      * Convert database type to connector supported set of attribute types
